@@ -13,9 +13,9 @@ class BoundaryCalculator:
         self.c = c
 
 
-    def calculate_boundaries(self, task, schedule):
-        lcb = calculate_left_boundary(task, schedule)
-        rcb = calculate_right_boundary(task, schedule)
+    def calculate_boundaries(self, task, scheduling):
+        lcb = calculate_left_boundary(task, scheduling)
+        rcb = calculate_right_boundary(task, scheduling)
 
         available_time = self.deadline - lcb - rcb
         available_time_to_use = round(self.c * available_time)

@@ -1,4 +1,4 @@
-def calculate_left_boundary(task, schedule):
+def calculate_left_boundary(task, scheduling):
 
     if len(task.predecessors) == 0:
         return 0
@@ -6,8 +6,8 @@ def calculate_left_boundary(task, schedule):
     max_predecessor_finish_time = -1
     for p in task.predecessors:
 
-        if p.id in schedule:
-            older_ft = schedule[p.id]
+        if p.id in scheduling:
+            older_ft = scheduling[p.id]
             # TODO return if a scheduled previous task is limiting
         else:
             older_ft = max_finish_time(p)
@@ -18,15 +18,15 @@ def calculate_left_boundary(task, schedule):
     return max_predecessor_finish_time
 
 
-def calculate_right_boundary(task, schedule):
+def calculate_right_boundary(task, scheduling):
     # TODO take in account the scheduling
     if len(task.successors) == 0:
         return 0
 
     max_successor_start_time = -1
     for s in task.successors:
-        if s.id in schedule:
-            s_min_start_time = schedule[s.id]
+        if s.id in scheduling:
+            s_min_start_time = scheduling[s.id]
         else:
             s_min_start_time = min_start_time(s)
 
