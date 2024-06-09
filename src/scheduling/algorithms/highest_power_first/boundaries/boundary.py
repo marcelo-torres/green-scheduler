@@ -1,6 +1,6 @@
-from src.scheduling_algorithms.highest_power_first.boundaries.constant_boundary import calculate_left_boundary, \
+from src.scheduling.algorithms.highest_power_first.boundaries.constant_boundary import calculate_left_boundary, \
     calculate_right_boundary
-from src.scheduling_algorithms.highest_power_first.calc_levels import calc_levels
+from src.scheduling.algorithms.highest_power_first.calc_levels import calc_levels
 
 
 class BoundaryCalculator:

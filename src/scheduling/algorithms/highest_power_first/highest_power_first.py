@@ -1,8 +1,8 @@
 import math
-from collections import deque
 
-from src.scheduling_algorithms.highest_power_first.boundaries.boundary import BoundaryCalculator
-from src.scheduling_algorithms.highest_power_first.drawer import Drawer
+from src.scheduling.algorithms.highest_power_first.boundaries.boundary import BoundaryCalculator
+from src.scheduling.algorithms.highest_power_first.drawer import Drawer
+from src.scheduling.energy_usage_calculator import EnergyUsageCalculator
 from src.task_graph.task_graph import TaskGraph
 
 
@@ -105,7 +105,7 @@ def show_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, schedu
     drawer.show()
 
 
-def find_min_brown_energy(task, lb, rb, green_energy, interval_size):
+def find_min_brown_energy(task, lb, rb, scheduling, calculator):
     # TODO - to optimize this function
 
     start = lb
@@ -114,14 +114,11 @@ def find_min_brown_energy(task, lb, rb, green_energy, interval_size):
     min_brown_energy_usage = float('inf')
 
     while start + task.runtime < rb:
-        brown_energy_usage = 0
-        for j in range(task.runtime):
-            g = math.ceil((j + start) / interval_size)
-            green_power = green_energy[g]
-            if green_power < task.power:
-                brown_energy_usage += task.power - green_power
-        if brown_energy_usage < min_brown_energy_usage:
-            min_brown_energy_usage = brown_energy_usage
+
+        brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage(scheduling, task, start)
+
+        if brown_energy_used < min_brown_energy_usage:
+            min_brown_energy_usage = brown_energy_used
             start_min = start
         start += 1
     return start_min
@@ -132,6 +129,10 @@ def consolidate_tasks(scheduling):
 
 def schedule_graph(graph, deadline, c=0.5):
 
+    # green_energy = [2, 7, 10, 18, 23, 27, 30, 27, 24, 21, 18, 14]
+    green_energy = [20, 40, 30, 20, 10, 5, 3, 2, 1, 4, 5, 6, 8]
+    interval_size = 10
+
     scheduling = {}
 
     tasks = graph.list_of_tasks()
@@ -140,6 +141,7 @@ def schedule_graph(graph, deadline, c=0.5):
     tasks.sort(key=lambda t: t.power * t.runtime, reverse=True)
 
     boundary_calc = BoundaryCalculator(graph, deadline, c)
+    energy_usage_calculator = EnergyUsageCalculator(graph, green_energy, interval_size)
 
     for task in tasks:
 
@@ -149,12 +151,7 @@ def schedule_graph(graph, deadline, c=0.5):
         rb = rcb + rvb
 
         # 2.2) Schedule each task when it uses less brown energy as early as possible
-        interval_size = 10
-        #green_energy = [2, 7, 10, 18, 23, 27, 30, 27, 24, 21, 18, 14]
-        green_energy = [2, 7, 10, 18, 23, 27, 30, 27, 24, 21, 18, 14]
-
-        #schedule[task.id] = lb # TMP - schedule as early as possible
-        scheduling[task.id] = find_min_brown_energy(task, lb, rb, green_energy, interval_size) # TODO - take in account the energy used from tasks
+        scheduling[task.id] = find_min_brown_energy(task, lb, rb, scheduling, energy_usage_calculator)
         show_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, scheduling, graph, task)
     consolidate_tasks(scheduling)
 
