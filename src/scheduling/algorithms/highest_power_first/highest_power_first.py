@@ -6,33 +6,6 @@ from src.scheduling.energy_usage_calculator import EnergyUsageCalculator
 from src.task_graph.task_graph import TaskGraph
 
 
-def create_graph():
-    graph = TaskGraph()
-    graph.set_start_task(0)
-    graph.add_new_task(0, runtime=0, power=0) # Dummy task
-    graph.add_new_task(1, runtime=10, power=14)
-    graph.add_new_task(2, runtime=15, power=10)
-    graph.add_new_task(3, runtime=20, power=12)
-    graph.add_new_task(4, runtime=7, power=18)
-    graph.add_new_task(5, runtime=14, power=14)
-    graph.add_new_task(6, runtime=12, power=16)
-    graph.add_new_task(7, runtime=8, power=4)
-
-    graph.create_dependency(0, 1)
-    graph.create_dependency(0, 2)
-    graph.create_dependency(1, 3)
-    graph.create_dependency(2, 3)
-    graph.create_dependency(3, 6)
-    graph.create_dependency(3, 4)
-    graph.create_dependency(3, 5)
-    graph.create_dependency(4, 6)
-    graph.create_dependency(4, 7)
-    graph.create_dependency(5, 7)
-    graph.create_dependency(6, 7)
-
-    return graph
-
-
 def show_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, scheduling, graph, task):
     drawer = Drawer(60, deadline)
     drawer.add_constant_boundary(0, lcb)
@@ -86,7 +59,7 @@ def show_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, schedu
                 end_o = time_o
 
                 # Check if the current interval overlaps with the current task
-                if (init_o <= start_time <= end_o) or (init_o <= end_time <= end_o):
+                if (init_o < start_time < end_o) or (init_o < end_time < end_o):
                     if interval_power > max_power_overlapped_by_task:
                         max_power_overlapped_by_task = interval_power
 
@@ -105,7 +78,7 @@ def show_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, schedu
     drawer.show()
 
 
-def find_min_brown_energy(task, lb, rb, scheduling, calculator):
+def find_min_brown_energy(task, lb, rb, scheduling, deadline, calculator):
     # TODO - to optimize this function
 
     start = lb
@@ -113,7 +86,7 @@ def find_min_brown_energy(task, lb, rb, scheduling, calculator):
     start_min = start
     min_brown_energy_usage = float('inf')
 
-    while start + task.runtime < rb:
+    while start + task.runtime <= deadline - rb:
 
         brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage(scheduling, task, start)
 
@@ -123,15 +96,14 @@ def find_min_brown_energy(task, lb, rb, scheduling, calculator):
         start += 1
     return start_min
 
+
 def consolidate_tasks(scheduling):
     # TODO
     pass
 
-def schedule_graph(graph, deadline, c=0.5):
 
-    # green_energy = [2, 7, 10, 18, 23, 27, 30, 27, 24, 21, 18, 14]
-    green_energy = [20, 40, 30, 20, 10, 5, 3, 2, 1, 4, 5, 6, 8]
-    interval_size = 10
+def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None):
+
 
     scheduling = {}
 
@@ -141,20 +113,25 @@ def schedule_graph(graph, deadline, c=0.5):
     tasks.sort(key=lambda t: t.power * t.runtime, reverse=True)
 
     boundary_calc = BoundaryCalculator(graph, deadline, c)
-    energy_usage_calculator = EnergyUsageCalculator(graph, green_energy, interval_size)
+    energy_usage_calculator = EnergyUsageCalculator(graph, green_power, interval_size)
 
     for task in tasks:
 
         # 2.1)  Calculate boundaries to avoid that a single task gets all slack time
-        lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling)
+        lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling, deadline)
         lb = lcb + lvb
         rb = rcb + rvb
 
         # 2.2) Schedule each task when it uses less brown energy as early as possible
-        scheduling[task.id] = find_min_brown_energy(task, lb, rb, scheduling, energy_usage_calculator)
-        show_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, scheduling, graph, task)
+        scheduling[task.id] = find_min_brown_energy(task, lb, rb, scheduling, deadline, energy_usage_calculator)
+
+        if show == 'all':
+            show_graph(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph, task)
+
     consolidate_tasks(scheduling)
 
-G = create_graph()
-schedule_graph(G, 124)
+    if show == 'last' or show == 'all':
+        show_graph(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph, task)
+
+    return scheduling
 

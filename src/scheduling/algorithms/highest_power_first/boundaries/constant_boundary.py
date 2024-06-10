@@ -1,61 +1,66 @@
 def calculate_left_boundary(task, scheduling):
 
     if len(task.predecessors) == 0:
-        return 0
+        return 0, False
 
+    is_limited_by_scheduled_predecessor = False
     max_predecessor_finish_time = -1
     for p in task.predecessors:
 
-        if p.id in scheduling:
-            older_ft = scheduling[p.id]
-            # TODO return if a scheduled previous task is limiting
-        else:
-            older_ft = max_finish_time(p)
+        older_ft = max_finish_time_temp(p, scheduling)
 
         if older_ft > max_predecessor_finish_time:
             max_predecessor_finish_time = older_ft
+            is_limited_by_scheduled_predecessor = (p.id in scheduling)
 
-    return max_predecessor_finish_time
+    return max_predecessor_finish_time, is_limited_by_scheduled_predecessor
 
 
-def calculate_right_boundary(task, scheduling):
-    # TODO take in account the scheduling
+def calculate_right_boundary(task, scheduling, deadline):
     if len(task.successors) == 0:
-        return 0
+        return 0, False
 
+    is_limited_by_scheduled_successor = False
     max_successor_start_time = -1
     for s in task.successors:
-        if s.id in scheduling:
-            s_min_start_time = scheduling[s.id]
-        else:
-            s_min_start_time = min_start_time(s)
+
+        s_min_start_time = min_start_time(s, scheduling, deadline)
 
         if s_min_start_time > max_successor_start_time:
             max_successor_start_time = s_min_start_time
+            is_limited_by_scheduled_successor = (s.id in scheduling)
 
-    return max_successor_start_time
+    return max_successor_start_time, is_limited_by_scheduled_successor
 
 
-def max_finish_time(task):
+def max_finish_time_temp(task, scheduling):
+    if task.id in scheduling:
+        start_time = scheduling[task.id]
+        return task.runtime + start_time
+
     if len(task.predecessors) == 0:
         return task.runtime
 
     max_predecessor_finish_time = -1
     for p in task.predecessors:
-        p_older_finish_time = max_finish_time(p)
+        p_older_finish_time = max_finish_time_temp(p, scheduling)
         if p_older_finish_time > max_predecessor_finish_time:
             max_predecessor_finish_time = p_older_finish_time
 
     return task.runtime + max_predecessor_finish_time
 
 
-def min_start_time(task):
+def min_start_time(task, scheduling, deadline):
+    if task.id in scheduling:
+        start_time = scheduling[task.id]
+        return deadline - start_time
+
     if len(task.successors) == 0:
         return task.runtime
 
     max_successor_start_time = -1
     for s in task.successors:
-        s_min_start_time = min_start_time(s)
+        s_min_start_time = min_start_time(s, scheduling, deadline)
         if s_min_start_time > max_successor_start_time:
             max_successor_start_time = s_min_start_time
 

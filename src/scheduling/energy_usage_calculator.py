@@ -10,7 +10,8 @@ def _append_task_power_events(power_events, task, start_time):
 
 def _append_new_task(power_events, new_task, new_task_start_time):
     if new_task is None or new_task_start_time is None:
-        raise Exception(f'new_task and new_task_start_time cannot be None. Current values: {new_task} and {new_task_start_time}')
+        #print('new_task and new_task_start_time cannot be None. Current values: {new_task} and {new_task_start_time}')
+        return
 
     _append_task_power_events(power_events, new_task, new_task_start_time)
 
