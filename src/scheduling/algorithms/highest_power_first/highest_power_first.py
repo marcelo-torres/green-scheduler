@@ -36,7 +36,7 @@ def show_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, schedu
         # Find task overlaps for current task
         for j in reversed(range(i)):
             task_j, start_time_j, end_time_j = d[j]
-            is_overlap = (start_time_j <= start_time <= end_time_j) or (start_time_j <= end_time <= end_time_j)
+            is_overlap = (start_time_j < start_time < end_time_j) or (start_time_j < end_time < end_time_j)
             if is_overlap:
                 overlap_locations.append(
                     (start_time_j, task_j, 'start')
