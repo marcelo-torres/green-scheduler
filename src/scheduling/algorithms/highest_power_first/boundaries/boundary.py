@@ -12,9 +12,9 @@ class BoundaryCalculator:
         self.deadline = deadline
         self.c = c
 
-    def calculate_boundaries(self, task, scheduling, deadline):
+    def calculate_boundaries(self, task, scheduling):
         lcb, is_limited_by_scheduled_predecessor = calculate_left_boundary(task, scheduling)
-        rcb, is_limited_by_scheduled_successor = calculate_right_boundary(task, scheduling, deadline)
+        rcb, is_limited_by_scheduled_successor = calculate_right_boundary(task, scheduling, self.deadline)
 
         available_time = self.deadline - lcb - rcb
         available_time_to_use = round(self.c * available_time)

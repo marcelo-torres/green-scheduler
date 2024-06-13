@@ -3,6 +3,7 @@ import math
 from src.scheduling.algorithms.highest_power_first.boundaries.boundary import BoundaryCalculator
 from src.scheduling.algorithms.highest_power_first.drawer import Drawer
 from src.scheduling.energy_usage_calculator import EnergyUsageCalculator
+from src.scheduling.topological_ordering import calculate_upward_rank, sort_topologically
 from src.task_graph.task_graph import TaskGraph
 
 
@@ -97,13 +98,39 @@ def find_min_brown_energy(task, lb, rb, scheduling, deadline, calculator):
     return start_min
 
 
-def consolidate_tasks(scheduling):
+def consolidate_tasks(graph, scheduling, boundary_calc, energy_usage_calc):
     # TODO
+
+    # Order tasks by topological order
+    tasks = sort_topologically(graph)
+    for i in range(len(tasks)):
+        task = graph.get_task(tasks[i])
+
+        scheduling_temp = scheduling.copy()
+        scheduling_temp.pop(task.id)
+
+        lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling_temp)
+
+        start_time = scheduling[task.id]
+        min_brown_energy_used = energy_usage_calc.calculate_energy_usage(scheduling_temp, task, start_time)[0]
+
+        for j in range(start_time-lcb):
+
+            new_start_time = lcb + j
+            brown_energy_used = energy_usage_calc.calculate_energy_usage(scheduling_temp, task, new_start_time)[0]
+            if brown_energy_used <= min_brown_energy_used and new_start_time < scheduling[task.id]:
+                min_brown_energy_used = brown_energy_used
+                scheduling[task.id] = new_start_time
+
+    # Iterate each task using Integer index
+    #   Calculate boundary
+    #   Calculate energy usage
+    #   Try to shift left
+
     pass
 
 
 def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None):
-
 
     scheduling = {}
 
@@ -118,7 +145,7 @@ def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None
     for task in tasks:
 
         # 2.1)  Calculate boundaries to avoid that a single task gets all slack time
-        lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling, deadline)
+        lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling)
         lb = lcb + lvb
         rb = rcb + rvb
 
@@ -128,7 +155,15 @@ def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None
         if show == 'all':
             show_graph(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph, task)
 
-    consolidate_tasks(scheduling)
+    if show == 'last' or show == 'all':
+        show_graph(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph, task)
+
+    # brown_energy_used = energy_usage_calculator.calculate_energy_usage(scheduling)[0]
+    # last_task = graph.get_task(7)
+    # makespan = scheduling[last_task.id] + last_task.runtime
+    # print(f'brown_energy_used before consolidation: {brown_energy_used}J | makespan: {makespan}s')
+
+    consolidate_tasks(graph, scheduling, boundary_calc, energy_usage_calculator)
 
     if show == 'last' or show == 'all':
         show_graph(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph, task)

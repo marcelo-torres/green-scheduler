@@ -20,6 +20,11 @@ class TaskGraph:
     def get_task(self, task_id):
         return self.tasks[task_id]
 
+    def get_first_task(self):
+        return self.get_task(
+            self.start_task_id
+        )
+
     def create_dependency(self, task_a_id, task_b_id):
         task_a = self.tasks[task_a_id]
         task_b = self.tasks[task_b_id]
