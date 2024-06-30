@@ -28,12 +28,18 @@ class Drawer:
         rect = patches.Rectangle((start, Drawer.BOUNDARY_HEIGHT), width, power, linewidth=1, edgecolor='green', facecolor='none')
         self.ax.add_patch(rect)
 
-    def add_scheduled_task(self, start, task, y):
-        rect = patches.Rectangle((start, Drawer.BOUNDARY_HEIGHT + y), task.runtime, task.power, linewidth=1, edgecolor='black', facecolor='blue')
-        rx, ry = rect.get_xy()
-        cx = rx + rect.get_width() / 2.0
-        cy = ry + rect.get_height() / 2.0
-        self.ax.annotate(task.id, (cx, cy), color='black', weight='bold', fontsize=10, ha='center', va='center')
+    def add_scheduled_task(self, start, task, y, include_task_id=False):
+        edgecolor = (0, 0, 1, 0.9)
+        facecolor = (0, 0, 1, 0.5)
+
+        rect = patches.Rectangle((start, Drawer.BOUNDARY_HEIGHT + y), task.runtime, task.power, linewidth=1, edgecolor=edgecolor, facecolor=facecolor)
+
+        if include_task_id:
+            rx, ry = rect.get_xy()
+            cx = rx + rect.get_width() / 2.0
+            cy = ry + rect.get_height() / 2.0
+            self.ax.annotate(task.id, (cx, cy), color='black', weight='bold', fontsize=10, ha='center', va='center')
+
         self.ax.add_patch(rect)
 
     def show(self):
