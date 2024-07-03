@@ -5,6 +5,7 @@ from src.data.workflow_parquet_reader import WorkflowTraceArchiveReader
 from src.scheduling.algorithms.highest_power_first.calc_levels import calc_levels
 from src.scheduling.algorithms.highest_power_first.highest_power_first import schedule_graph
 from src.scheduling.energy_usage_calculator import EnergyUsageCalculator
+from src.scheduling.scheduling_check import check
 from src.task_graph.task_graph import TaskGraph
 
 
@@ -106,7 +107,7 @@ def run_single_test():
     reader = WorkflowTraceArchiveReader(resources_path, min_task_power, max_task_power)
     photovoltaReader = PhotovoltaReader(resources_path)
 
-    graph = reader.epigenomics()
+    graph = reader.montage()
 
     min_makespan = calc_critical_path_length(graph)
 
@@ -126,6 +127,13 @@ def run_single_test():
     makespan = get_makespan(scheduling, graph)
 
     print(f'brown_energy_used: {brown_energy_used}J | makespan: {makespan}s')
+
+    scheduling_violations = check(scheduling, graph)
+    if len(scheduling_violations) > 0:
+        print(f'\n {len(scheduling_violations)} scheduling violations were found')
+        for task_id, start, pred_id, pred_finish_time in scheduling_violations:
+            print(f'Task {task_id} start: {start} | Pred {pred_id} finish time: {pred_finish_time}')
+
 
 if __name__ == '__main__':
 

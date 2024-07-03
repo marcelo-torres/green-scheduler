@@ -11,8 +11,6 @@ def calc_levels(graph):
 
 def calc_levels_recursive(task, current_level, levels, visited_tasks):
 
-    print(task.id)
-
     if task.id in visited_tasks:
         return visited_tasks[task.id]
 
