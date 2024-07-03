@@ -1,14 +1,8 @@
-import math
-import time
-
 from src.scheduling.algorithms.highest_power_first.boundaries.boundary import BoundaryCalculator
-from src.scheduling.algorithms.highest_power_first.drawer import Drawer
+from src.scheduling.drawer.drawer import Drawer
 from src.scheduling.algorithms.highest_power_first.shift_left.shift_left import shift_left_tasks_to_save_energy
-from src.scheduling.energy_usage_calculator import EnergyUsageCalculator
-from src.scheduling.find_min_brown_energy_start_time import find_min_brown_energy, find_min_brown_energy_greedy
-from src.scheduling.topological_ordering import calculate_upward_rank, sort_topologically
-from src.task_graph.task_graph import TaskGraph
-from src.util.stopwatch import Stopwatch
+from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
+from src.scheduling.energy.find_min_brown_energy_start_time import find_min_brown_energy
 
 
 def show_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, scheduling, graph, max_power=60):

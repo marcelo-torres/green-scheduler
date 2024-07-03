@@ -1,4 +1,4 @@
-from src.task_graph.task import Task
+from src.scheduling.task_graph.task import Task
 
 
 class TaskGraph:

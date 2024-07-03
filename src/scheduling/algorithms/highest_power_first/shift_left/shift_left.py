@@ -1,7 +1,5 @@
-import time
-
-from src.scheduling.find_min_brown_energy_start_time import find_min_brown_energy
-from src.scheduling.topological_ordering import sort_topologically
+from src.scheduling.energy.find_min_brown_energy_start_time import find_min_brown_energy
+from src.scheduling.util.topological_ordering import sort_topologically
 
 
 def shift_left_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energy_usage_calc):

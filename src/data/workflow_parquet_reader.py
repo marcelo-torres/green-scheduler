@@ -2,7 +2,7 @@ import random
 
 import pandas as pd
 
-from src.task_graph.task_graph import TaskGraph
+from src.scheduling.task_graph.task_graph import TaskGraph
 
 
 class WorkflowTraceArchiveReader:

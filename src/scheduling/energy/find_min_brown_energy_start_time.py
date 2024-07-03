@@ -1,7 +1,6 @@
 from collections import deque
 
-from src.task_graph.task import Task
-from src.util.stopwatch import Stopwatch
+from src.scheduling.task_graph.task import Task
 
 
 def find_min_brown_energy_greedy(task, lb, rb, deadline, calculator):

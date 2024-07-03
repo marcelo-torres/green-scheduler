@@ -2,11 +2,12 @@ import time
 
 from src.data.photovolta import PhotovoltaReader
 from src.data.workflow_parquet_reader import WorkflowTraceArchiveReader
-from src.scheduling.algorithms.highest_power_first.calc_levels import calc_levels
 from src.scheduling.algorithms.highest_power_first.highest_power_first import schedule_graph
-from src.scheduling.energy_usage_calculator import EnergyUsageCalculator
-from src.scheduling.scheduling_check import check
-from src.task_graph.task_graph import TaskGraph
+from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
+from src.scheduling.util.critical_path_length_calculator import calc_critical_path_length
+from src.scheduling.util.makespan_calculator import calc_makespan
+from src.scheduling.util.scheduling_check import check
+from src.scheduling.task_graph.task_graph import TaskGraph
 
 
 # Project structure https://docs.python-guide.org/writing/structure/
@@ -62,39 +63,9 @@ def run_all_tests():
             print(f'c={c}:\tbrown_energy_used: {brown_energy_used}J | makespan: {makespan}s')
         print()
 
-def calc_critical_path_length(graph):
-    levels, max_level = calc_levels(graph)
 
-    max_of_level = {}
 
-    for task_id, level in levels.items():
-        task = graph.get_task(task_id)
 
-        if level not in max_of_level:
-            max_of_level[level] = task.runtime
-        else:
-            current_max = max_of_level[level]
-            if task.runtime > current_max:
-                max_of_level[level] = task.runtime
-
-    critical_path_length = 0
-    for level, max_runtime in max_of_level.items():
-        critical_path_length += max_runtime
-
-    return critical_path_length
-
-def get_makespan(scheduling, graph):
-
-    max_finish_time = -1
-
-    for task_id, start_time in scheduling.items():
-        task = graph.get_task(task_id)
-        finish_time = start_time + task.runtime
-
-        if finish_time > max_finish_time:
-            max_finish_time = finish_time
-
-    return max_finish_time
 
 
 def run_single_test():
@@ -107,7 +78,7 @@ def run_single_test():
     reader = WorkflowTraceArchiveReader(resources_path, min_task_power, max_task_power)
     photovoltaReader = PhotovoltaReader(resources_path)
 
-    graph = reader.montage()
+    graph = reader.epigenomics()
 
     min_makespan = calc_critical_path_length(graph)
 
@@ -124,7 +95,7 @@ def run_single_test():
     calculator = EnergyUsageCalculator(graph, green_power, interval_size)
     brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling)
 
-    makespan = get_makespan(scheduling, graph)
+    makespan = calc_makespan(scheduling, graph)
 
     print(f'brown_energy_used: {brown_energy_used}J | makespan: {makespan}s')
 
