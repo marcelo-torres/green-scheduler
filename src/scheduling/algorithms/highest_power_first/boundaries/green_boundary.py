@@ -1,12 +1,9 @@
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
-
-from src.scheduling.algorithms.highest_power_first.boundaries.constant_boundary import calculate_left_boundary, \
-    calculate_right_boundary
+from src.scheduling.algorithms.highest_power_first.boundaries.constant_boundary import calculate_right_boundary, \
+    calculate_left_boundary
 from src.scheduling.algorithms.highest_power_first.calc_levels import calc_levels
 
 
-class BoundaryCalculator:
-
+class GreenBoundaryCalculator:
     def __init__(self, graph, deadline, c):
         task_levels, max_level = calc_levels(graph)
         self.task_levels = task_levels
@@ -19,17 +16,8 @@ class BoundaryCalculator:
         rcb, is_limited_by_scheduled_successor = calculate_right_boundary(task, scheduling, self.deadline)
 
         available_time = self.deadline - lcb - rcb
-        available_time_to_use = round(self.c * available_time)
 
-        task_level = float(self.task_levels[task.id])
-        left_c = task_level / self.max_level
-        right_c = 1 - left_c
-
-        #lvb = available_time_to_use * left_c
-        #rvb = available_time_to_use * right_c
-
-        lvb = round(available_time_to_use * left_c)
-        rvb = available_time_to_use - lvb
+        # TODO
 
         if lcb == 0 or is_limited_by_scheduled_predecessor:
             lvb = 0
@@ -38,10 +26,3 @@ class BoundaryCalculator:
             rvb = 0
 
         return lcb, lvb, rcb, rvb
-
-        # lb = lcb + lvb
-        # rb = rcb + rvb
-
-
-
-        #return lb, rb

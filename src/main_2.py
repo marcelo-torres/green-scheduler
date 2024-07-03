@@ -55,14 +55,14 @@ def run_all_tests():
             print(c)
             scheduling = schedule_graph(graph, 124, green_power, interval_size, c=c, show='all')
             calculator = EnergyUsageCalculator(graph, green_power, interval_size)
-            brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage(scheduling)
+            brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling)
             last_task = graph.get_task(7)
             makespan = scheduling[last_task.id] + last_task.runtime
             print(f'c={c}:\tbrown_energy_used: {brown_energy_used}J | makespan: {makespan}s')
         print()
 
 def calc_critical_path_length(graph):
-    levels, max_level =  calc_levels(graph)
+    levels, max_level = calc_levels(graph)
 
     max_of_level = {}
 
@@ -116,22 +116,24 @@ def run_single_test():
     #green_power = [gp * 1 for gp in green_power]
 
     green_power = photovoltaReader.get_trace_1()
-    interval_size = 10 #int(min_makespan / len(green_power)) + 1
+    interval_size = 100 #int(min_makespan / len(green_power)) + 1
 
-    scheduling = schedule_graph(graph, min_makespan * 2, green_power, interval_size, c=0.30, show='off', max_power=max_green_power)
+    scheduling = schedule_graph(graph, min_makespan * 2, green_power, interval_size, c=0.30, show='last', max_power=max_green_power)
 
     calculator = EnergyUsageCalculator(graph, green_power, interval_size)
-    brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage(scheduling)
+    brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling)
 
     makespan = get_makespan(scheduling, graph)
 
     print(f'brown_energy_used: {brown_energy_used}J | makespan: {makespan}s')
 
 if __name__ == '__main__':
+
     start_time = time.time()
 
     #run_all_tests()
     run_single_test()
 
     print("--- %s seconds ---" % (time.time() - start_time))
+
 
