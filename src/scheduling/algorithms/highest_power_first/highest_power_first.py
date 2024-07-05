@@ -75,7 +75,18 @@ def create_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, sche
     #drawer.add_task(schedule[task.id], task)
     return drawer
 
-def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None, max_power=60, figure_file=None):
+
+def get_task_ordering(key):
+    task_ordering = {
+        'energy': lambda t: t.power * t.runtime,
+        'power': lambda t: t.power,
+        'runtime': lambda t: t.runtime,
+    }
+
+    return task_ordering[key]
+
+
+def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None, max_power=60, figure_file=None, task_ordering='energy'):
 
     scheduling = {}
     lcb = lvb = rcb = rvb = 0
@@ -89,12 +100,10 @@ def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None
         drawer = create_graph(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph, max_power)
         drawer.save(file)
 
-
-
     tasks = graph.list_of_tasks()
 
-    # 1) Order all tasks by energy usage (power * runtime)
-    tasks.sort(key=lambda t: t.power * t.runtime, reverse=True)
+    # 1) Order all tasks - default criteria: by energy usage (power * runtime)
+    tasks.sort(key=get_task_ordering(task_ordering), reverse=True)
 
     boundary_calc = BoundaryCalculator(graph, deadline, c)
     energy_usage_calculator = EnergyUsageCalculator(graph, green_power, interval_size)

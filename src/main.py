@@ -49,7 +49,7 @@ def run_all_tests():
     for name, interval_size, green_power in green_intervals:
         for c in c_values:
             print(c)
-            scheduling = schedule_graph(graph, 124, green_power, interval_size, c=c, show='last')
+            scheduling = schedule_graph(graph, 124, green_power, interval_size, c=c, show='last', task_ordering='power')
             calculator = EnergyUsageCalculator(graph, green_power, interval_size)
             brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling)
             last_task = graph.get_task(7)
@@ -60,12 +60,12 @@ def run_all_tests():
 
 def run_single_test():
     graph = create_graph()
-    draw_task_graph(graph)
+    #draw_task_graph(graph)
 
     interval_size = 13
     green_power = [20, 40, 30, 20, 10, 5, 3, 2, 1, 4, 5, 6, 8, 5]
 
-    scheduling = schedule_graph(graph, 124, green_power, interval_size, c=0.50, show='all')
+    scheduling = schedule_graph(graph, 124, green_power, interval_size, c=0.50, show='last', task_ordering='runtime')
 
     calculator = EnergyUsageCalculator(graph, green_power, interval_size)
     brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling)

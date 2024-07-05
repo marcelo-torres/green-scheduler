@@ -25,8 +25,8 @@ def get_experiment_id(dt):
     return dt.strftime("experiments_%Y-%m-%d_%H-%M-%S")
 
 
-def run_highest_power_first(graph, deadline, green_power, interval_size, c, max_green_power, figure_file):
-    scheduling = schedule_graph(graph, deadline, green_power, interval_size, c=c, show='off', max_power=max_green_power, figure_file=figure_file)
+def run_highest_power_first(graph, deadline, green_power, interval_size, c, max_green_power, figure_file, task_ordering_criteria):
+    scheduling = schedule_graph(graph, deadline, green_power, interval_size, c=c, show='off', max_power=max_green_power, figure_file=figure_file, task_ordering=task_ordering_criteria)
 
     # Makespan Report
     makespan = calc_makespan(scheduling, graph)
@@ -76,10 +76,13 @@ if __name__ == '__main__':
         ('trace_2', photovoltaReader.get_trace_2)
     ]
 
+    task_ordering_criterias = ['energy', 'power', 'runtime']
+
     deadline_factors = [1, 2, 4, 8, 10]
     c_values = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95]
 
-    experiments_count = len(graph_providers) * len(green_power_providers) * len(deadline_factors) * len(c_values)
+    experiments_count = (len(graph_providers) * len(green_power_providers) * len(deadline_factors) * len(c_values)
+                         * len(task_ordering_criterias))
     start_time = datetime.now()
     report(f'[{format_date(start_time)}] Starting {experiments_count} experiments...\n')
 
@@ -96,49 +99,53 @@ if __name__ == '__main__':
         stopwatch = Stopwatch()
         stopwatch.start()
 
-        headers = ['experiment', 'workflow', 'energy_trace', 'algorithm', 'deadline', 'deadline_factor', 'c',
-                   'min_makespan', 'makespan', 'brown_energy_used', 'green_energy_not_used', 'total_energy']
+        headers = ['experiment', 'workflow', 'energy_trace', 'algorithm', 'task_ordering', 'deadline',
+                   'deadline_factor', 'c', 'min_makespan', 'makespan', 'brown_energy_used', 'green_energy_not_used',
+                   'total_energy']
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(headers)
 
         i = 1
         for graph_name, graph_provider in graph_providers:
             for g_power_trace_name, green_power_provider in green_power_providers:
-                for deadline_factor in deadline_factors:
-                    for c in c_values:
-                        report(
-                            f'{i}/{experiments_count}: {graph_name} {g_power_trace_name} deadline_factor={deadline_factor} c={c}')
+                for task_ordering_criteria in task_ordering_criterias:
+                    for deadline_factor in deadline_factors:
+                        for c in c_values:
+                            report(
+                                f'{i}/{experiments_count}: {graph_name} {g_power_trace_name} task_ordering={task_ordering_criteria} deadline_factor={deadline_factor} c={c}')
 
-                        graph = graph_provider()
-                        green_power = green_power_provider()
+                            graph = graph_provider()
+                            green_power = green_power_provider()
 
-                        min_makespan = calc_critical_path_length(graph)
-                        deadline = deadline_factor * min_makespan
-                        report(f'\tmin_makespan: {min_makespan}s')
+                            min_makespan = calc_critical_path_length(graph)
+                            deadline = deadline_factor * min_makespan
+                            report(f'\tmin_makespan: {min_makespan}s')
 
-                        try:
-                            #draw_task_graph(graph)
-                            figure_file = f'{experiments_figures_path}/{i}_scheduling_figure.png'
-                            makespan, brown_energy_used, green_energy_not_used, total_energy = run_highest_power_first(
-                                graph, deadline, green_power, interval_size, c, max_green_power, figure_file)
-                        except Exception as e:
-                            print(f'Error: {e}')
+                            try:
+                                #draw_task_graph(graph)
+                                figure_file = f'{experiments_figures_path}/{i}_scheduling_figure.png'
+                                makespan, brown_energy_used, green_energy_not_used, total_energy = run_highest_power_first(
+                                    graph, deadline, green_power, interval_size, c, max_green_power, figure_file,
+                                    task_ordering_criteria)
+                            except Exception as e:
+                                print(f'Error: {e}')
 
-                        # Write data to csv file
-                        data = {'experiment': i, 'workflow': graph_name, 'energy_trace': g_power_trace_name,
-                                'algorithm': 'highest_power_first', 'deadline': deadline,
-                                'deadline_factor': deadline_factor, 'c': c, 'min_makespan': min_makespan,
-                                'makespan': makespan, 'brown_energy_used': brown_energy_used,
-                                'green_energy_not_used': green_energy_not_used, 'total_energy': total_energy}
+                            # Write data to csv file
+                            data = {'experiment': i, 'workflow': graph_name, 'energy_trace': g_power_trace_name,
+                                    'algorithm': 'highest_power_first', 'deadline': deadline,
+                                    'task_ordering': task_ordering_criteria, 'deadline_factor': deadline_factor, 'c': c,
+                                    'min_makespan': min_makespan, 'makespan': makespan,
+                                    'brown_energy_used': brown_energy_used,
+                                    'green_energy_not_used': green_energy_not_used, 'total_energy': total_energy}
 
-                        row = []
-                        for header in headers:
-                            row.append(
-                                data[header]
-                            )
-                        csvwriter.writerow(row)
+                            row = []
+                            for header in headers:
+                                row.append(
+                                    data[header]
+                                )
+                            csvwriter.writerow(row)
 
-                        print()
-                        i += 1
+                            print()
+                            i += 1
 
     report(f'Overall execution: %.4fs' % stopwatch.get_elapsed_time())
