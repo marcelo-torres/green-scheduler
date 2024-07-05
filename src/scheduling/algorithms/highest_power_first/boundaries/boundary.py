@@ -22,9 +22,10 @@ class BoundaryCalculator:
         available_time_to_use = round(1-self.c * available_time)
         time_to_variable_boundary = abs(available_time_to_use - available_time)
 
-        if available_time_to_use < task.runtime:
-            available_time_to_use += task.runtime-available_time_to_use
-            time_to_variable_boundary = abs(available_time_to_use - available_time)
+        # Todo review this logic
+        # if available_time_to_use < task.runtime:
+        #    available_time_to_use += task.runtime-available_time_to_use
+        #    time_to_variable_boundary = abs(available_time_to_use - available_time)
 
         task_level = float(self.task_levels[task.id])
         left_c = task_level / self.max_level
@@ -42,8 +43,8 @@ class BoundaryCalculator:
         if rcb == 0 or is_limited_by_scheduled_successor:
             rvb = 0
 
-        # if self.deadline - lcb - lvb - rcb - rvb < task.runtime:
-        #     lvb = 0
-        #     rvb = 0
+        if self.deadline - lcb - lvb - rcb - rvb < task.runtime:
+            lvb = 0
+            rvb = 0
 
         return lcb, lvb, rcb, rvb

@@ -64,7 +64,7 @@ if __name__ == '__main__':
     reader = WorkflowTraceArchiveReader(resources_path, min_task_power, max_task_power)
     photovoltaReader = PhotovoltaReader(resources_path)
 
-    interval_size = 100
+    interval_size = 10
     max_green_power = 1000
 
     graph_providers = [
