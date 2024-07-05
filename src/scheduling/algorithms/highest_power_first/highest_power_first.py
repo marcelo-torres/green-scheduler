@@ -5,7 +5,7 @@ from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
 from src.scheduling.energy.find_min_brown_energy_start_time import find_min_brown_energy
 
 
-def show_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, scheduling, graph, max_power=60):
+def create_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, scheduling, graph, max_power=60):
     drawer = Drawer(max_power, deadline)
     drawer.add_constant_boundary(0, lcb)
     drawer.add_variable_boundary(lcb, lvb)
@@ -73,17 +73,23 @@ def show_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, schedu
 
         drawer.add_scheduled_task(start_time, task, max_power_overlapped_by_task)
     #drawer.add_task(schedule[task.id], task)
-    drawer.show()
+    return drawer
 
-
-def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None, max_power=60):
+def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None, max_power=60, figure_file=None):
 
     scheduling = {}
     lcb = lvb = rcb = rvb = 0
 
-    def show_graph_if(conditions):
+    def show_graph_if(conditions): # TODO rename 'graph'
         if show in conditions:
-            show_graph(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph, max_power)
+            drawer = create_graph(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph, max_power)
+            drawer.show()
+
+    def save_graph(file):
+        drawer = create_graph(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph, max_power)
+        drawer.save(file)
+
+
 
     tasks = graph.list_of_tasks()
 
@@ -110,13 +116,15 @@ def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None
 
         show_graph_if(['all'])
 
-    show_graph_if(['last', 'all'])
-
+    show_graph_if(['all'])
     # TODO - review consolidation bug (makespan lesser than minimum)
     #shift_left_tasks_to_save_energy_greedy(graph, scheduling, boundary_calc, energy_usage_calculator)
     shift_left_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energy_usage_calculator)
 
     show_graph_if(['last', 'all'])
+
+    if figure_file:
+        save_graph(figure_file)
 
     return scheduling
 

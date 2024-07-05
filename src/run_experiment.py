@@ -1,4 +1,5 @@
 import csv
+import os
 from datetime import datetime
 
 from src.data.photovolta import PhotovoltaReader
@@ -20,12 +21,12 @@ def format_date(dt):
     return dt.strftime("%Y-%m-%d %H:%M:%S")
 
 
-def get_file_name(dt):
-    return dt.strftime("experiments_%Y-%m-%d_%H-%M-%S.csv")
+def get_experiment_id(dt):
+    return dt.strftime("experiments_%Y-%m-%d_%H-%M-%S")
 
 
-def run_highest_power_first(graph, deadline, green_power, interval_size, c, max_green_power):
-    scheduling = schedule_graph(graph, deadline, green_power, interval_size, c=c, show='off', max_power=max_green_power)
+def run_highest_power_first(graph, deadline, green_power, interval_size, c, max_green_power, figure_file):
+    scheduling = schedule_graph(graph, deadline, green_power, interval_size, c=c, show='off', max_power=max_green_power, figure_file=figure_file)
 
     # Makespan Report
     makespan = calc_makespan(scheduling, graph)
@@ -48,6 +49,10 @@ def run_highest_power_first(graph, deadline, green_power, interval_size, c, max_
             report(f'Task {task_id} start: {start} | Pred {pred_id} finish time: {pred_finish_time}')
 
     return makespan, brown_energy_used, green_energy_not_used, total_energy
+
+def create_dir(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 
 if __name__ == '__main__':
@@ -78,8 +83,13 @@ if __name__ == '__main__':
     start_time = datetime.now()
     report(f'[{format_date(start_time)}] Starting {experiments_count} experiments...\n')
 
-    experiments_reports_path = resources_path + '/experiments'
-    file_full_path = experiments_reports_path + '/' + get_file_name(start_time)
+    experiment_id = get_experiment_id(start_time)
+    experiments_reports_path = resources_path + f'/experiments/{experiment_id}'
+    experiments_figures_path = resources_path + f'/experiments/{experiment_id}/figures'
+    file_full_path = f'{experiments_reports_path}/report_{experiment_id}.csv'
+
+    create_dir(experiments_reports_path)
+    create_dir(experiments_figures_path)
 
     with open(file_full_path, 'x') as csvfile:
 
@@ -108,8 +118,9 @@ if __name__ == '__main__':
 
                         try:
                             #draw_task_graph(graph)
+                            figure_file = f'{experiments_figures_path}/{i}_scheduling_figure.png'
                             makespan, brown_energy_used, green_energy_not_used, total_energy = run_highest_power_first(
-                                graph, deadline, green_power, interval_size, c, max_green_power)
+                                graph, deadline, green_power, interval_size, c, max_green_power, figure_file)
                         except Exception as e:
                             print(f'Error: {e}')
 

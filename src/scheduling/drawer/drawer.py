@@ -46,3 +46,8 @@ class Drawer:
         plt.xlim([0, self.width])
         plt.ylim([0, self.height])
         plt.show()
+
+    def save(self, file):
+        plt.xlim([0, self.width])
+        plt.ylim([0, self.height])
+        plt.savefig(file)
