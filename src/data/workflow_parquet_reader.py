@@ -54,7 +54,6 @@ class WorkflowTraceArchiveReader:
             if len(row['parents']) == 0:
                 graph.create_dependency(start_task_id, parent)
 
-
             for child in children:
                 graph.create_dependency(parent, child)
 

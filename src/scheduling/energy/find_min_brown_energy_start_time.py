@@ -24,8 +24,15 @@ def find_min_brown_energy_greedy(task, lb, rb, deadline, calculator):
 
 
 def find_min_brown_energy(task, lb, rb, deadline, green_energy_available):
+
+    if task.power == 0:
+        return lb
+
     start = lb
     end = deadline-rb
+
+    if end - start < task.runtime:
+        raise Exception(f'Interval length is not enough to schedule task {task.id}: runtime={task.runtime} start={start} end={end}')
 
     green_power_interval = _slice_green_power_available_list(green_energy_available, start, end)
     start_min = start + _find_min_brown_energy_in_interval(task, green_power_interval)
@@ -75,7 +82,7 @@ def _find_min_brown_energy_in_interval(task, green_power_interval):
     task_end = task_start + task.runtime
 
     if len(green_power_interval) == 0:
-        print('warn: len(green_power_interval) == 0')
+        #print('warn: len(green_power_interval) == 0')
         return 0
 
     # Load current green events

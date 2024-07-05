@@ -1,4 +1,5 @@
 from src.scheduling.algorithms.highest_power_first.highest_power_first import schedule_graph
+from src.scheduling.drawer.task_graph_drawer import draw_task_graph
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
 from src.scheduling.task_graph.task_graph import TaskGraph
 
@@ -59,6 +60,7 @@ def run_all_tests():
 
 def run_single_test():
     graph = create_graph()
+    draw_task_graph(graph)
 
     interval_size = 13
     green_power = [20, 40, 30, 20, 10, 5, 3, 2, 1, 4, 5, 6, 8, 5]
