@@ -68,8 +68,8 @@ if __name__ == '__main__':
     max_green_power = 1000
 
     graph_providers = [
-        ('epigenomics', reader.epigenomics),
-        ('montage', reader.montage)
+        ('epigenomics', reader.epigenomics, 1720545439607916),
+        ('montage', reader.montage, 1720545464159438)
     ]
     green_power_providers = [
         ('trace_1', photovoltaReader.get_trace_1),
@@ -106,16 +106,18 @@ if __name__ == '__main__':
         csvwriter.writerow(headers)
 
         i = 1
-        for graph_name, graph_provider in graph_providers:
+        for graph_name, graph_provider, seed in graph_providers:
+            reader.set_seed(seed)
+            graph = graph_provider()
+
             for g_power_trace_name, green_power_provider in green_power_providers:
+                green_power = green_power_provider()
+
                 for task_ordering_criteria in task_ordering_criterias:
                     for deadline_factor in deadline_factors:
                         for c in c_values:
                             report(
                                 f'{i}/{experiments_count}: {graph_name} {g_power_trace_name} task_ordering={task_ordering_criteria} deadline_factor={deadline_factor} c={c}')
-
-                            graph = graph_provider()
-                            green_power = green_power_provider()
 
                             min_makespan = calc_critical_path_length(graph)
                             deadline = deadline_factor * min_makespan
@@ -123,7 +125,7 @@ if __name__ == '__main__':
 
                             try:
                                 #draw_task_graph(graph)
-                                figure_file = f'{experiments_figures_path}/{i}_scheduling_figure.png'
+                                figure_file = None #f'{experiments_figures_path}/{i}_scheduling_figure.png'
                                 makespan, brown_energy_used, green_energy_not_used, total_energy = run_highest_power_first(
                                     graph, deadline, green_power, interval_size, c, max_green_power, figure_file,
                                     task_ordering_criteria)

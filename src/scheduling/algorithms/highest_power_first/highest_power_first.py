@@ -126,7 +126,6 @@ def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None
         show_graph_if(['all'])
 
     show_graph_if(['all'])
-    # TODO - review consolidation bug (makespan lesser than minimum)
     #shift_left_tasks_to_save_energy_greedy(graph, scheduling, boundary_calc, energy_usage_calculator)
     shift_left_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energy_usage_calculator)
 
