@@ -18,8 +18,8 @@ class BoundaryCalculator:
         lcb, is_limited_by_scheduled_predecessor = calculate_left_boundary(task, scheduling)
         rcb, is_limited_by_scheduled_successor = calculate_right_boundary(task, scheduling, self.deadline)
 
-        available_time = self.deadline - lcb - rcb
-        available_time_to_use = round(1-self.c * available_time)
+        available_time = abs(self.deadline - lcb - rcb)
+        available_time_to_use = round((1-self.c) * available_time)
         time_to_variable_boundary = abs(available_time_to_use - available_time)
 
         # Todo review this logic

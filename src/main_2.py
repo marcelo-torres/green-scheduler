@@ -84,6 +84,7 @@ def run_single_test():
 
     print(f'min_makespan: {min_makespan}s')
 
+
     #green_power = [20, 40, 30, 20, 10, 5, 3, 2, 1, 4, 5, 6, 8, 5]
     #green_power = [gp * 1 for gp in green_power]
 

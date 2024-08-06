@@ -65,7 +65,7 @@ def run_single_test():
     interval_size = 13
     green_power = [20, 40, 30, 20, 10, 5, 3, 2, 1, 4, 5, 6, 8, 5]
 
-    scheduling = schedule_graph(graph, 124, green_power, interval_size, c=0.50, show='last', task_ordering='runtime')
+    scheduling = schedule_graph(graph, 62, green_power, interval_size, c=0.50, show='last', task_ordering='runtime')
 
     calculator = EnergyUsageCalculator(graph, green_power, interval_size)
     brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling)

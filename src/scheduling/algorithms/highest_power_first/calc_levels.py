@@ -10,12 +10,13 @@ def calc_levels(graph):
 
 
 def calc_levels_recursive(task, current_level, levels, visited_tasks):
-
-    if task.id in visited_tasks:
-        return visited_tasks[task.id]
+    if task.id in levels and current_level <= levels[task.id]:
+        return levels[task.id]
 
     if not (task.id in levels) or levels[task.id] < current_level:
         levels[task.id] = current_level
+    else:
+        current_level = levels[task.id]
 
     next_level = current_level + 1
     current_max_level = next_level

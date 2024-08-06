@@ -5,7 +5,6 @@ from datetime import datetime
 from src.data.photovolta import PhotovoltaReader
 from src.data.workflow_parquet_reader import WorkflowTraceArchiveReader
 from src.scheduling.algorithms.highest_power_first.highest_power_first import schedule_graph
-from src.scheduling.drawer.task_graph_drawer import draw_task_graph
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
 from src.scheduling.util.critical_path_length_calculator import calc_critical_path_length
 from src.scheduling.util.makespan_calculator import calc_makespan
@@ -27,6 +26,7 @@ def get_experiment_id(dt):
 
 def run_highest_power_first(graph, deadline, green_power, interval_size, c, max_green_power, figure_file, task_ordering_criteria):
     scheduling = schedule_graph(graph, deadline, green_power, interval_size, c=c, show='off', max_power=max_green_power, figure_file=figure_file, task_ordering=task_ordering_criteria)
+    scheduling_hash = hash(frozenset(scheduling.items()))
 
     # Makespan Report
     makespan = calc_makespan(scheduling, graph)
@@ -38,8 +38,9 @@ def run_highest_power_first(graph, deadline, green_power, interval_size, c, max_
         scheduling)
 
     report(f'\tbrown_energy_used: %.4fJ' % brown_energy_used)
-    report(f'\tgreen_energy_not_used: %.4fJ' % brown_energy_used)
-    report(f'\ttotal_energy: %.4fJ' % brown_energy_used)
+    report(f'\tgreen_energy_not_used: %.4fJ' % green_energy_not_used)
+    report(f'\ttotal_energy: %.4fJ' % total_energy)
+    report(f'\tscheduling hash: %s' % scheduling_hash)
 
     # Scheduling Violation Report
     scheduling_violations = check(scheduling, graph)
@@ -48,7 +49,7 @@ def run_highest_power_first(graph, deadline, green_power, interval_size, c, max_
         for task_id, start, pred_id, pred_finish_time in scheduling_violations:
             report(f'Task {task_id} start: {start} | Pred {pred_id} finish time: {pred_finish_time}')
 
-    return makespan, brown_energy_used, green_energy_not_used, total_energy
+    return makespan, brown_energy_used, green_energy_not_used, total_energy, scheduling_hash
 
 def create_dir(directory):
     if not os.path.exists(directory):
@@ -58,13 +59,13 @@ def create_dir(directory):
 if __name__ == '__main__':
 
     resources_path = './../resources'
-    min_task_power = 20
-    max_task_power = 100
+    min_task_power = 10
+    max_task_power = 60
 
     reader = WorkflowTraceArchiveReader(resources_path, min_task_power, max_task_power)
-    photovoltaReader = PhotovoltaReader(resources_path)
+    photovolta_reader = PhotovoltaReader(resources_path)
 
-    interval_size = 10
+    interval_size = 5
     max_green_power = 1000
 
     graph_providers = [
@@ -72,14 +73,23 @@ if __name__ == '__main__':
         ('montage', reader.montage, 1720545464159438)
     ]
     green_power_providers = [
-        ('trace_1', photovoltaReader.get_trace_1),
-        ('trace_2', photovoltaReader.get_trace_2)
+        ('trace_1', photovolta_reader.get_trace_1),
+        ('trace_2', photovolta_reader.get_trace_2)
     ]
 
     task_ordering_criterias = ['energy', 'power', 'runtime']
 
-    deadline_factors = [1, 2, 4, 8, 10]
+    deadline_factors = [1, 2, 4, 8]
     c_values = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95]
+
+    for g_power_trace_name, green_power_provider in green_power_providers:
+        green_power = green_power_provider()
+        average_power, median = photovolta_reader.stats(green_power)
+        report(f'Green Power Trace {g_power_trace_name}')
+        report(f'\taverage_power: {average_power}')
+        report(f'\tmedian: {median}')
+        report('')
+
 
     experiments_count = (len(graph_providers) * len(green_power_providers) * len(deadline_factors) * len(c_values)
                          * len(task_ordering_criterias))
@@ -101,7 +111,7 @@ if __name__ == '__main__':
 
         headers = ['experiment', 'workflow', 'energy_trace', 'algorithm', 'task_ordering', 'deadline',
                    'deadline_factor', 'c', 'min_makespan', 'makespan', 'brown_energy_used', 'green_energy_not_used',
-                   'total_energy']
+                   'total_energy', 'scheduling_hash']
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(headers)
 
@@ -109,10 +119,8 @@ if __name__ == '__main__':
         for graph_name, graph_provider, seed in graph_providers:
             reader.set_seed(seed)
             graph = graph_provider()
-
             for g_power_trace_name, green_power_provider in green_power_providers:
                 green_power = green_power_provider()
-
                 for task_ordering_criteria in task_ordering_criterias:
                     for deadline_factor in deadline_factors:
                         for c in c_values:
@@ -126,7 +134,7 @@ if __name__ == '__main__':
                             try:
                                 #draw_task_graph(graph)
                                 figure_file = None #f'{experiments_figures_path}/{i}_scheduling_figure.png'
-                                makespan, brown_energy_used, green_energy_not_used, total_energy = run_highest_power_first(
+                                makespan, brown_energy_used, green_energy_not_used, total_energy, scheduling_hash = run_highest_power_first(
                                     graph, deadline, green_power, interval_size, c, max_green_power, figure_file,
                                     task_ordering_criteria)
                             except Exception as e:
@@ -138,7 +146,8 @@ if __name__ == '__main__':
                                     'task_ordering': task_ordering_criteria, 'deadline_factor': deadline_factor, 'c': c,
                                     'min_makespan': min_makespan, 'makespan': makespan,
                                     'brown_energy_used': brown_energy_used,
-                                    'green_energy_not_used': green_energy_not_used, 'total_energy': total_energy}
+                                    'green_energy_not_used': green_energy_not_used, 'total_energy': total_energy,
+                                    'scheduling_hash': scheduling_hash}
 
                             row = []
                             for header in headers:
