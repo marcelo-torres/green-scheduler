@@ -21,6 +21,7 @@ def shift_left_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, 
         # Find new start
         new_start_time = find_min_brown_energy(task, lb, rb, deadline, energy_usage_calc.get_green_power_available())
         scheduling[task.id] = new_start_time
+        energy_usage_calc.add_scheduled_task(task, start_time)
 
 
 def shift_left_tasks_to_save_energy_greedy(graph, scheduling, boundary_calc, energy_usage_calc):

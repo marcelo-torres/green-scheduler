@@ -6,7 +6,7 @@ def _append_task_power_events(power_events, task, start_time):
     power_events.append(
         (finish_time, 'task', -task.power)
     )
-
+    power_events.sort(key=lambda d: d[0])
 
 def _remove_task_power_event(power_events, task, start_time):
     indexes_to_remove = []
@@ -127,9 +127,9 @@ class EnergyUsageCalculator:
         actual_green_power_available = []
         current_green_power = 0
         current_power_request = 0
-        previous_time = None
+        previous_time = 0
 
-        def add_actual_green_power_available(actual_green_power_available, current_green_power, current_power_request):
+        def add_actual_green_power_available(time, actual_green_power_available, current_green_power, current_power_request):
             available_green_power = current_green_power - current_power_request
             if available_green_power < 0:
                 available_green_power = 0
@@ -140,14 +140,18 @@ class EnergyUsageCalculator:
             )
 
         for time, type, power in self.power_events:
-            if time is not previous_time and time is not None and previous_time is not None:
-                add_actual_green_power_available(actual_green_power_available, current_green_power,
+            is_the_same_time = (time == previous_time)
+
+            if not is_the_same_time:
+                # Add previous time a power availability
+                add_actual_green_power_available(previous_time, actual_green_power_available, current_green_power,
                                                  current_power_request)
+
             if type == 'green_power':
                 current_green_power = power
             elif type == 'task':
                 current_power_request += power
             previous_time = time
 
-        add_actual_green_power_available(actual_green_power_available, current_green_power, current_power_request)
+        add_actual_green_power_available(previous_time, actual_green_power_available, current_green_power, current_power_request)
         return actual_green_power_available
