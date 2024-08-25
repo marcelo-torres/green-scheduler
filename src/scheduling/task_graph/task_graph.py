@@ -32,6 +32,17 @@ class TaskGraph:
         task_a.successors.append(task_b)
         task_b.predecessors.append(task_a)
 
+    def remove_task(self, task_id):
+        task = self.tasks[task_id]
+        for succ in task.successors:
+            succ.predecessors.remove(task)
+
+        for pred in task.predecessors:
+            pred.successors.remove(task)
+
+        del self.tasks[task_id]
+
+
     def list_of_tasks(self):
         return list(
             self.tasks.values()
