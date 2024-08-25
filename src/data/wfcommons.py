@@ -58,11 +58,12 @@ def _create_graph(task_file, min_power, max_power):
         graph.add_new_task(start_task_id, runtime=0, power=0)  # Dummy task
         graph.set_start_task(start_task_id)
 
-
         tasks = data['workflow']['tasks']
 
         for task in tasks:
             runtime_is_seconds = round(float(task['runtimeInSeconds']))
+            if runtime_is_seconds == 0: # TODO
+                runtime_is_seconds = 1
             power = _generate_random_power(min_power, max_power)
             graph.add_new_task(task['name'], runtime=runtime_is_seconds, power=power)
 

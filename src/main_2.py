@@ -3,7 +3,10 @@ import time
 from src.data.photovolta import PhotovoltaReader
 from src.data.workflow_parquet_reader import WorkflowTraceArchiveReader
 from src.scheduling.algorithms.highest_power_first.highest_power_first import schedule_graph
+from src.scheduling.drawer.active_tasks_drawer import ActiveTasksDrawer
+from src.scheduling.drawer.ranks_drawer import draw
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
+from src.scheduling.util.count_active_tasks import count_active_tasks
 from src.scheduling.util.critical_path_length_calculator import calc_critical_path_length
 from src.scheduling.util.makespan_calculator import calc_makespan
 from src.scheduling.util.scheduling_check import check
@@ -73,7 +76,7 @@ def run_single_test():
 
     min_task_power = 20
     max_task_power = 100
-    max_green_power = 1000
+    max_green_power = 5000
 
     reader = WorkflowTraceArchiveReader(resources_path, min_task_power, max_task_power)
     photovoltaReader = PhotovoltaReader(resources_path)
@@ -93,6 +96,7 @@ def run_single_test():
 
     # TODO - test Experiment 4/55: epigenomics trace_1 deadline_factor=1 c=0.3
     scheduling = schedule_graph(graph, min_makespan * 2, green_power, interval_size, c=0.3, show='last', max_power=max_green_power)
+    draw(graph, scheduling)
 
     calculator = EnergyUsageCalculator(graph, green_power, interval_size)
     brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling)
@@ -107,6 +111,11 @@ def run_single_test():
         for task_id, start, pred_id, pred_finish_time in scheduling_violations:
             print(f'Task {task_id} start: {start} | Pred {pred_id} finish time: {pred_finish_time}')
 
+    max_active_tasks, mean, std, active_tasks_by_time = count_active_tasks(scheduling, graph)
+
+    ActiveTasksDrawer().draw(active_tasks_by_time)
+
+    print(f'max_active_tasks: {max_active_tasks}')
 
 if __name__ == '__main__':
 
