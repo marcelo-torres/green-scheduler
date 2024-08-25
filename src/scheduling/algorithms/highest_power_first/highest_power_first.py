@@ -1,8 +1,9 @@
 from src.scheduling.algorithms.highest_power_first.boundaries.boundary import BoundaryCalculator
 from src.scheduling.drawer.drawer import Drawer
-from src.scheduling.algorithms.highest_power_first.shift_left.shift_left import shift_left_tasks_to_save_energy
+from src.scheduling.algorithms.highest_power_first.shift_left.shift_left import shift_left_tasks_to_save_energy, \
+    shift_left_tasks_to_save_energy_greedy
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
-from src.scheduling.energy.find_min_brown_energy_start_time import find_min_brown_energy
+from src.scheduling.energy.find_min_brown_energy_start_time import find_min_brown_energy, find_min_brown_energy_greedy
 
 
 def create_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, scheduling, graph, max_power=60):
@@ -17,62 +18,58 @@ def create_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, sche
         drawer.add_green_energy_availability(interval_start, interval_size, power)
         interval_start += interval_size
 
-    d = []
+    events = []
     for task_id, start_time in scheduling.items():
         task = graph.get_task(task_id)
-        end_time = start_time + task.runtime
-        d.append(
-            (task, start_time, end_time)
+        events.append(
+            (task, start_time, 'start')
         )
 
-    # Calculate task overlap to show tasks above each other
-    for i in reversed(range(len(d))):
-        task, start_time, end_time = d[i]
+        end_time = start_time + task.runtime
+        events.append(
+            (task, end_time, 'end')
+        )
 
-        overlap_locations = []
+        # Sort by time and event type (start comes first)
+        events.sort(key=lambda e: (e[1], 0 if e[2] == "start" else 1))
 
-        # Find task overlaps for current task
-        for j in reversed(range(i)):
-            task_j, start_time_j, end_time_j = d[j]
-            is_overlap = (start_time_j < start_time < end_time_j) or (start_time_j < end_time < end_time_j)
-            if is_overlap:
-                overlap_locations.append(
-                    (start_time_j, task_j, 'start')
-                )
-                overlap_locations.append(
-                    (end_time_j, task_j, 'end')
-                )
+    active_tasks = []
 
-        # Sort locations to represent a timeline with several intervals
-        overlap_locations.sort(key=lambda e: e[0])
+    max_power= -1
+    is_a_lot_of_events = len(events) > 0
 
-        max_power_overlapped_by_task = 0
+    time_list = []
+    power_list = []
+    last_time = -1
+    for task, time, event_type in events:
+        if last_time >= 0 and time is not last_time:
+            duration = time - last_time
+            current_power = 0
+            if is_a_lot_of_events:
+                for active_task in active_tasks:
+                    current_power += active_task.power
+                #drawer.add_rectangle(duration, current_power, last_time, 0, description=None, edgecolor=(0, 0, 1, 0.5), facecolor=(0, 0, 1, 0.5))
+                #drawer.add_line(duration, last_time, current_power)
+                time_list.append(last_time)
+                time_list.append(last_time+duration)
+                power_list.append(current_power)
+                power_list.append(current_power)
+            else:
+                for active_task in active_tasks:
+                    drawer.add_rectangle(duration, active_task.power, last_time, current_power, description=task.id)
+                    current_power += active_task.power
+            if current_power > max_power:
+                max_power = current_power
 
-        # Find the max sum of power of tasks that overlap with each other and with the current task
-        if len(overlap_locations) > 0:
-            start_time_o, task_o, type = overlap_locations.pop(0)
-            init_o = start_time_o
-            interval_power = task_o.power
+        if event_type == 'start':
+            active_tasks.append(task)
+        else:
+            active_tasks.remove(task)
+        last_time = time
 
-            for time_o, task_o, type in overlap_locations:
-                end_o = time_o
+    drawer.add_line(time_list, power_list)
 
-                # Check if the current interval overlaps with the current task
-                if (init_o < start_time < end_o) or (init_o < end_time < end_o):
-                    if interval_power > max_power_overlapped_by_task:
-                        max_power_overlapped_by_task = interval_power
-
-                if type == 'start':
-                    # If a new task is starting, then more power is needed
-                    interval_power += task_o.power
-                else:
-                    # If a task is turning off, then less power is needed
-                    interval_power -= task_o.power
-
-                init_o = end_o
-
-        drawer.add_scheduled_task(start_time, task, max_power_overlapped_by_task)
-    #drawer.add_task(schedule[task.id], task)
+    drawer.height = 1.1 * max_power
     return drawer
 
 
@@ -119,6 +116,7 @@ def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None
         # 2.2) Schedule each task when it uses less brown energy as early as possible
         #start_time = find_min_brown_energy_greedy(task, lb, rb, deadline, energy_usage_calculator)
         start_time = find_min_brown_energy(task, lb, rb, deadline, energy_usage_calculator.get_green_power_available())
+        #start_time = lb
 
         scheduling[task.id] = start_time
         energy_usage_calculator.add_scheduled_task(task, start_time)
