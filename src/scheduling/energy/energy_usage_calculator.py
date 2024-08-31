@@ -47,6 +47,9 @@ class EnergyUsageCalculator:
                 (g_power_start_time, 'green_power', g_power)
             )
             g_power_start_time += self.interval_size
+        power_events.append(
+            (g_power_start_time, 'green_power', 0)
+        )
 
     def _append_scheduling_power_events(self, power_events, scheduling):
         for task_id, start_time in scheduling.items():
