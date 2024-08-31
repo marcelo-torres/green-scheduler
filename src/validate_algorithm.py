@@ -62,7 +62,7 @@ if __name__ == '__main__':
     green_power = photovoltaReader.get_trace_1(size=30)
     interval_size = 300
 
-    graph = build_graph(5)
+    graph = build_graph(20)
 
     min_makespan = calc_critical_path_length(graph)
     scheduling = schedule_graph(graph, min_makespan * 2, green_power, interval_size, c=0.8, show='last',

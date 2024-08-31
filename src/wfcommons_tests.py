@@ -74,7 +74,7 @@ def execute_generator():
     # Workflow WfCommons to graph
     graph = _create_graph(workflow_name, min_task_power, max_task_power)
 
-    reduce_workflow_srasearch(graph)
+    #reduce_workflow_srasearch(graph)
     report_graph(graph)
 
 
