@@ -170,11 +170,9 @@ def _calculate_brown_energy_of_task(task, task_start, current_green_events):
 
         interval_length = time - previous_time
 
-        # TODO check this logic
-        if previous_time <= task_start <= time:
-            execution_time_in_interval = time - task_start
-        elif task.runtime <= time:
-            execution_time_in_interval = task.runtime - already_computed_time
+        remaining_task_runtime = task.runtime - already_computed_time
+        if remaining_task_runtime < interval_length:
+            execution_time_in_interval = remaining_task_runtime
         else:
             execution_time_in_interval = interval_length
 
