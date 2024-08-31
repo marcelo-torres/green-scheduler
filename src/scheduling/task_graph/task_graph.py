@@ -16,11 +16,14 @@ class TaskGraph:
 
         task = Task(task_id, runtime, power)
         self.tasks[task_id] = task
+        return task
 
     def get_task(self, task_id):
         return self.tasks[task_id]
 
     def get_first_task(self):
+        if self.start_task_id is None:
+            raise Exception('start_task_id not defined')
         return self.get_task(
             self.start_task_id
         )

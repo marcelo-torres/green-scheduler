@@ -5,6 +5,67 @@ from src.scheduling.algorithms.highest_power_first.shift_left.shift_left import 
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
 from src.scheduling.energy.find_min_brown_energy_start_time import find_min_brown_energy, find_min_brown_energy_greedy
 
+def draw_rectangles(drawer, events):
+    max_power = -1
+    active_tasks = []
+    last_time = -1
+    for task, time, event_type in events:
+        if last_time >= 0 and time is not last_time:
+            duration = time - last_time
+            current_power = 0
+
+            for active_task in active_tasks:
+                print(f' task {active_task.id} start {last_time} duration {duration}')
+                drawer.add_rectangle(duration, active_task.power, last_time, current_power, description=active_task.id)
+                current_power += active_task.power
+
+            if current_power > max_power:
+                max_power = current_power
+
+        if event_type == 'start':
+            active_tasks.append(task)
+        else:
+            active_tasks.remove(task)
+        last_time = time
+
+    return max_power
+
+def draw_line(drawer, events):
+    max_power = -1
+    active_tasks = []
+    time_list = []
+    power_list = []
+    last_time = -1
+    for task, time, event_type in events:
+        if last_time >= 0 and time is not last_time:
+            duration = time - last_time
+            current_power = 0
+            for active_task in active_tasks:
+                current_power += active_task.power
+            time_list.append(last_time)
+            time_list.append(last_time + duration)
+            power_list.append(current_power)
+            power_list.append(current_power)
+
+            if current_power > max_power:
+                max_power = current_power
+
+        if event_type == 'start':
+            active_tasks.append(task)
+        else:
+            active_tasks.remove(task)
+        last_time = time
+
+    # Add first point (to close the line)
+    time_list.insert(0, time_list[0])  # duplicate the first time
+    power_list.insert(0, 0)  # set power to 0 (y-axis)
+
+    # Add last point (to close the line)
+    time_list.append(time_list[-1])  # duplicate the last time (x-axis)
+    power_list.append(0)  # set power to 0 (y-axis)
+
+    drawer.add_line(time_list, power_list)
+    return max_power
 
 def create_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, scheduling, graph, max_power=60):
     drawer = Drawer(max_power, deadline)
@@ -30,46 +91,19 @@ def create_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, sche
             (task, end_time, 'end')
         )
 
-        # Sort by time and event type (start comes first)
-        events.sort(key=lambda e: (e[1], 0 if e[2] == "start" else 1))
+    # Sort by time and event type (start comes first)
+    events.sort(key=lambda e: (e[1], 0 if e[2] == "start" else 1))
 
-    active_tasks = []
+    is_a_lot_of_events = len(events) > 50
+    if is_a_lot_of_events:
+        max_power = draw_line(drawer, events)
+    else:
+        max_power = draw_rectangles(drawer, events)
 
-    max_power= -1
-    is_a_lot_of_events = len(events) > 0
+    for task, time, type in events:
+        print(f'{time} {task.id} {type}')
 
-    time_list = []
-    power_list = []
-    last_time = -1
-    for task, time, event_type in events:
-        if last_time >= 0 and time is not last_time:
-            duration = time - last_time
-            current_power = 0
-            if is_a_lot_of_events:
-                for active_task in active_tasks:
-                    current_power += active_task.power
-                #drawer.add_rectangle(duration, current_power, last_time, 0, description=None, edgecolor=(0, 0, 1, 0.5), facecolor=(0, 0, 1, 0.5))
-                #drawer.add_line(duration, last_time, current_power)
-                time_list.append(last_time)
-                time_list.append(last_time+duration)
-                power_list.append(current_power)
-                power_list.append(current_power)
-            else:
-                for active_task in active_tasks:
-                    drawer.add_rectangle(duration, active_task.power, last_time, current_power, description=task.id)
-                    current_power += active_task.power
-            if current_power > max_power:
-                max_power = current_power
-
-        if event_type == 'start':
-            active_tasks.append(task)
-        else:
-            active_tasks.remove(task)
-        last_time = time
-
-    drawer.add_line(time_list, power_list)
-
-    drawer.height = 1.1 * max_power
+    drawer.height = 1.5 * max_power
     return drawer
 
 

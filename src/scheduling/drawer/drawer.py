@@ -25,7 +25,7 @@ class Drawer:
         self.ax.add_patch(rect)
 
     def add_green_energy_availability(self, start, width, power):
-        rect = patches.Rectangle((start, 0), width, power, linewidth=1, edgecolor='green', facecolor='none')
+        rect = patches.Rectangle((start, Drawer.BOUNDARY_HEIGHT), width, power, linewidth=1, edgecolor='green', facecolor='none')
         self.ax.add_patch(rect)
 
     def add_scheduled_task(self, start, task, y, include_task_id=True):
@@ -43,6 +43,7 @@ class Drawer:
         self.ax.add_patch(rect)
 
     def add_line(self, x_list, y_list):
+        y_list = [Drawer.BOUNDARY_HEIGHT + y for y in y_list]
         plt.plot(x_list, y_list, 'blue', lw=1)
 
     def add_single_line(self, width, x, y):
