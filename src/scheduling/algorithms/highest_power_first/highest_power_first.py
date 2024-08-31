@@ -15,7 +15,6 @@ def draw_rectangles(drawer, events):
             current_power = 0
 
             for active_task in active_tasks:
-                print(f' task {active_task.id} start {last_time} duration {duration}')
                 drawer.add_rectangle(duration, active_task.power, last_time, current_power, description=active_task.id)
                 current_power += active_task.power
 
@@ -99,9 +98,6 @@ def create_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, sche
         max_power = draw_line(drawer, events)
     else:
         max_power = draw_rectangles(drawer, events)
-
-    for task, time, type in events:
-        print(f'{time} {task.id} {type}')
 
     drawer.height = 1.5 * max_power
     return drawer
