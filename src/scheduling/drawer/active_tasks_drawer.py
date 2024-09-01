@@ -1,7 +1,7 @@
 import matplotlib
 import matplotlib.pyplot as plt
 
-matplotlib.use("qt5agg")  #https://stackoverflow.com/a/52221178
+#matplotlib.use("qt5agg")  #https://stackoverflow.com/a/52221178
 
 
 class ActiveTasksDrawer:

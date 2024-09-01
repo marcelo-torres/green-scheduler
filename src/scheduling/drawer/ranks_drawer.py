@@ -4,7 +4,7 @@ from matplotlib import patches
 
 from src.scheduling.util.topological_ordering import calculate_upward_rank
 
-matplotlib.use("qt5agg")  #https://stackoverflow.com/a/52221178
+#matplotlib.use("qt5agg")  #https://stackoverflow.com/a/52221178
 
 
 def _add_rectangle(ax, start, length, y, height, label, edgecolor = (0, 0, 1, 0.9), facecolor = (0, 0, 1, 0.5)):

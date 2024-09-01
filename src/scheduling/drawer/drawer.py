@@ -2,7 +2,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-matplotlib.use("qt5agg") #https://stackoverflow.com/a/52221178
+#matplotlib.use("qt5agg") #https://stackoverflow.com/a/52221178
 
 
 class Drawer:
