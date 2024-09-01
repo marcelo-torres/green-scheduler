@@ -1,4 +1,4 @@
-from src.scheduling.algorithms.highest_power_first.calc_levels import calc_levels
+from src.scheduling.util.calc_levels import calc_levels
 from src.scheduling.task_graph.task_graph import TaskGraph
 from src.scheduling.util.topological_ordering import sort_topologically
 

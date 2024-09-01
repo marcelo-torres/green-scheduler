@@ -161,7 +161,7 @@ class HighestPowerFirstTest(unittest.TestCase):
     def test_multiple_tasks_g1_with_g_energy(self):
         graph, min_makespan = _get_graph_1()
 
-        scheduling = schedule_graph(graph, min_makespan * 2, [0, 10, 20, 10, 0, 20, 40, 20, 0, 0, 0, 30, 0], 10)
+        scheduling = schedule_graph(graph, min_makespan * 2, [0, 10, 20, 20, 0, 20, 40, 20, 0, 0, 0, 30, 0], 10)
 
         self.assertEqual(10, scheduling[1])
         self.assertEqual(20, scheduling[2])
@@ -184,8 +184,8 @@ class HighestPowerFirstTest(unittest.TestCase):
         self.assertEqual(20, scheduling[3])
         self.assertEqual(27, scheduling[4])
         self.assertEqual(31, scheduling[5])
-        self.assertEqual(31, scheduling[6])
-        self.assertEqual(50, scheduling[7])
+        self.assertEqual(47, scheduling[6])
+        self.assertEqual(57, scheduling[7])
 
     def test_multiple_tasks_g1_with_slack_to_delay_and_with_g_energy(self):
         graph, min_makespan = _get_graph_1()

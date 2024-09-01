@@ -1,8 +1,6 @@
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
-
 from src.scheduling.algorithms.highest_power_first.boundaries.constant_boundary import calculate_left_boundary, \
     calculate_right_boundary
-from src.scheduling.algorithms.highest_power_first.calc_levels import calc_levels
+from src.scheduling.util.calc_levels import calc_levels
 
 
 class BoundaryCalculator:

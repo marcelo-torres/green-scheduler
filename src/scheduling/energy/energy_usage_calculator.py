@@ -6,7 +6,8 @@ def _append_task_power_events(power_events, task, start_time):
     power_events.append(
         (finish_time, 'task', -task.power)
     )
-    power_events.sort(key=lambda d: d[0])
+    power_events.sort(key=lambda d: d[0])  # TODO use binary search tree
+
 
 def _remove_task_power_event(power_events, task, start_time):
     indexes_to_remove = []
@@ -17,8 +18,9 @@ def _remove_task_power_event(power_events, task, start_time):
             if time == start_time and power == task.power and len(indexes_to_remove) == 0:
                 indexes_to_remove.append(index)
             elif time == finish_time and power == -task.power and len(indexes_to_remove) == 1:
-                indexes_to_remove.append(index-1) # Removing the previous index decreases the current index
+                indexes_to_remove.append(index - 1)  # Removing the previous index decreases the current index
                 break
+
     for index_to_remove in indexes_to_remove:
         del power_events[index_to_remove]
 
@@ -55,7 +57,6 @@ class EnergyUsageCalculator:
         for task_id, start_time in scheduling.items():
             scheduled_task = self.graph.get_task(task_id)
             _append_task_power_events(power_events, scheduled_task, start_time)
-
 
     def _calculate(self, power_events):
         # Power along iterations
@@ -132,23 +133,30 @@ class EnergyUsageCalculator:
         current_power_request = 0
         previous_time = 0
 
-        def add_actual_green_power_available(time, actual_green_power_available, current_green_power, current_power_request):
+        last_power_added = -1
+
+        def add_actual_green_power_available(time, actual_green_power_available, current_green_power,
+                                             current_power_request, last_power_added):
             available_green_power = current_green_power - current_power_request
             if available_green_power < 0:
                 available_green_power = 0
 
-            # TODO fix overlapped time
-            actual_green_power_available.append(
-                (time, available_green_power)
-            )
+            if available_green_power != last_power_added:
+                # TODO fix overlapped time
+                actual_green_power_available.append(
+                    (time, available_green_power)
+                )
+                return available_green_power
+            return last_power_added
 
         for time, type, power in self.power_events:
             is_the_same_time = (time == previous_time)
 
             if not is_the_same_time:
                 # Add previous time a power availability
-                add_actual_green_power_available(previous_time, actual_green_power_available, current_green_power,
-                                                 current_power_request)
+                last_power_added = add_actual_green_power_available(previous_time, actual_green_power_available,
+                                                                    current_green_power,
+                                                                    current_power_request, last_power_added)
 
             if type == 'green_power':
                 current_green_power = power
@@ -156,5 +164,6 @@ class EnergyUsageCalculator:
                 current_power_request += power
             previous_time = time
 
-        add_actual_green_power_available(previous_time, actual_green_power_available, current_green_power, current_power_request)
+        add_actual_green_power_available(previous_time, actual_green_power_available, current_green_power,
+                                         current_power_request, last_power_added)
         return actual_green_power_available

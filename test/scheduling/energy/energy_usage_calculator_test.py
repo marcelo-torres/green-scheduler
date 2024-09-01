@@ -54,6 +54,26 @@ class EnergyUsageCalculatorTest(unittest.TestCase):
 
         self.do_test_get_green_power_available(green_energy, interval_size, expected_green_power_available, scheduled_tasks=scheduled_tasks)
 
+    def test(self):
+        green_energy = [0, 10, 20, 10, 0, 20, 40]
+        interval_size = 10
+
+        expected_green_power_available = [
+            (0, 0), (22, 10), (30, 0), (50, 10), (51, 20), (60, 40), (70, 0)
+        ]
+
+        scheduled_tasks = [
+            (10, Task(1, runtime=10, power=10)),
+            (20, Task(2, runtime=7, power=10)),
+            (20, Task(3, runtime=2, power=10)),
+            (27, Task(4, runtime=4, power=10)),
+            (31, Task(5, runtime=8, power=10)),
+            (31, Task(6, runtime=10, power=10)),
+            (50, Task(7, runtime=1, power=10))
+        ]
+
+        self.do_test_get_green_power_available(green_energy, interval_size, expected_green_power_available, scheduled_tasks=scheduled_tasks)
+
     def do_test_get_green_power_available(self, green_energy, interval_size, expected_green_power_available,
                                           scheduled_tasks=None):
         calculator = EnergyUsageCalculator(TaskGraph(), green_energy, interval_size)

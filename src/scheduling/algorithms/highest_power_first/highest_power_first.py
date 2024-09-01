@@ -1,9 +1,9 @@
 from src.scheduling.algorithms.highest_power_first.boundaries.boundary import BoundaryCalculator
 from src.scheduling.drawer.drawer import Drawer
-from src.scheduling.algorithms.highest_power_first.shift_left.shift_left import shift_left_tasks_to_save_energy, \
-    shift_left_tasks_to_save_energy_greedy
+from src.scheduling.algorithms.highest_power_first.shift_left.shift_left import shift_left_tasks_to_save_energy
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
-from src.scheduling.energy.find_min_brown_energy_start_time import find_min_brown_energy, find_min_brown_energy_greedy
+from src.scheduling.energy.find_min_brown_energy import find_min_brown_energy
+
 
 def draw_rectangles(drawer, events):
     max_power = -1
@@ -28,6 +28,7 @@ def draw_rectangles(drawer, events):
         last_time = time
 
     return max_power
+
 
 def draw_line(drawer, events):
     max_power = -1
@@ -65,6 +66,7 @@ def draw_line(drawer, events):
 
     drawer.add_line(time_list, power_list)
     return max_power
+
 
 def create_graph(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, scheduling, graph, max_power=60):
     drawer = Drawer(max_power, deadline)
@@ -113,14 +115,15 @@ def get_task_ordering(key):
     return task_ordering[key]
 
 
-def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None, max_power=60, figure_file=None, task_ordering='energy'):
-
+def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None, max_power=60, figure_file=None,
+                   task_ordering='energy'):
     scheduling = {}
     lcb = lvb = rcb = rvb = 0
 
-    def show_graph_if(conditions): # TODO rename 'graph'
+    def show_graph_if(conditions):  # TODO rename 'graph'
         if show in conditions:
-            drawer = create_graph(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph, max_power)
+            drawer = create_graph(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph,
+                                  max_power)
             drawer.show()
 
     def save_graph(file):
@@ -137,16 +140,13 @@ def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None
     energy_usage_calculator.init()
 
     for task in tasks:
-
         # 2.1)  Calculate boundaries to avoid that a single task gets all slack time
         lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling)
         lb = lcb + lvb
         rb = rcb + rvb
 
         # 2.2) Schedule each task when it uses less brown energy as early as possible
-        #start_time = find_min_brown_energy_greedy(task, lb, rb, deadline, energy_usage_calculator)
         start_time = find_min_brown_energy(task, lb, rb, deadline, energy_usage_calculator.get_green_power_available())
-        #start_time = lb
 
         scheduling[task.id] = start_time
         energy_usage_calculator.add_scheduled_task(task, start_time)
@@ -154,7 +154,6 @@ def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None
         show_graph_if(['all'])
 
     show_graph_if(['all'])
-    #shift_left_tasks_to_save_energy_greedy(graph, scheduling, boundary_calc, energy_usage_calculator)
     shift_left_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energy_usage_calculator)
 
     show_graph_if(['last', 'all'])
@@ -163,4 +162,3 @@ def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None
         save_graph(figure_file)
 
     return scheduling
-
