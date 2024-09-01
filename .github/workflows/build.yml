@@ -23,6 +23,8 @@ jobs:
         run: tox -e py
       - name: TEST
         run: ls
+      - name: TEST
+        run: pwd
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
