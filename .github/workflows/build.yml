@@ -17,17 +17,10 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - name: Install tox and any other packages
         run: pip install tox
       - name: Run tox
         run: tox -e py
-      - name: TEST
-        run: ls
-      - name: TEST
-        run: pwd
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
