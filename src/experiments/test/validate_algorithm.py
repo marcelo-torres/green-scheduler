@@ -55,7 +55,7 @@ def build_graph(tasks_per_rank):
     return graph
 
 if __name__ == '__main__':
-    resources_path = './../resources'
+    resources_path = '../../../../../resources'
 
     # Green power data
     photovoltaReader = PhotovoltaReader(resources_path)

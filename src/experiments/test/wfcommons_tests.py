@@ -48,7 +48,7 @@ def reduce_workflow_srasearch(graph):
             graph.create_dependency(task_id, end_task_id)
 
 def execute_generator():
-    resources_path = './../resources'
+    resources_path = '../../../resources'
 
     min_task_power = 1
     max_task_power = 5
@@ -123,7 +123,7 @@ def execute_generator():
 #print(min_makespan)
 
 def execute_real_traces():
-    resources_path = './../resources'
+    resources_path = '../../../../../resources'
     real_traces = f'{resources_path}/wfcommons/real_traces'
 
     genome = f'{real_traces}/1000genome-chameleon-8ch-250k-001.json'

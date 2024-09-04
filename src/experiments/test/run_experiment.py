@@ -58,7 +58,7 @@ def create_dir(directory):
 
 if __name__ == '__main__':
 
-    resources_path = './../resources'
+    resources_path = '../../../../../resources'
     min_task_power = 10
     max_task_power = 60
 
