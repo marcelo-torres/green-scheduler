@@ -11,11 +11,15 @@ class TaskGraph:
         self.start_task_id = task_id
 
     def add_new_task(self, task_id, runtime=None, power=None):
-        if task_id in self.tasks:
-            raise Exception(f"Task ${task_id} already exists")
+        return self.add_task(
+            Task(task_id, runtime, power)
+        )
 
-        task = Task(task_id, runtime, power)
-        self.tasks[task_id] = task
+    def add_task(self, task):
+        if task.id in self.tasks:
+            raise Exception(f"Task ${task.id} already exists")
+
+        self.tasks[task.id] = task
         return task
 
     def get_task(self, task_id):

@@ -1,6 +1,8 @@
 from collections import deque
 
-from src.scheduling.task_graph.task import Task
+class IntervalException(Exception):
+    def __init__(self, task, start, end):
+        super().__init__(f'Interval length is not enough to schedule task {task.id}: runtime={task.runtime} start={start} end={end}')
 
 
 def find_min_brown_energy(task, lb, rb, deadline, green_energy_available):
@@ -12,7 +14,7 @@ def find_min_brown_energy(task, lb, rb, deadline, green_energy_available):
     end = deadline-rb
 
     if end - start < task.runtime:
-        raise Exception(f'Interval length is not enough to schedule task {task.id}: runtime={task.runtime} start={start} end={end}')
+        raise IntervalException(task, start, end)
 
     green_power_interval = _slice_green_power_available_list(green_energy_available, start, end)
     start_min = start + _find_min_brown_energy_in_interval(task, green_power_interval)
@@ -24,7 +26,6 @@ def _slice_green_power_available_list(actual_green_power_available, start, end):
     available_green_powers = []
 
     g_power_iter = iter(actual_green_power_available)
-
     previous_time, previous_available_green_power = next(g_power_iter, (float('inf'), -1))
     current_time = -1
 
@@ -94,13 +95,29 @@ def _find_min_brown_energy_in_interval(task, green_power_interval):
             time, green_power = second_current_power_event
             distance_to_second = time - task_start
 
+        distance_to_last = float('inf')
+        last_power_event = current_green_events[-1] if len(current_green_events) >= 2 else None
+        if last_power_event:
+            time, green_power = last_power_event
+            distance_to_last = time - (task_start + task.runtime)
+
         distance_to_next = float('inf')
         if next_power_event:
             time, green_power = next_power_event
             distance_to_next = time - task_end
 
+        if 0 < distance_to_last < distance_to_second:
+            if len(current_green_events) > 0:
+                first_event_time, p = current_green_events[0]
+                if first_event_time < task_start:
+                    current_green_events.popleft()
+            task_start += distance_to_last
+            task_end = task_start + task.runtime
+            continue
+
+
         # Choose next start
-        if distance_to_second <= distance_to_next:
+        elif distance_to_second <= distance_to_next:
             task_start += distance_to_second
             if len(current_green_events) > 0:
                 first_event_time, p = current_green_events[0]
@@ -173,11 +190,3 @@ def _calculate_brown_energy_of_task(task, task_start, current_green_events):
             break
 
     return current_brown_energy_usage
-
-
-
-if __name__ == '__main__':
-    # TODO move to tests class
-    _test_slice_green_power_available_list()
-    _test_find_min_brown_energy()
-    _test_calculate_brown_energy_of_task()
