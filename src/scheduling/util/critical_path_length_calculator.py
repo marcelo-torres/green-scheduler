@@ -65,20 +65,3 @@ def _get_max_of_level(graph):
                 if task.runtime > current_max:
                     max_of_level[level] = task.runtime
     return max_of_level
-
-
-
-
-if __name__ == '__main__':
-    def create_graph():
-
-
-        return graph
-
-
-    graph = create_graph()
-
-    critical_path_length = calc_critical_path_length(graph)
-    print(critical_path_length)
-
-    assert critical_path_length == 62
