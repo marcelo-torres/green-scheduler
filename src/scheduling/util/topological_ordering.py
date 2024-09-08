@@ -1,4 +1,4 @@
-def calculate_upward_rank_recursive(task, current_rank, ranks):
+def _calculate_upward_rank_recursive(task, current_rank, ranks):
 
     if task.id not in ranks or ranks[task.id] < current_rank:
         ranks[task.id] = current_rank
@@ -6,12 +6,12 @@ def calculate_upward_rank_recursive(task, current_rank, ranks):
     if len(task.successors) > 0:
         for successor in task.successors:
             if successor.id not in ranks or ranks[successor.id] < current_rank+1:
-                calculate_upward_rank_recursive(successor, current_rank + 1, ranks)
+                _calculate_upward_rank_recursive(successor, current_rank + 1, ranks)
 
 
 def calculate_upward_rank(graph):
     ranks = {}
-    calculate_upward_rank_recursive(graph.get_first_task(), 0, ranks)
+    _calculate_upward_rank_recursive(graph.get_first_task(), 0, ranks)
     return ranks
 
 

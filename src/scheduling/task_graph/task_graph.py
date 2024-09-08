@@ -1,3 +1,4 @@
+from src.scheduling.task_graph.create_graph_exception import CreateGraphException
 from src.scheduling.task_graph.task import Task
 
 
@@ -27,7 +28,7 @@ class TaskGraph:
 
     def get_first_task(self):
         if self.start_task_id is None:
-            raise Exception('start_task_id not defined')
+            raise CreateGraphException('start_task_id not defined')
         return self.get_task(
             self.start_task_id
         )
