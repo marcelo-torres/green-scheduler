@@ -114,18 +114,15 @@ class EnergyUsageCalculator:
     def calculate_energy_usage(self):
         return _calculate(self.power_events)
 
-    def calculate_energy_usage_for_scheduling(self, scheduling, new_task=None, new_task_start_time=None):
+    def calculate_energy_usage_for_scheduling(self, scheduling):
 
-        power_events = []
-
-        self._append_green_power_events(power_events)
-        self._append_scheduling_power_events(power_events, scheduling)
-        _append_new_task(power_events, new_task, new_task_start_time)
+        self._init()
+        self._append_scheduling_power_events(self.power_events, scheduling)
 
         # Sort power events by time
-        power_events.sort(key=lambda d: d[0])
+        self.power_events.sort(key=lambda d: d[0])
 
-        return _calculate(power_events)
+        return _calculate(self.power_events)
 
     def get_green_power_available(self):
         # TODO test this function
