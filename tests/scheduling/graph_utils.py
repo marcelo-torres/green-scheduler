@@ -102,7 +102,7 @@ def get_stencil_graph():
         graph.create_dependency(task_1.id, task.id)
 
     # Level 2
-    task_5 = graph.add_new_task(5, 10, 5)
+    task_5 = graph.add_new_task(5, 3, 5)
     task_6 = graph.add_new_task(6, 6, 6)
     task_7 = graph.add_new_task(7, 7, 1)
 
@@ -113,7 +113,7 @@ def get_stencil_graph():
             graph.create_dependency(parent.id, child.id)
 
     # Level 3
-    task_8 = graph.add_new_task(8, 10, 1)
+    task_8 = graph.add_new_task(8, 3, 1)
     task_9 = graph.add_new_task(9, 1, 4)
     task_10 = graph.add_new_task(10, 2, 7)
 
