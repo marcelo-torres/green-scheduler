@@ -76,7 +76,7 @@ class EnergyUsageCalculatorTest(unittest.TestCase):
 
     def do_test_get_green_power_available(self, green_energy, interval_size, expected_green_power_available,
                                           scheduled_tasks=None):
-        calculator = EnergyUsageCalculator(TaskGraph(), green_energy, interval_size)
+        calculator = EnergyUsageCalculator(green_energy, interval_size)
 
         if scheduled_tasks:
             for start_time, task in scheduled_tasks:
@@ -86,3 +86,75 @@ class EnergyUsageCalculatorTest(unittest.TestCase):
         self.assertEqual(green_power_available, expected_green_power_available)
 
 
+    def test_scheduling_no_task(self):
+        green_energy = [0, 10, 20, 10, 0, 20, 40]
+        interval_size = 10
+
+        graph = TaskGraph()
+        graph.add_new_task(1, 10, 5)
+
+        scheduling = {}
+
+        calculator = EnergyUsageCalculator(green_energy, interval_size)
+        brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling, graph)
+
+        self.assertEqual(0, brown_energy_used)
+        self.assertEqual(1000, green_energy_not_used)
+        self.assertEqual(0, total_energy)
+
+    def test_scheduling_single_task(self):
+        green_energy = [0, 10, 20, 10, 0, 20, 40]
+        interval_size = 10
+
+        graph = TaskGraph()
+        graph.add_new_task(1, 10, 5)
+
+        scheduling = {
+            1: 0
+        }
+
+        calculator = EnergyUsageCalculator(green_energy, interval_size)
+        brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling, graph)
+
+        self.assertEqual(50, brown_energy_used)
+        self.assertEqual(1000, green_energy_not_used)
+        self.assertEqual(50, total_energy)
+
+    def test_scheduling_single_big_task(self):
+        green_energy = [0, 10, 20, 10, 0, 20, 40]
+        interval_size = 10
+
+        graph = TaskGraph()
+        graph.add_new_task(1, 41, 5)
+
+        scheduling = {
+            1: 0
+        }
+
+        calculator = EnergyUsageCalculator(green_energy, interval_size)
+        brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(
+            scheduling, graph)
+
+        self.assertEqual(55, brown_energy_used)
+        self.assertEqual(850, green_energy_not_used)
+        self.assertEqual(205, total_energy)
+
+    def test_scheduling_two_tasks(self):
+        green_energy = [0, 10, 20, 10, 0, 20, 40]
+        interval_size = 10
+
+        graph = TaskGraph()
+        graph.add_new_task(1, 10, 5)
+        graph.add_new_task(2, 5, 20)
+
+        scheduling = {
+            1: 0,
+            2: 10
+        }
+
+        calculator = EnergyUsageCalculator(green_energy, interval_size)
+        brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling, graph)
+
+        self.assertEqual(100, brown_energy_used)
+        self.assertEqual(950, green_energy_not_used)
+        self.assertEqual(150, total_energy)

@@ -59,8 +59,8 @@ def run_all_tests():
         for c in c_values:
             print(c)
             scheduling = schedule_graph(graph, 124, green_power, interval_size, c=c, show='all')
-            calculator = EnergyUsageCalculator(graph, green_power, interval_size)
-            brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling)
+            calculator = EnergyUsageCalculator(green_power, interval_size)
+            brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling, graph)
             last_task = graph.get_task(7)
             makespan = scheduling[last_task.id] + last_task.runtime
             print(f'c={c}:\tbrown_energy_used: {brown_energy_used}J | makespan: {makespan}s')
@@ -98,8 +98,8 @@ def run_single_test():
     scheduling = schedule_graph(graph, min_makespan * 2, green_power, interval_size, c=0.3, show='last', max_power=max_green_power)
     draw(graph, scheduling)
 
-    calculator = EnergyUsageCalculator(graph, green_power, interval_size)
-    brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling)
+    calculator = EnergyUsageCalculator(green_power, interval_size)
+    brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling, graph)
 
     makespan = calc_makespan(scheduling, graph)
 

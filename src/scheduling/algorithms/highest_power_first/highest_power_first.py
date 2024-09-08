@@ -36,7 +36,7 @@ def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None
     tasks.sort(key=get_task_ordering(task_ordering), reverse=True)
 
     boundary_calc = BoundaryCalculator(graph, deadline, c)
-    energy_usage_calculator = EnergyUsageCalculator(graph, green_power, interval_size)
+    energy_usage_calculator = EnergyUsageCalculator(green_power, interval_size)
 
     for task in tasks:
         # 2.1)  Calculate boundaries to avoid that a single task gets all slack time

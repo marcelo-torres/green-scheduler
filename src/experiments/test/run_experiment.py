@@ -33,9 +33,9 @@ def run_highest_power_first(graph, deadline, green_power, interval_size, c, max_
     report(f'\tmakespan: %.4fs' % makespan)
 
     # Energy Report
-    calculator = EnergyUsageCalculator(graph, green_power, interval_size)
+    calculator = EnergyUsageCalculator(green_power, interval_size)
     brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(
-        scheduling)
+        scheduling, graph)
 
     report(f'\tbrown_energy_used: %.4fJ' % brown_energy_used)
     report(f'\tgreen_energy_not_used: %.4fJ' % green_energy_not_used)

@@ -95,8 +95,8 @@ def execute_generator():
         task = graph.get_task(task_id)
         print(f'\tStart: {start_time} Runtime: {task.runtime}s')
 
-    calculator = EnergyUsageCalculator(graph, green_power, interval_size)
-    brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling)
+    calculator = EnergyUsageCalculator(green_power, interval_size)
+    brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling, graph)
 
     makespan = calc_makespan(scheduling, graph)
     max_active_tasks, mean, std, active_tasks_by_time = count_active_tasks(scheduling, graph)
