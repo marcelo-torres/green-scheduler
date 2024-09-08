@@ -39,8 +39,8 @@ class EnergyUsageCalculator:
         self.graph = graph
         self.green_energy = green_energy
         self.interval_size = interval_size
-
         self.power_events = []
+        self._init()
 
     def _append_green_power_events(self, power_events):
         g_power_start_time = 0
@@ -97,12 +97,12 @@ class EnergyUsageCalculator:
 
         return brown_energy_used, green_energy_not_used, total_energy
 
-    def init(self):
+    def _init(self):
         self.power_events = []
         self._append_green_power_events(self.power_events)
 
     def reset(self):
-        self.init()
+        self._init()
 
     def add_scheduled_task(self, new_task, start_time):
         _append_task_power_events(self.power_events, new_task, start_time)

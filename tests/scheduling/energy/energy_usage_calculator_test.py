@@ -77,7 +77,6 @@ class EnergyUsageCalculatorTest(unittest.TestCase):
     def do_test_get_green_power_available(self, green_energy, interval_size, expected_green_power_available,
                                           scheduled_tasks=None):
         calculator = EnergyUsageCalculator(TaskGraph(), green_energy, interval_size)
-        calculator.init()
 
         if scheduled_tasks:
             for start_time, task in scheduled_tasks:

@@ -47,7 +47,6 @@ def test_find_min_brown_energy_equal_to_greedy(expected_start_min, lb, rb, deadl
     graph.add_task(task)
 
     energy_usage_calculator = EnergyUsageCalculator(graph, green_power, green_interval_size)
-    energy_usage_calculator.init()
 
     for start_time, scheduled_task in scheduled_tasks:
         graph.add_task(scheduled_task)
