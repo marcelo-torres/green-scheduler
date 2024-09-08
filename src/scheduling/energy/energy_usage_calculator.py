@@ -33,6 +33,46 @@ def _append_new_task(power_events, new_task, new_task_start_time):
     _append_task_power_events(power_events, new_task, new_task_start_time)
 
 
+def _calculate(power_events):
+    # Power along iterations
+    green_power = 0
+    requested_power = 0
+
+    # Energy used
+    brown_energy_used = 0
+    green_energy_not_used = 0
+    total_energy = 0
+
+    start_time = 0
+    for power_event in power_events:
+
+        time, event_type, power = power_event
+
+        # Convert power and duration to energy
+        event_duration = time - start_time
+        green_energy = event_duration * green_power
+        requested_energy = event_duration * requested_power
+
+        if requested_energy > green_energy:
+            brown_energy_used += requested_energy - green_energy
+
+        elif requested_energy < green_energy:
+            green_energy_not_used += green_energy - requested_energy
+
+        total_energy += requested_energy
+
+        if event_type == 'green_power':
+            green_power = power
+        elif event_type == 'task':
+            requested_power += power
+        else:
+            raise EventTypeException(f'No eventy type {event_type} defined')
+
+        start_time = time
+
+    return brown_energy_used, green_energy_not_used, total_energy
+
+
 class EnergyUsageCalculator:
 
     def __init__(self, graph, green_energy, interval_size):
@@ -58,45 +98,6 @@ class EnergyUsageCalculator:
             scheduled_task = self.graph.get_task(task_id)
             _append_task_power_events(power_events, scheduled_task, start_time)
 
-    def _calculate(self, power_events):
-        # Power along iterations
-        green_power = 0
-        requested_power = 0
-
-        # Energy used
-        brown_energy_used = 0
-        green_energy_not_used = 0
-        total_energy = 0
-
-        start_time = 0
-        for power_event in power_events:
-
-            time, event_type, power = power_event
-
-            # Convert power and duration to energy
-            event_duration = time - start_time
-            green_energy = event_duration * green_power
-            requested_energy = event_duration * requested_power
-
-            if requested_energy > green_energy:
-                brown_energy_used += requested_energy - green_energy
-
-            elif requested_energy < green_energy:
-                green_energy_not_used += green_energy - requested_energy
-
-            total_energy += requested_energy
-
-            if event_type == 'green_power':
-                green_power = power
-            elif event_type == 'task':
-                requested_power += power
-            else:
-                raise Exception(f'No eventy type {event_type} defined')
-
-            start_time = time
-
-        return brown_energy_used, green_energy_not_used, total_energy
-
     def _init(self):
         self.power_events = []
         self._append_green_power_events(self.power_events)
@@ -111,7 +112,7 @@ class EnergyUsageCalculator:
         _remove_task_power_event(self.power_events, scheduled_task, start_time)
 
     def calculate_energy_usage(self):
-        return self._calculate(self.power_events)
+        return _calculate(self.power_events)
 
     def calculate_energy_usage_for_scheduling(self, scheduling, new_task=None, new_task_start_time=None):
 
@@ -124,7 +125,7 @@ class EnergyUsageCalculator:
         # Sort power events by time
         power_events.sort(key=lambda d: d[0])
 
-        return self._calculate(power_events)
+        return _calculate(power_events)
 
     def get_green_power_available(self):
         # TODO test this function
@@ -162,8 +163,15 @@ class EnergyUsageCalculator:
                 current_green_power = power
             elif type == 'task':
                 current_power_request += power
+            else:
+                raise EventTypeException(f'No eventy type {type} defined')
             previous_time = time
 
         add_actual_green_power_available(previous_time, actual_green_power_available, current_green_power,
                                          current_power_request, last_power_added)
         return actual_green_power_available
+
+
+class EventTypeException(Exception):
+    def __init__(self, message):
+        super().__init__(message)
