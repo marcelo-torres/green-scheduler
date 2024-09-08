@@ -72,7 +72,7 @@ def run_all_tests():
 
 
 def run_single_test():
-    resources_path = '../../../../../resources'
+    resources_path = '../../../resources'
 
     min_task_power = 20
     max_task_power = 100

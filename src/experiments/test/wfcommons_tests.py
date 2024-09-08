@@ -56,7 +56,7 @@ def execute_generator():
 
     # Workflow generation
     synthetic_path = f'{resources_path}/wfcommons/synthetic'
-    num_tasks = 10000
+    num_tasks = 1000 #10000
     runtime_factor = 2.0
     generator = WorkflowGenerator(SrasearchRecipe.from_num_tasks(num_tasks, runtime_factor=runtime_factor))
     workflow_name = f'{synthetic_path}/srasearch-workflow-t{num_tasks}-r{runtime_factor * 10}.json'
