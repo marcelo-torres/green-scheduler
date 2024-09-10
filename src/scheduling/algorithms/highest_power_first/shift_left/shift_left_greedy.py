@@ -16,17 +16,17 @@ def shift_left_tasks_to_save_energy_greedy(graph, scheduling, boundary_calc, ene
         start_time = scheduling[task.id]
 
         min_brown_energy_used = energy_usage_calc.calculate_energy_usage()[0]
-        energy_usage_calc.remove_scheduled_task(task, start_time)
+        energy_usage_calc.remove_scheduled_task(task)
 
         for j in range(start_time-lcb):
 
             new_start_time = lcb + j
 
-            energy_usage_calc.remove_scheduled_task(task, new_start_time)
+            energy_usage_calc.remove_scheduled_task(task) # TODO check this function call
             brown_energy_used = energy_usage_calc.calculate_energy_usage()[0]
 
             if brown_energy_used <= min_brown_energy_used and new_start_time < scheduling[task.id]:
                 min_brown_energy_used = brown_energy_used
                 scheduling[task.id] = new_start_time
             else:
-                energy_usage_calc.remove_scheduled_task(task, new_start_time)
+                energy_usage_calc.remove_scheduled_task(task)

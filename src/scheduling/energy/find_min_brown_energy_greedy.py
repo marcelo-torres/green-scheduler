@@ -9,7 +9,7 @@ def find_min_brown_energy_greedy(task, lb, rb, deadline, calculator):
 
         calculator.add_scheduled_task(task, start)
         brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage()
-        calculator.remove_scheduled_task(task, start)
+        calculator.remove_scheduled_task(task)
 
         if brown_energy_used < min_brown_energy_usage:
             min_brown_energy_usage = brown_energy_used

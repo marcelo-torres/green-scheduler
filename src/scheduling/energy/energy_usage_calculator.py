@@ -1,28 +1,62 @@
-def _append_task_power_events(power_events, task, start_time):
-    power_events.append(
-        (start_time, 'task', task.power)
-    )
-    finish_time = start_time + task.runtime
-    power_events.append(
-        (finish_time, 'task', -task.power)
-    )
-    power_events.sort(key=lambda d: d[0])  # TODO use binary search tree
+import pyredblack
 
+TASK_EVENT = 'task'
+G_POWER_EVENT = 'green_power'
 
-def _remove_task_power_event(power_events, task, start_time):
-    indexes_to_remove = []
-    finish_time = start_time + task.runtime
-    for index, data in enumerate(power_events):
-        time, type, power = data
-        if type == 'task':
-            if time == start_time and power == task.power and len(indexes_to_remove) == 0:
-                indexes_to_remove.append(index)
-            elif time == finish_time and power == -task.power and len(indexes_to_remove) == 1:
-                indexes_to_remove.append(index - 1)  # Removing the previous index decreases the current index
+class PowerEvents:
+
+    def __init__(self):
+        self.power_events = pyredblack.rbdict()
+        self.task_scheduling = {}
+
+    def _add_power_event(self, event_type, power, time):
+        if time not in self.power_events:
+            events = []
+            self.power_events[time] = events
+        else:
+            events = self.power_events[time]
+
+        events.append(
+            (event_type, power)
+        )
+
+    def _remove_where(self, event_type, power, time):
+        events = self.power_events[time]
+        for index, data in enumerate(events):
+            current_event_type, current_power = data
+            if event_type == current_event_type and power == current_power:
+                del events[index]
+                if len(events) == 0:
+                    del self.power_events[time]
                 break
 
-    for index_to_remove in indexes_to_remove:
-        del power_events[index_to_remove]
+    def append_task_power(self, task, start_time):
+        self._add_power_event(TASK_EVENT, task.power, start_time)
+        finish_time = start_time + task.runtime
+        self._add_power_event(TASK_EVENT, -task.power, finish_time)
+        self.task_scheduling[task.id] = start_time
+
+    def append_green_power(self, green_power, time):
+        self._add_power_event(G_POWER_EVENT, green_power, time)
+
+    def remove_task_power_event(self, task):
+        start_time = self.task_scheduling[task.id]
+        finish_time = start_time + task.runtime
+
+        self._remove_where(TASK_EVENT, task.power, start_time)
+        self._remove_where(TASK_EVENT, -task.power, finish_time)
+
+        del self.task_scheduling[task.id]
+
+    def items(self):
+        """"
+        :return: a tuple in the form:
+            (
+                time,
+                [(event_type, power), (event_type, power)]
+            )
+        """
+        return self.power_events.items()
 
 
 def _calculate(power_events):
@@ -36,9 +70,7 @@ def _calculate(power_events):
     total_energy = 0
 
     start_time = 0
-    for power_event in power_events:
-
-        time, event_type, power = power_event
+    for time, events in power_events.items():
 
         # Convert power and duration to energy
         event_duration = time - start_time
@@ -53,12 +85,13 @@ def _calculate(power_events):
 
         total_energy += requested_energy
 
-        if event_type == 'green_power':
-            green_power = power
-        elif event_type == 'task':
-            requested_power += power
-        else:
-            raise EventTypeException(f'No eventy type {event_type} defined')
+        for event_type, power in events:
+            if event_type == G_POWER_EVENT:
+                green_power = power
+            elif event_type == TASK_EVENT:
+                requested_power += power
+            else:
+                raise EventTypeException(f'No eventy type {event_type} defined')
 
         start_time = time
 
@@ -70,32 +103,27 @@ class EnergyUsageCalculator:
     def __init__(self, green_energy, interval_size):
         self.green_energy = green_energy
         self.interval_size = interval_size
-        self.power_events = []
         self._init()
 
-    def _append_green_power_events(self, power_events):
+    def _append_green_power_events(self):
         g_power_start_time = 0
         for g_power in self.green_energy:
-            power_events.append(
-                (g_power_start_time, 'green_power', g_power)
-            )
+            self.power_events.append_green_power(g_power, g_power_start_time)
             g_power_start_time += self.interval_size
-        power_events.append(
-            (g_power_start_time, 'green_power', 0)
-        )
+        self.power_events.append_green_power(0, g_power_start_time)
 
     def _init(self):
-        self.power_events = []
-        self._append_green_power_events(self.power_events)
+        self.power_events = PowerEvents()
+        self._append_green_power_events()
 
     def reset(self):
         self._init()
 
     def add_scheduled_task(self, new_task, start_time):
-        _append_task_power_events(self.power_events, new_task, start_time)
+        self.power_events.append_task_power(new_task, start_time)
 
-    def remove_scheduled_task(self, scheduled_task, start_time):
-        _remove_task_power_event(self.power_events, scheduled_task, start_time)
+    def remove_scheduled_task(self, scheduled_task):
+        self.power_events.remove_task_power_event(scheduled_task)
 
     def calculate_energy_usage(self):
         return _calculate(self.power_events)
@@ -107,10 +135,7 @@ class EnergyUsageCalculator:
         # Append scheduling power events
         for task_id, start_time in scheduling.items():
             scheduled_task = graph.get_task(task_id)
-            _append_task_power_events(self.power_events, scheduled_task, start_time)
-
-        # Sort power events by time
-        self.power_events.sort(key=lambda d: d[0])
+            self.power_events.append_task_power(scheduled_task, start_time)
 
         return _calculate(self.power_events)
 
@@ -119,7 +144,6 @@ class EnergyUsageCalculator:
         actual_green_power_available = []
         current_green_power = 0
         current_power_request = 0
-        previous_time = 0
 
         last_power_added = -1
 
@@ -137,25 +161,20 @@ class EnergyUsageCalculator:
                 return available_green_power
             return last_power_added
 
-        for time, type, power in self.power_events:
-            is_the_same_time = (time == previous_time)
+        for time, events in self.power_events.items():
 
-            if not is_the_same_time:
-                # Add previous time a power availability
-                last_power_added = add_actual_green_power_available(previous_time, actual_green_power_available,
-                                                                    current_green_power,
-                                                                    current_power_request, last_power_added)
+            for event_type, power in events:
+                if event_type == G_POWER_EVENT:
+                    current_green_power = power
+                elif event_type == TASK_EVENT:
+                    current_power_request += power
+                else:
+                    raise EventTypeException(f'No eventy type {event_type} defined')
 
-            if type == 'green_power':
-                current_green_power = power
-            elif type == 'task':
-                current_power_request += power
-            else:
-                raise EventTypeException(f'No eventy type {type} defined')
-            previous_time = time
+            last_power_added = add_actual_green_power_available(time, actual_green_power_available,
+                                                                current_green_power,
+                                                                current_power_request, last_power_added)
 
-        add_actual_green_power_available(previous_time, actual_green_power_available, current_green_power,
-                                         current_power_request, last_power_added)
         return actual_green_power_available
 
 
