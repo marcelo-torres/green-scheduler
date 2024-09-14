@@ -19,7 +19,9 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Install Cython dependencies
-        run: pip install Cython pyredblack
+        run: pip install Cython
+      - name: Install pyredblack dependencies
+        run: pip install pyredblack
       - name: Install tox and any other packages
         run: pip install tox
       - name: Run tox
