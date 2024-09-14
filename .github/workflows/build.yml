@@ -18,10 +18,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - name: Install Cython dependencies
+      - name: Install Cython # Cython needs to be installed before pyredblack
         run: pip install Cython
-      - name: Install pyredblack dependencies
-        run: pip install pyredblack
       - name: Install tox and any other packages
         run: pip install tox
       - name: Run tox
