@@ -1,17 +1,14 @@
-from collections import deque
-
 class IntervalException(Exception):
     def __init__(self, task, start, end):
         super().__init__(f'Interval length is not enough to schedule task {task.id}: runtime={task.runtime} start={start} end={end}')
 
 
 def find_min_brown_energy(task, lb, rb, deadline, green_energy_available):
-
     if task.power == 0:
         return lb
 
     start = lb
-    end = deadline-rb
+    end = deadline - rb
 
     if end - start < task.runtime:
         raise IntervalException(task, start, end)
@@ -27,7 +24,6 @@ def _slice_green_power_available_list(actual_green_power_available, start, end):
 
     g_power_iter = iter(actual_green_power_available)
     previous_time, previous_available_green_power = next(g_power_iter, (float('inf'), -1))
-    current_time = -1
 
     while previous_time <= end:
         current_time, current_available_green_power = next(g_power_iter, (float('inf'), -1))
@@ -52,103 +48,54 @@ def _slice_green_power_available_list(actual_green_power_available, start, end):
 
 
 def _find_min_brown_energy_in_interval(task, green_power_interval):
-
-    if task.runtime == 0:
-        return 0
-
-    start_min = 0
-    min_brown_energy_usage = float('inf')
-
-    task_start = 0
-    task_end = task_start + task.runtime
-
     if len(green_power_interval) == 0:
-        #print('warn: len(green_power_interval) == 0')
         return 0
 
-    # Load current green events
-    current_green_events = deque()
-    g_power_iter = iter(green_power_interval)
+    start_times_to_verify = _start_times_to_verify(task, green_power_interval)
+
+    g_iter = iter(green_power_interval)
+    current_green_events = _load_current_power_green_events(g_iter, task)
+
+    # Calculate the first time
+    first_start_time = start_times_to_verify.pop(0)
+    current_brown_energy_usage = _calculate_brown_energy_of_task(task, first_start_time, current_green_events)
+
+    # Minimal
+    start_min = first_start_time
+    min_brown_energy_usage = current_brown_energy_usage
+
+    previous_start_time = first_start_time
+
+    for start_time in start_times_to_verify:
+
+        # Calculate brown energy change
+        b_e_to_increase = _brown_energy_to_increase(start_time, previous_start_time, current_green_events, g_iter, task)
+        b_e_to_decrease = _brown_energy_to_decrease(start_time, previous_start_time, current_green_events, task)
+
+        # Adjust brown energy usage
+        current_brown_energy_usage += b_e_to_increase
+        current_brown_energy_usage -= b_e_to_decrease
+
+        # Verify if it is minimal
+        if current_brown_energy_usage < min_brown_energy_usage:
+            min_brown_energy_usage = current_brown_energy_usage
+            start_min = start_time
+
+        previous_start_time = start_time
+    return start_min
+
+
+def _load_current_power_green_events(g_iter, task):
+    current_green_events = []
+
     time = -1
-    while time < task_end:
-        time, power = next(g_power_iter, (-1, 0))
+    while time < task.runtime:
+        time, power = next(g_iter, (-1, 0))
         current_green_events.append(
             (time, power)
         )
 
-    next_power_event = None
-
-    while True:
-        # Compute brown energy usage
-        current_brown_energy_usage = _calculate_brown_energy_of_task(task, task_start, current_green_events)
-        if current_brown_energy_usage < min_brown_energy_usage:
-            min_brown_energy_usage = current_brown_energy_usage
-            start_min = task_start
-
-        # Calculate distances
-        second_current_power_event = current_green_events[1] if len(current_green_events) >= 2 else None
-        if next_power_event is None:
-            next_power_event = next(g_power_iter, None)
-
-        distance_to_second = float('inf')
-        if second_current_power_event:
-            time, green_power = second_current_power_event
-            distance_to_second = time - task_start
-
-        distance_to_last = float('inf')
-        last_power_event = current_green_events[-1] if len(current_green_events) >= 2 else None
-        if last_power_event:
-            time, green_power = last_power_event
-            distance_to_last = time - (task_start + task.runtime)
-
-        distance_to_next = float('inf')
-        if next_power_event:
-            time, green_power = next_power_event
-            distance_to_next = time - task_end
-
-        if 0 < distance_to_last < distance_to_second:
-            if len(current_green_events) > 0:
-                first_event_time, p = current_green_events[0]
-                if first_event_time < task_start:
-                    current_green_events.popleft()
-            task_start += distance_to_last
-            task_end = task_start + task.runtime
-            continue
-
-
-        # Choose next start
-        elif distance_to_second <= distance_to_next:
-            task_start += distance_to_second
-            if len(current_green_events) > 0:
-                first_event_time, p = current_green_events[0]
-                last_event_time, p = green_power_interval[-1]
-                if last_event_time - first_event_time >= task.runtime:
-                    current_green_events.popleft()
-                else:
-                    break
-
-        elif distance_to_next < distance_to_second:
-            task_start += distance_to_next
-            current_green_events.append(next_power_event)
-            next_power_event = None
-
-        # Adjust task end taking into account the new task start
-        task_end = task_start + task.runtime
-
-        # If current interval length is lesser than task runtime, then increase the interval
-        # TODO tests if it is possible to request more than one next interval
-        first_event_time, p = current_green_events[0]
-        last_event_time, p = current_green_events[-1]
-        if last_event_time - first_event_time < task.runtime:
-            if next_power_event is None:
-                next_power_event = next(g_power_iter, None)
-                if next_power_event is None:
-                    break
-
-            current_green_events.append(next_power_event)
-            next_power_event = None
-
-    return start_min
+    return current_green_events
 
 
 def _calculate_brown_energy_of_task(task, task_start, current_green_events):
@@ -190,3 +137,141 @@ def _calculate_brown_energy_of_task(task, task_start, current_green_events):
             break
 
     return current_brown_energy_usage
+
+
+def _brown_energy_to_increase(start_time, previous_start_time, current_green_events, g_iter, task):
+    current_brown_energy_usage = 0
+
+    finish_time = start_time + task.runtime
+    last_finish_time = previous_start_time + task.runtime
+
+    time_to_compute = start_time - previous_start_time
+    already_computed_time = 0
+
+    start = last_finish_time if last_finish_time <= start_time else last_finish_time
+    while already_computed_time < time_to_compute:
+        interval_end = current_green_events[-1][0]
+        if finish_time <= interval_end:
+            duration = finish_time - start
+            start = finish_time
+        else:
+            duration = interval_end - start
+            start = interval_end
+
+            # Next interval
+            new_last_time, new_g_power = next(g_iter)
+            current_green_events.append(
+                (new_last_time, new_g_power)
+            )
+
+        last_interval_g_power = current_green_events[-2][1]
+        brown_power_to_increase = task.power - last_interval_g_power if task.power > last_interval_g_power else 0
+
+        brown_energy_to_increase = brown_power_to_increase * duration
+        current_brown_energy_usage += brown_energy_to_increase
+
+        already_computed_time += duration
+
+    return current_brown_energy_usage
+
+
+def _brown_energy_to_decrease(start_time, previous_start_time, current_green_events, task):
+    _, g_power = current_green_events[0]
+
+    brown_power_to_decrease = task.power - g_power if task.power > g_power else 0
+    duration = start_time - previous_start_time
+
+    brown_energy_to_decrease = brown_power_to_decrease * duration
+
+    # pop the first interval if start time is in the second interval
+    if len(current_green_events) > 1 and start_time >= current_green_events[1][0]:
+        current_green_events.pop(0)
+
+    return brown_energy_to_decrease
+
+
+def _start_times_to_verify(task, green_power_interval):
+    """
+    This functions list all the start times to verify which one provides minimal brown energy usage. This approach tests
+    only the necessary time stamps.
+
+    For the green power interval [(0, 5), (5, 8), (7, 3), (10, 0)] we have:
+        - 5 seconds of 5W (5s - 0s)
+        - 2 seconds of 8W (7s - 5s)
+        - 3 seconds of 3W (10s - 7s)
+
+    As in our model a task have a constant power request, we do not need to recalculate the power usage during the same
+    power interval. Then, we need to calculate the timestamps related to task start and task end.
+
+    :param task: task to be scheduled
+    :param green_power_interval: list of tuples in the form (start time, green power available)
+    :return: a list of start times to verify which one provide minimal green energy usage
+    """
+
+    if len(green_power_interval) == 0:
+        return []
+
+    start_time = green_power_interval[0][0]
+    end_time = green_power_interval[-1][0]
+
+    task_can_start = []
+    task_can_finish = []
+
+    for time, _ in green_power_interval:
+
+        # Check if a task can start at a given time
+        if time + task.runtime <= end_time:
+            task_can_start.append(time)
+
+        # TODO - it causes a bug
+        # Check if a task can finish at a given time
+        #previous_interval_length = time - previous_time
+        #if previous_interval_length < task.runtime:
+            # If the previous interval length is bigger than task runtime, then the task do not span across several
+            # intervals. Therefore, there is no need to schedule a task to finish by the end of the interval, because
+            # the brown power usage would be the same then by scheduling at beginning of the interval.
+
+        # Check if there is enough time to task end by time
+        time_to_start = time - task.runtime
+        if time_to_start > start_time:
+            task_can_finish.append(time_to_start)
+
+    return _merge_sorted_lists_without_repeated_elements(task_can_start, task_can_finish)
+
+
+def _merge_sorted_lists_without_repeated_elements(list1, list2):
+    list1_iter = iter(list1)
+    list2_iter = iter(list2)
+
+    merge_list = []
+
+    l1_element = next(list1_iter, None)
+    l2_element = next(list2_iter, None)
+
+    while l1_element is not None and l2_element is not None:
+        if l1_element < l2_element:
+            merge_list.append(l1_element)
+            l1_element = next(list1_iter, None)
+
+        elif l2_element < l1_element:
+            merge_list.append(l2_element)
+            l2_element = next(list2_iter, None)
+
+        else:
+            # If the elements are equal, add just one
+            merge_list.append(l1_element)
+            l1_element = next(list1_iter, None)
+            l2_element = next(list2_iter, None)
+
+    while l1_element is not None:
+        merge_list.append(l1_element)
+        l1_element = next(list1_iter, None)
+
+    while l2_element is not None:
+        merge_list.append(l2_element)
+        l2_element = next(list2_iter, None)
+
+    return merge_list
+
+
+

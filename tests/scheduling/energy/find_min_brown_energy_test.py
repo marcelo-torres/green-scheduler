@@ -2,7 +2,8 @@ import pytest
 
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
 from src.scheduling.energy.find_min_brown_energy import _slice_green_power_available_list, \
-    _find_min_brown_energy_in_interval, _calculate_brown_energy_of_task, find_min_brown_energy, IntervalException
+    _find_min_brown_energy_in_interval, _calculate_brown_energy_of_task, IntervalException, \
+    find_min_brown_energy
 from src.scheduling.energy.find_min_brown_energy_greedy import find_min_brown_energy_greedy
 from src.scheduling.task_graph.task import Task
 from src.scheduling.task_graph.task_graph import TaskGraph
