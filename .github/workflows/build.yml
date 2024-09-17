@@ -20,6 +20,8 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Install Cython # Cython needs to be installed before pyredblack
         run: pip install Cython
+      - name: Install pyredblack dependencies # pyredblack needs to be installed before
+        run: pip install pyredblack
       - name: Install tox and any other packages
         run: pip install tox
       - name: Run tox
