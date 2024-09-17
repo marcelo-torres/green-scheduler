@@ -148,7 +148,7 @@ def _brown_energy_to_increase(start_time, previous_start_time, current_green_eve
     time_to_compute = start_time - previous_start_time
     already_computed_time = 0
 
-    start = last_finish_time if last_finish_time <= start_time else last_finish_time
+    start = last_finish_time
     while already_computed_time < time_to_compute:
         interval_end = current_green_events[-1][0]
         if finish_time <= interval_end:
