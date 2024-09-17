@@ -37,13 +37,22 @@ def test_with_green_energy_available_is_null():
     assert start_min == 10
 
 @pytest.mark.parametrize(
-    'expected_start_min, lb, rb, deadline, green_power, green_interval_size, task, scheduled_tasks',
+    'expected_start_min, lb, rb, deadline, green_power, green_interval_size, task, scheduled_tasks, description',
     [
-        (0, 0, 0, 50, [0, 0, 0, 0, 0, 0], 10, Task(1, 17, 100), []),
-        (13, 0, 0, 100, [1, 4, 5, 0, 10, 0], 5, Task(1, 12, 9), []),
+        (0, 0, 0, 50, [0, 0, 0, 0, 0, 0], 10, Task(1, 17, 100), [], 'no green energy'),
+        (13, 0, 0, 100, [1, 4, 5, 0, 10, 0], 5, Task(1, 12, 9), [], 'task spans over intervals'),
+        (0, 0, 0, 100, [5, 2, 5, 2], 10, Task(1, 10, 5), [], 'task fits'),
+        (0, 0, 0, 100, [2, 0, 1, 2, 0], 10, Task(1, 1, 3), [], 'min at start'),
+        (30, 0, 0, 100, [2, 0, 4, 5], 10, Task(1, 1, 5), [], 'min at end'),
+        (2, 0, 0, 100, [1, 2, 3, 2, 1, 2, 3, 2], 2, Task(1, 5, 5), [], 'never fits'),
+        (7, 0, 0, 100, [0, 0, 0, 0, 1, 0, 0], 2, Task(1, 3, 100), [], 'only place'),
+        (0, 0, 0, 100, [10, 15, 20, 30], 10, Task(1, 3, 31), [(0, Task(2, 40, 100))], 'other task takes all the green energy'),
+        (5, 0, 0, 100, [5, 10, 5, 5], 10, Task(1, 15, 10), [], 'earliest min start'),
+        (5, 0, 0, 100, [20, 10, 5, 5], 10, Task(1, 15, 10), [(0, Task(2, 10, 15))], 'earliest min start with scheduled task'),
+        (10, 0, 0, 100, [20, 10, 5, 5], 10, Task(1, 15, 10), [(0, Task(2, 10, 16))], 'earliest min start with scheduled task with bigger task'),
     ]
 )
-def test_find_min_brown_energy_equal_to_greedy(expected_start_min, lb, rb, deadline, green_power, green_interval_size, task, scheduled_tasks):
+def test_find_min_brown_energy_equal_to_greedy(expected_start_min, lb, rb, deadline, green_power, green_interval_size, task, scheduled_tasks, description):
     graph = TaskGraph()
     graph.add_task(task)
 
@@ -56,8 +65,8 @@ def test_find_min_brown_energy_equal_to_greedy(expected_start_min, lb, rb, deadl
     start_min = find_min_brown_energy(task, lb, rb, deadline, energy_usage_calculator.get_green_power_available())
     start_min_greedy = find_min_brown_energy_greedy(task, lb, rb, deadline, energy_usage_calculator)
 
-    assert expected_start_min == start_min
-    assert start_min == start_min_greedy
+    assert start_min == expected_start_min, f'{description} failed'
+    assert start_min == start_min_greedy, f'{description} - equal to greedy failed'
 
 
 
