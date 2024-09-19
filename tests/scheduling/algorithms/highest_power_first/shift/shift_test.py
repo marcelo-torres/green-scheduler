@@ -1,9 +1,9 @@
 import unittest
 
 from src.scheduling.algorithms.highest_power_first.boundaries.boundary import BoundaryCalculator
-from src.scheduling.algorithms.highest_power_first.shift_left.shift_left import shift_left_tasks_to_save_energy
-from src.scheduling.algorithms.highest_power_first.shift_left.shift_left_greedy import \
-    shift_left_tasks_to_save_energy_greedy
+from src.scheduling.algorithms.highest_power_first.shift_left.shift import shift_tasks_to_save_energy
+from src.scheduling.algorithms.highest_power_first.shift_left.shift_greedy import \
+    shift_tasks_to_save_energy_greedy
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
 from tests.scheduling.graph_utils import get_pipeline_graph
 
@@ -37,9 +37,9 @@ class ShiftLeftTest(unittest.TestCase):
             energy_usage_calc.add_scheduled_task(task, start_time)
 
         if shift_left_function == 'default':
-            shift_left_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energy_usage_calc)
+            shift_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energy_usage_calc)
         elif shift_left_function == 'greedy':
-            shift_left_tasks_to_save_energy_greedy(graph, scheduling, boundary_calc, energy_usage_calc)
+            shift_tasks_to_save_energy_greedy(graph, scheduling, boundary_calc, energy_usage_calc)
         else:
             raise Exception(f'{shift_left_function} not defined')
 

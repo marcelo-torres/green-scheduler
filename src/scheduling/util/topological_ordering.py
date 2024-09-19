@@ -15,11 +15,11 @@ def calculate_upward_rank(graph):
     return ranks
 
 
-def sort_topologically(graph):
+def sort_topologically(graph, reverse=False):
     ranks = calculate_upward_rank(graph)
 
     task_rank_list = list(ranks.items())
-    task_rank_list.sort(key=lambda d: d[1])
+    task_rank_list.sort(key=lambda d: d[1], reverse=reverse)
 
     tasks = [task_rank[0] for task_rank in task_rank_list]
     return tasks

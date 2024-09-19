@@ -2,7 +2,6 @@ import unittest
 
 from src.scheduling.algorithms.highest_power_first.highest_power_first import schedule_graph
 from src.scheduling.task_graph.task_graph import TaskGraph
-from src.scheduling.util.critical_path_length_calculator import calc_critical_path_length
 
 '''
      1---+
@@ -186,6 +185,22 @@ class HighestPowerFirstTest(unittest.TestCase):
         self.assertEqual(31, scheduling[5])
         self.assertEqual(47, scheduling[6])
         self.assertEqual(57, scheduling[7])
+
+    def test_multiple_tasks_g1_with_no_slack_to_delay_and_with_g_energy_and_right_left(self):
+        graph, min_makespan = _get_graph_1()
+
+        min_makespan += 1
+        graph.get_task(6).runtime = 10
+
+        scheduling = schedule_graph(graph, min_makespan * 2, [0, 10, 20, 10, 0, 20, 40, 20, 0, 0, 0, 30, 0], 10, shift_mode='right-left')
+
+        self.assertEqual(10, scheduling[1])
+        self.assertEqual(20, scheduling[2])
+        self.assertEqual(20, scheduling[3])
+        self.assertEqual(27, scheduling[4])
+        self.assertEqual(31, scheduling[5])
+        self.assertEqual(50, scheduling[6])
+        self.assertEqual(60, scheduling[7])
 
     def test_multiple_tasks_g1_with_slack_to_delay_and_with_g_energy(self):
         graph, min_makespan = _get_graph_1()

@@ -1,7 +1,7 @@
 from src.scheduling.util.topological_ordering import sort_topologically
 
 
-def shift_left_tasks_to_save_energy_greedy(graph, scheduling, boundary_calc, energy_usage_calc):
+def shift_tasks_to_save_energy_greedy(graph, scheduling, boundary_calc, energy_usage_calc):
     # Order tasks by topological order
     tasks = sort_topologically(graph)
 

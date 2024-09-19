@@ -3,7 +3,7 @@ class IntervalException(Exception):
         super().__init__(f'Interval length is not enough to schedule task {task.id}: runtime={task.runtime} start={start} end={end}')
 
 
-def find_min_brown_energy(task, lb, rb, deadline, green_energy_available):
+def find_min_brown_energy(task, lb, rb, deadline, green_energy_available, max_start_mode=False):
     if task.power == 0:
         return lb
 
@@ -14,7 +14,7 @@ def find_min_brown_energy(task, lb, rb, deadline, green_energy_available):
         raise IntervalException(task, start, end)
 
     green_power_interval = _slice_green_power_available_list(green_energy_available, start, end)
-    start_min = start + _find_min_brown_energy_in_interval(task, green_power_interval)
+    start_min = start + _find_min_brown_energy_in_interval(task, green_power_interval, max_start_mode=max_start_mode)
 
     return start_min
 
@@ -47,7 +47,7 @@ def _slice_green_power_available_list(actual_green_power_available, start, end):
     return available_green_powers
 
 
-def _find_min_brown_energy_in_interval(task, green_power_interval):
+def _find_min_brown_energy_in_interval(task, green_power_interval, max_start_mode=False):
     if len(green_power_interval) == 0:
         return 0
 
@@ -77,7 +77,8 @@ def _find_min_brown_energy_in_interval(task, green_power_interval):
         current_brown_energy_usage -= b_e_to_decrease
 
         # Verify if it is minimal
-        if current_brown_energy_usage < min_brown_energy_usage:
+        if (current_brown_energy_usage < min_brown_energy_usage
+                or (max_start_mode and current_brown_energy_usage == min_brown_energy_usage)):
             min_brown_energy_usage = current_brown_energy_usage
             start_min = start_time
 
