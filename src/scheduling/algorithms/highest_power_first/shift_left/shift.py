@@ -6,7 +6,7 @@ def shift_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energ
     _validate_mode(mode)
 
     # Order tasks by topological order
-    tasks = sort_topologically(graph)
+    tasks = sort_topologically(graph, reverse=(mode == 'right'))
 
     max_start_mode = (mode == 'right')
 
@@ -17,10 +17,10 @@ def shift_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energ
         energy_usage_calc.remove_scheduled_task(task)
         del scheduling[task.id]
 
-        # Compute boundaries
+        # Compute boundaries (do not consider variable boundaries)
         lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling)
-        lb = lcb + lvb
-        rb = rcb + rvb
+        lb = lcb
+        rb = rcb
 
         # Find new start
         g_power = energy_usage_calc.get_green_power_available()
