@@ -7,7 +7,7 @@ def _generate_random_power(min, max):
     return random.uniform(min, max)
 
 
-def _create_graph_from_real_trace(task_file, min_power, max_power):
+def _create_graph_from_real_trace(task_file, min_power, max_power, seed=123123123):
     with open(task_file) as f:
         data = json.load(f)
 
@@ -27,6 +27,8 @@ def _create_graph_from_real_trace(task_file, min_power, max_power):
 
         tasks = data['workflow']['specification']['tasks']
 
+        random.seed(seed)
+
         for task in tasks:
             runtime_is_seconds = task_runtimes[task['name']]
             power = _generate_random_power(min_power, max_power)
@@ -43,12 +45,10 @@ def _create_graph_from_real_trace(task_file, min_power, max_power):
             for child in children:
                 graph.create_dependency(current_task_name, child)
 
-
-
-
         return graph
 
-def _create_graph(task_file, min_power, max_power):
+
+def _create_graph(task_file, min_power, max_power, seed=123123123):
     with open(task_file) as f:
         data = json.load(f)
 
@@ -59,6 +59,8 @@ def _create_graph(task_file, min_power, max_power):
         graph.set_start_task(start_task_id)
 
         tasks = data['workflow']['tasks']
+
+        random.seed(seed)
 
         for task in tasks:
             runtime_is_seconds = round(float(task['runtimeInSeconds']))
