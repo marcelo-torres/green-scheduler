@@ -53,6 +53,21 @@ def _find_min_brown_energy_in_interval(task, green_power_interval, max_start_mod
 
     start_times_to_verify = _start_times_to_verify(task, green_power_interval)
 
+    start_min = -1
+    min_brown_energy_usage = float('inf')
+
+    for start_time, brown_energy_usage in _brown_energy_in_interval(task, start_times_to_verify, green_power_interval):
+
+        # Verify if it is minimal
+        if (brown_energy_usage < min_brown_energy_usage
+                or (max_start_mode and brown_energy_usage == min_brown_energy_usage)):
+            min_brown_energy_usage = brown_energy_usage
+            start_min = start_time
+
+    return start_min
+
+
+def _brown_energy_in_interval(task, start_times_to_verify, green_power_interval):
     g_iter = iter(green_power_interval)
     current_green_events = _load_current_power_green_events(g_iter, task)
 
@@ -60,12 +75,9 @@ def _find_min_brown_energy_in_interval(task, green_power_interval, max_start_mod
     first_start_time = start_times_to_verify.pop(0)
     current_brown_energy_usage = _calculate_brown_energy_of_task(task, first_start_time, current_green_events)
 
-    # Minimal
-    start_min = first_start_time
-    min_brown_energy_usage = current_brown_energy_usage
+    yield first_start_time, current_brown_energy_usage
 
     previous_start_time = first_start_time
-
     for start_time in start_times_to_verify:
 
         # Calculate brown energy change
@@ -75,15 +87,11 @@ def _find_min_brown_energy_in_interval(task, green_power_interval, max_start_mod
         # Adjust brown energy usage
         current_brown_energy_usage += b_e_to_increase
         current_brown_energy_usage -= b_e_to_decrease
-
-        # Verify if it is minimal
-        if (current_brown_energy_usage < min_brown_energy_usage
-                or (max_start_mode and current_brown_energy_usage == min_brown_energy_usage)):
-            min_brown_energy_usage = current_brown_energy_usage
-            start_min = start_time
+        current_brown_energy_usage = round_internal(current_brown_energy_usage)
 
         previous_start_time = start_time
-    return start_min
+
+        yield start_time, current_brown_energy_usage
 
 
 def _load_current_power_green_events(g_iter, task):
@@ -126,9 +134,8 @@ def _calculate_brown_energy_of_task(task, task_start, current_green_events):
 
         already_computed_time += execution_time_in_interval
 
-        # execution_time_in_interval = interval_length if interval_length <= task_end else task.runtime
         brown_power = (task.power - previous_green_power) if task.power > previous_green_power else 0
-        partial_brown_energy = execution_time_in_interval * brown_power
+        partial_brown_energy = calculate_energy(execution_time_in_interval, brown_power)
         current_brown_energy_usage += partial_brown_energy
 
         previous_time = time
@@ -137,8 +144,15 @@ def _calculate_brown_energy_of_task(task, task_start, current_green_events):
         if already_computed_time == task.runtime:
             break
 
-    return current_brown_energy_usage
+    return round_internal(current_brown_energy_usage)
 
+
+def round_internal(value):
+    return round(value, 4)
+
+def calculate_energy(power, time):
+    result = round_internal(power) * round_internal(time)
+    return round_internal(result)
 
 def _brown_energy_to_increase(start_time, previous_start_time, current_green_events, g_iter, task):
     current_brown_energy_usage = 0
@@ -168,12 +182,12 @@ def _brown_energy_to_increase(start_time, previous_start_time, current_green_eve
         last_interval_g_power = current_green_events[-2][1]
         brown_power_to_increase = task.power - last_interval_g_power if task.power > last_interval_g_power else 0
 
-        brown_energy_to_increase = brown_power_to_increase * duration
+        brown_energy_to_increase = calculate_energy(brown_power_to_increase, duration)
         current_brown_energy_usage += brown_energy_to_increase
 
         already_computed_time += duration
 
-    return current_brown_energy_usage
+    return round_internal(current_brown_energy_usage)
 
 
 def _brown_energy_to_decrease(start_time, previous_start_time, current_green_events, task):
@@ -182,7 +196,7 @@ def _brown_energy_to_decrease(start_time, previous_start_time, current_green_eve
     brown_power_to_decrease = task.power - g_power if task.power > g_power else 0
     duration = start_time - previous_start_time
 
-    brown_energy_to_decrease = brown_power_to_decrease * duration
+    brown_energy_to_decrease = calculate_energy(brown_power_to_decrease, duration)
 
     # pop the first interval if start time is in the second interval
     if len(current_green_events) > 1 and start_time >= current_green_events[1][0]:
@@ -224,7 +238,7 @@ def _start_times_to_verify(task, green_power_interval):
         if time + task.runtime <= end_time:
             task_can_start.append(time)
 
-        # TODO - it causes a bug
+        # it is commented because it causes a bug
         # Check if a task can finish at a given time
         #previous_interval_length = time - previous_time
         #if previous_interval_length < task.runtime:
