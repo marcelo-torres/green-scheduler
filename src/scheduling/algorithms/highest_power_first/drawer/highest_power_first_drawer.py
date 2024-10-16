@@ -34,7 +34,7 @@ def draw_rectangles(drawer, events):
     return max_power
 
 
-def draw_line(drawer, events):
+def draw_line(drawer, events, color='blue'):
     """
     It used a Drawer to represent the power usage as line chart. A power event represents energy usage changes.
 
@@ -76,7 +76,7 @@ def draw_line(drawer, events):
     time_list.append(time_list[-1])  # duplicate the last time (x-axis)
     power_list.append(0)  # set power to 0 (y-axis)
 
-    drawer.add_line(time_list, power_list)
+    drawer.add_line(time_list, power_list, color=color)
     return max_power
 
 

@@ -85,15 +85,9 @@ def execute_generator():
     interval_size = 300
 
     min_makespan = calc_critical_path_length(graph)
-    scheduling = schedule_graph(graph, min_makespan * 2, green_power, interval_size, c=0.8, show='last', max_power=max_green_power)
+    scheduling = schedule_graph(graph, min_makespan * 2, green_power, interval_size, c=0.8, show='last', max_power=max_green_power, shift_mode='right-left')
 
-    draw(graph, scheduling)
-
-    scheduled_tasks = list(scheduling.items())
-    scheduled_tasks.sort(key=lambda e: e[1]) # order by start time
-    for task_id, start_time in scheduled_tasks:
-        task = graph.get_task(task_id)
-        print(f'\tStart: {start_time} Runtime: {task.runtime}s')
+    #draw(graph, scheduling)
 
     calculator = EnergyUsageCalculator(green_power, interval_size)
     brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling, graph)
@@ -101,13 +95,13 @@ def execute_generator():
     makespan = calc_makespan(scheduling, graph)
     max_active_tasks, mean, std, active_tasks_by_time = count_active_tasks(scheduling, graph)
 
-    print(f'\tbrown_energy_used: {brown_energy_used}J')
+    print(f'\tbrown_energy_used: {brown_energy_used:.{2}f}J')
     print(f'\tmakespan: {makespan}s')
-    print(f'max_active_tasks: {max_active_tasks}')
-    print(f'active_tasks_mean: {mean}')
-    print(f'active_tasks_std: {std}')
+    print(f'\tmax_active_tasks: {max_active_tasks}')
+    print(f'\tactive_tasks_mean: {mean:.{2}f}')
+    print(f'\tactive_tasks_std: {std:.{2}f}')
 
-    ActiveTasksDrawer().draw(active_tasks_by_time)
+    #ActiveTasksDrawer().draw(active_tasks_by_time)
 
 
 
@@ -123,7 +117,7 @@ def execute_generator():
 #print(min_makespan)
 
 def execute_real_traces():
-    resources_path = '../../../../../resources'
+    resources_path = '../../../resources'
     real_traces = f'{resources_path}/wfcommons/real_traces'
 
     genome = f'{real_traces}/1000genome-chameleon-8ch-250k-001.json'
@@ -137,11 +131,6 @@ def execute_real_traces():
     for trace_file in real_traces_list:
         print(trace_file)
 
-        graph = _create_graph_from_real_trace(trace_file, 1, 100)
-        min_makespan = calc_critical_path_length(graph)
-
-        report_graph(graph)
-        print()
 
 if __name__ == '__main__':
     #execute_real_traces()

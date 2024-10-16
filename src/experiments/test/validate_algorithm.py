@@ -16,12 +16,12 @@ def _generate_random_power(min, max):
 def build_graph(tasks_per_rank):
 
     power_and_runtime_per_rank = [
-        (10000, 9000),
+        (10000, 10000),
         (8000, 8000),
-        (6000, 6000),
-        (3000, 3000),
-        (2000, 2000),
-        (1000, 1000)
+        (6000, 7000),
+        (3000, 5000),
+        (2000, 4000),
+        (1000, 2000)
     ]
 
     graph = TaskGraph()
@@ -62,11 +62,11 @@ if __name__ == '__main__':
     green_power = photovoltaReader.get_trace_1(size=30)
     interval_size = 300
 
-    graph = build_graph(1)
+    graph = build_graph(10)
 
     min_makespan = calc_critical_path_length(graph)
-    scheduling = schedule_graph(graph, min_makespan * 2, green_power, interval_size, c=0.8, show='last',
-                                max_power=15000)
+    scheduling = schedule_graph(graph, min_makespan * 32, green_power, interval_size, c=0.8, show='last',
+                                max_power=15000, shift_mode='left')
 
     draw(graph, scheduling)
 

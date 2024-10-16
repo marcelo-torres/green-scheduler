@@ -23,6 +23,12 @@ def _validate_shift_mode(mode):
 
 def _apply_shift(shift_mode, graph, scheduling, boundary_calc, deadline, energy_usage_calculator):
 
+    if shift_mode == 'none':
+        return scheduling
+
+    brown_energy_used, _, _ = energy_usage_calculator.calculate_energy_usage()
+    previous_scheduling = scheduling.copy()
+
     if shift_mode == 'left':
         shift_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energy_usage_calculator)
 
@@ -30,6 +36,11 @@ def _apply_shift(shift_mode, graph, scheduling, boundary_calc, deadline, energy_
         shift_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energy_usage_calculator, mode='right')
         shift_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energy_usage_calculator, mode='left')
 
+    new_brown_energy_used, _, _ = energy_usage_calculator.calculate_energy_usage()
+    if new_brown_energy_used <= brown_energy_used:
+        return scheduling
+
+    return previous_scheduling
 
 def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None, max_power=60, figure_file=None,
                    task_ordering='energy', shift_mode='left'):
@@ -71,7 +82,8 @@ def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None
         show_draw_if(['all'])
 
     show_draw_if(['all'])
-    _apply_shift(shift_mode, graph, scheduling, boundary_calc, deadline, energy_usage_calculator)
+
+    scheduling = _apply_shift(shift_mode, graph, scheduling, boundary_calc, deadline, energy_usage_calculator)
 
     show_draw_if(['last', 'all'])
 
