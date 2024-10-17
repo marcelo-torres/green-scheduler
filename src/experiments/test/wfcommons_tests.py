@@ -4,7 +4,7 @@ from wfcommons.wfchef.recipes import EpigenomicsRecipe
 from wfcommons import WorkflowGenerator, SrasearchRecipe, MontageRecipe, SeismologyRecipe
 
 from src.data.photovolta import PhotovoltaReader
-from src.data.wfcommons import _create_graph, _create_graph_from_real_trace
+from src.data.wfcommons_reader import _create_graph, _create_graph_from_real_trace
 from src.scheduling.algorithms.highest_power_first.highest_power_first import schedule_graph
 from src.scheduling.drawer.active_tasks_drawer import ActiveTasksDrawer
 from src.scheduling.drawer.ranks_drawer import draw
