@@ -11,6 +11,7 @@ from src.scheduling.util.count_active_tasks import count_active_tasks
 from src.scheduling.util.critical_path_length_calculator import calc_critical_path_length
 from src.scheduling.util.makespan_calculator import calc_makespan
 from src.scheduling.util.scheduling_check import check
+from src.scheduling.util.stretch_calculator import calc_stretch
 from src.util.stopwatch import Stopwatch
 
 resources_path = '../../../resources'
@@ -28,8 +29,8 @@ def seconds_to_hours(seconds):
 
 def report_scheduling(scheduling, graph, energy_calculator):
     makespan = calc_makespan(scheduling, graph)
-    workflow_start_time = scheduling[graph.get_first_task().id]  #TODO fix this
-    workflow_stretch = makespan - workflow_start_time
+
+    workflow_stretch = calc_stretch(graph, scheduling, makespan=makespan)
     print(f'\tMakespan: {makespan:,}s ({seconds_to_hours(makespan)})')
     print(f'\tWorkflow Stretch: {workflow_stretch:,}s ({seconds_to_hours(workflow_stretch)})')
     print()
