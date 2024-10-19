@@ -11,7 +11,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib
 
-#matplotlib.use("qt5agg") # https://stackoverflow.com/a/52221178
+matplotlib.use(matplotlib.get_backend()) #https://stackoverflow.com/a/52221178
 
 
 #matplotlib.get_backend()

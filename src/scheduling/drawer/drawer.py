@@ -2,7 +2,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-#matplotlib.use("qt5agg") #https://stackoverflow.com/a/52221178
+matplotlib.use(matplotlib.get_backend()) #https://stackoverflow.com/a/52221178
 
 
 class Drawer:
@@ -42,9 +42,9 @@ class Drawer:
 
         self.ax.add_patch(rect)
 
-    def add_line(self, x_list, y_list):
+    def add_line(self, x_list, y_list, color='blue'):
         y_list = [Drawer.BOUNDARY_HEIGHT + y for y in y_list]
-        plt.plot(x_list, y_list, 'blue', lw=1)
+        plt.plot(x_list, y_list, color, lw=1)
 
     def add_single_line(self, width, x, y):
         plt.plot([x, x+width], [y, y], 'blue', lw=1)
