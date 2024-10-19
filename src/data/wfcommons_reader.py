@@ -1,18 +1,14 @@
 import json
 import os
 import pathlib
-import random
 
 from wfcommons import WorkflowGenerator, SrasearchRecipe, MontageRecipe, SeismologyRecipe, BlastRecipe, BwaRecipe, \
     CyclesRecipe, GenomeRecipe, SoykbRecipe
 
 from src.scheduling.task_graph.task_graph import TaskGraph
 
-def _generate_random_power(min, max):
-    return random.uniform(min, max)
 
-
-def _create_graph_from_real_trace(task_file, min_power, max_power, seed=123123123):
+def _create_graph_from_real_trace(task_file, random_power):
     with open(task_file) as f:
         data = json.load(f)
 
@@ -32,11 +28,9 @@ def _create_graph_from_real_trace(task_file, min_power, max_power, seed=12312312
 
         tasks = data['workflow']['specification']['tasks']
 
-        random.seed(seed)
-
         for task in tasks:
             runtime_is_seconds = task_runtimes[task['name']]
-            power = _generate_random_power(min_power, max_power)
+            power = random_power()
             graph.add_new_task(task['name'], runtime=runtime_is_seconds, power=power)
 
         for task in tasks:
@@ -53,7 +47,7 @@ def _create_graph_from_real_trace(task_file, min_power, max_power, seed=12312312
         return graph
 
 
-def _create_graph(task_file, min_power, max_power, seed=123123123):
+def _create_graph(task_file, random_power):
     with open(task_file) as f:
         data = json.load(f)
 
@@ -65,13 +59,12 @@ def _create_graph(task_file, min_power, max_power, seed=123123123):
 
         tasks = data['workflow']['tasks']
 
-        random.seed(seed)
 
         for task in tasks:
             runtime_is_seconds = round(float(task['runtimeInSeconds']))
             if runtime_is_seconds == 0: # TODO
                 runtime_is_seconds = 1
-            power = _generate_random_power(min_power, max_power)
+            power = random_power()
             graph.add_new_task(task['name'], runtime=runtime_is_seconds, power=power)
 
         for task in tasks:
@@ -88,14 +81,8 @@ def _create_graph(task_file, min_power, max_power, seed=123123123):
         return graph
 class WorkflowTraceArchiveReader:
 
-    def __init__(self, resource_path, min_power, max_power, seed=123456789):
+    def __init__(self, resource_path):
         self.resource_path = resource_path
-        self.min_power = min_power
-        self.max_power = max_power
-        random.seed(seed)
-
-    def set_seed(self, seed):
-        random.seed(seed)
 
 
 def _get_full_name(synthetic_path, name, num_tasks, runtime_factor):
@@ -144,35 +131,35 @@ class WfCommonsWorkflowReader:
     def create_soykb_workflow(self, num_tasks, runtime_factor):
         self._create(SoykbRecipe, 'soykb', num_tasks, runtime_factor)
 
-    def read_srasearch_workflow(self, num_tasks, runtime_factor, min_task_power=MIN_TASK_POWER_DEFAULT, max_task_power=MAX_TASK_POWER_DEFAULT):
-        return self._read('srasearch', num_tasks, runtime_factor, min_task_power, max_task_power)
+    def read_srasearch_workflow(self, num_tasks, runtime_factor, random_power):
+        return self._read('srasearch', num_tasks, runtime_factor, random_power)
 
-    def read_montage_workflow(self, num_tasks, runtime_factor, min_task_power=MIN_TASK_POWER_DEFAULT, max_task_power=MAX_TASK_POWER_DEFAULT):
-        return self._read('montage', num_tasks, runtime_factor, min_task_power, max_task_power)
+    def read_montage_workflow(self, num_tasks, runtime_factor, random_power):
+        return self._read('montage', num_tasks, runtime_factor, random_power)
 
-    def read_seismology_workflow(self, num_tasks, runtime_factor, min_task_power=MIN_TASK_POWER_DEFAULT, max_task_power=MAX_TASK_POWER_DEFAULT):
-        return self._read('seismology', num_tasks, runtime_factor, min_task_power, max_task_power)
+    def read_seismology_workflow(self, num_tasks, runtime_factor, random_power):
+        return self._read('seismology', num_tasks, runtime_factor, random_power)
 
-    def read_blast_workflow(self, num_tasks, runtime_factor, min_task_power=MIN_TASK_POWER_DEFAULT, max_task_power=MAX_TASK_POWER_DEFAULT):
-        return self._read('blast', num_tasks, runtime_factor, min_task_power, max_task_power)
+    def read_blast_workflow(self, num_tasks, runtime_factor, random_power):
+        return self._read('blast', num_tasks, runtime_factor, random_power)
 
-    def read_bwa_workflow(self, num_tasks, runtime_factor, min_task_power=MIN_TASK_POWER_DEFAULT, max_task_power=MAX_TASK_POWER_DEFAULT):
-        return self._read('bwa', num_tasks, runtime_factor, min_task_power, max_task_power)
+    def read_bwa_workflow(self, num_tasks, runtime_factor, random_power):
+        return self._read('bwa', num_tasks, runtime_factor, random_power)
 
-    def read_cycles_workflow(self, num_tasks, runtime_factor, min_task_power=MIN_TASK_POWER_DEFAULT, max_task_power=MAX_TASK_POWER_DEFAULT):
-        return self._read('cycles', num_tasks, runtime_factor, min_task_power, max_task_power)
+    def read_cycles_workflow(self, num_tasks, runtime_factor, random_power):
+        return self._read('cycles', num_tasks, runtime_factor, random_power)
 
-    def read_genome_workflow(self, num_tasks, runtime_factor, min_task_power=MIN_TASK_POWER_DEFAULT, max_task_power=MAX_TASK_POWER_DEFAULT):
-        return self._read('genome', num_tasks, runtime_factor, min_task_power, max_task_power)
+    def read_genome_workflow(self, num_tasks, runtime_factor, random_power):
+        return self._read('genome', num_tasks, runtime_factor, random_power)
 
-    def read_soykb_workflow(self, num_tasks, runtime_factor, min_task_power=MIN_TASK_POWER_DEFAULT, max_task_power=MAX_TASK_POWER_DEFAULT):
-        return self._read('soykb', num_tasks, runtime_factor, min_task_power, max_task_power)
+    def read_soykb_workflow(self, num_tasks, runtime_factor, random_power):
+        return self._read('soykb', num_tasks, runtime_factor, random_power)
 
     def _create(self, recipe_class, workflow_name, num_tasks, runtime_factor):
         path = _get_full_name(self.synthetic_path, workflow_name, num_tasks, runtime_factor)
         recipe = recipe_class.from_num_tasks(num_tasks, runtime_factor=runtime_factor)
         _create_wfcommons_graph(path, recipe)
 
-    def _read(self, workflow_name, num_tasks, runtime_factor, min_task_power=1, max_task_power=5):
+    def _read(self, workflow_name, num_tasks, runtime_factor, random_power):
         path = _get_full_name(self.synthetic_path, workflow_name, num_tasks, runtime_factor)
-        return _create_graph(path, min_task_power, max_task_power)
+        return _create_graph(path, random_power)

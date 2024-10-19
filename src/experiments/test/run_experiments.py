@@ -1,4 +1,5 @@
 import csv
+import random
 from datetime import datetime, timedelta
 import os
 
@@ -19,6 +20,32 @@ synthetic_path = f'{resources_path}/wfcommons/synthetic'
 
 MIN_TASK_POWER_DEFAULT = 1
 MAX_TASK_POWER_DEFAULT = 5
+
+random.seed(15735667867885)
+def random_uniform():
+    return random.uniform(MIN_TASK_POWER_DEFAULT, MAX_TASK_POWER_DEFAULT)
+
+
+def random_gauss():
+    mu = 3  # Mean
+    sigma = 0.9  # Standard deviation
+
+    value = random.gauss(mu, sigma)
+    while value < MIN_TASK_POWER_DEFAULT or value > MAX_TASK_POWER_DEFAULT:
+        value = random.gauss(mu, sigma)
+    return value
+
+
+def random_expovariate():
+    lambd = 1
+    value = random.expovariate(lambd)
+    while value < MIN_TASK_POWER_DEFAULT or value > MAX_TASK_POWER_DEFAULT:
+        value = random.expovariate(lambd)
+    return value
+
+
+def random_expovariate_inverse():
+    return MAX_TASK_POWER_DEFAULT - random_expovariate()
 
 
 def seconds_to_hours(seconds):
@@ -109,6 +136,7 @@ def experiments_per_workflow(experiment_parameters, metadata, parameters_report)
     graph = experiment_parameters['graph']
     green_power = experiment_parameters['green_power']
     interval_size = experiment_parameters['interval_size']
+    power_distribution = experiment_parameters['power_distribution']
 
     shift_modes = experiment_parameters['shift_modes']
     deadline_factors = experiment_parameters['deadline_factors']
@@ -131,7 +159,8 @@ def experiments_per_workflow(experiment_parameters, metadata, parameters_report)
                         'shift_mode': shift_mode,
                         'deadline_factor': deadline_factor,
                         'c_value': c_value,
-                        'task_ordering': task_ordering
+                        'task_ordering': task_ordering,
+                        'power_distribution': power_distribution,
                     }
 
                     print(f'JOB {job_number} of {job_count} | Experiment {i} of {experiment_count} | {prefix}')
@@ -186,7 +215,7 @@ def execute_experiments():
 
     headers = [
         'experiment', 'workflow', 'energy_trace', 'shift_mode', 'c_value', 'deadline_factor', 'deadline',
-        'task_ordering', 'scheduling_hash',
+        'task_ordering', 'scheduling_hash', 'power_distribution',
         'min_makespan', 'makespan', 'workflow_stretch',
         'brown_energy_used', 'green_energy_used', 'total_energy', 'green_energy_not_used',
         'max_active_tasks', 'active_tasks_mean', 'active_tasks_std', 'number_of_tasks',
@@ -205,15 +234,22 @@ def execute_experiments():
     photovolta_reader = PhotovoltaReader(resources_path)
     interval_size = 300
 
+    random_functions = [
+        ('uniform', random_uniform),
+        ('gaussian', random_gauss),
+        ('exponential', random_expovariate),
+        ('inverted_exponential', random_expovariate_inverse),
+    ]
+
     workflow_providers = [
-        ('blast', lambda: wfcommons_reader.read_blast_workflow(1000, 11.4492900609)),
-        ('bwa', lambda: wfcommons_reader.read_bwa_workflow(1000, 52.2248138958)),
-        ('cycles', lambda: wfcommons_reader.read_cycles_workflow(1000, 31.0991735531)),
-        ('genome', lambda: wfcommons_reader.read_genome_workflow(1000, 35.7812995246)),
-        ('soykb', lambda: wfcommons_reader.read_soykb_workflow(1000, 3.85224364443)),
-        ('srasearch', lambda: wfcommons_reader.read_srasearch_workflow(1000, 1.26845637583)),
-        ('montage', lambda: wfcommons_reader.read_montage_workflow(1000, 11.17646556189)),
-        ('seismology', lambda: wfcommons_reader.read_seismology_workflow(1000, 4000)),
+        ('blast', lambda random_power: wfcommons_reader.read_blast_workflow(1000, 11.4492900609, random_power)),
+        ('bwa', lambda random_power: wfcommons_reader.read_bwa_workflow(1000, 52.2248138958, random_power)),
+        ('cycles', lambda random_power: wfcommons_reader.read_cycles_workflow(1000, 31.0991735531, random_power)),
+        ('genome', lambda random_power: wfcommons_reader.read_genome_workflow(1000, 35.7812995246, random_power)),
+        ('soykb', lambda random_power: wfcommons_reader.read_soykb_workflow(1000, 3.85224364443, random_power)),
+        ('srasearch', lambda random_power: wfcommons_reader.read_srasearch_workflow(1000, 1.26845637583, random_power)),
+        ('montage', lambda random_power: wfcommons_reader.read_montage_workflow(1000, 11.17646556189, random_power)),
+        ('seismology', lambda random_power: wfcommons_reader.read_seismology_workflow(1000, 4000, random_power)),
     ]
 
     green_power_providers = [
@@ -227,7 +263,7 @@ def execute_experiments():
     c_values = [0, 0.2, 0.5, 0.8]
     task_ordering_criterias = ['energy', 'power', 'runtime', 'runtime_ascending']
 
-    job_count = len(workflow_providers) * len(green_power_providers)
+    job_count = len(random_functions) * len(workflow_providers) * len(green_power_providers)
     experiment_count = len(shift_modes) * len(deadline_factors) * len(c_values) * len(task_ordering_criterias)
 
     print(f'{experiment_count} experiments will be executed.')
@@ -235,39 +271,41 @@ def execute_experiments():
     executor.start()
 
     j = 1
-    for workflow_name, workflow_provider in workflow_providers:
-        graph = workflow_provider()
+    for distribution_name, random_function in random_functions:
+        for workflow_name, workflow_provider in workflow_providers:
+            graph = workflow_provider(random_function)
 
-        for g_trace_name, trace_provider in green_power_providers:
-            green_power = trace_provider()
+            for g_trace_name, trace_provider in green_power_providers:
+                green_power = trace_provider()
 
-            experiment_parameters = {
-                'graph': graph,
-                'green_power': green_power,
-                'interval_size': interval_size,
+                experiment_parameters = {
+                    'graph': graph,
+                    'green_power': green_power,
+                    'interval_size': interval_size,
+                    'power_distribution': distribution_name,
 
-                'shift_modes': shift_modes,
-                'deadline_factors': deadline_factors,
-                'c_values': c_values,
-                'task_ordering_criterias': task_ordering_criterias,
-            }
+                    'shift_modes': shift_modes,
+                    'deadline_factors': deadline_factors,
+                    'c_values': c_values,
+                    'task_ordering_criterias': task_ordering_criterias,
+                }
 
-            metadata = {
-                'prefix': f'{workflow_name}_{g_trace_name}',
-                'job_number': j,
-                'job_count': job_count,
-                'experiment_count': experiment_count,
-            }
+                metadata = {
+                    'prefix': f'{workflow_name}_{g_trace_name}',
+                    'job_number': j,
+                    'job_count': job_count,
+                    'experiment_count': experiment_count,
+                }
 
-            parameters_report = {
-                'workflow': '' + workflow_name,
-                'energy_trace': '' + g_trace_name,
-            }
+                parameters_report = {
+                    'workflow': '' + workflow_name,
+                    'energy_trace': '' + g_trace_name,
+                }
 
-            executor.run_experiment_async(
-                lambda: experiments_per_workflow(experiment_parameters, metadata, parameters_report)
-            )
-            j += 1
+                executor.run_experiment_async(
+                    lambda: experiments_per_workflow(experiment_parameters, metadata, parameters_report)
+                )
+                j += 1
 
     executor.wait_all()
 
@@ -284,16 +322,16 @@ def simple_execution():
 
     deadline_factor = 2
 
-    #graph = wfcommons_reader.read_srasearch_workflow(24, 4.26845637583)
+    #graph = wfcommons_reader.read_srasearch_workflow(24, 4.26845637583, random_gauss)
 
-    graph = wfcommons_reader.read_srasearch_workflow(1000, 1.26845637583)
-    #graph = wfcommons_reader.read_montage_workflow(1000, 11.17646556189)
-    #graph = wfcommons_reader.read_seismology_workflow(1000, 4000)
-    #graph = wfcommons_reader.read_blast_workflow(1000, 11.4492900609)
-    #graph = wfcommons_reader.read_bwa_workflow(1000, 52.2248138958)
-    #graph = wfcommons_reader.read_cycles_workflow(1000, 31.0991735531)
-    #graph = wfcommons_reader.read_genome_workflow(1000, 35.7812995246 )
-    #graph = wfcommons_reader.read_soykb_workflow(1000, 3.85224364443)
+    graph = wfcommons_reader.read_srasearch_workflow(1000, 1.26845637583, random_gauss)
+    #graph = wfcommons_reader.read_montage_workflow(1000, 11.17646556189, random_gauss)
+    #graph = wfcommons_reader.read_seismology_workflow(1000, 4000, random_gauss)
+    #graph = wfcommons_reader.read_blast_workflow(1000, 11.4492900609, random_gauss)
+    #graph = wfcommons_reader.read_bwa_workflow(1000, 52.2248138958, random_gauss)
+    #graph = wfcommons_reader.read_cycles_workflow(1000, 31.099173553, random_gauss1)
+    #graph = wfcommons_reader.read_genome_workflow(1000, 35.7812995246, random_gauss)
+    #graph = wfcommons_reader.read_soykb_workflow(1000, 3.85224364443, random_gauss)
 
     min_makespan = calc_critical_path_length(graph)
     print(f'\tMin makespan: {min_makespan:,}s ({seconds_to_hours(min_makespan)})')
