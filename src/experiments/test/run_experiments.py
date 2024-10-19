@@ -224,7 +224,7 @@ def execute_experiments():
     shift_modes = ['none', 'left', 'right-left']
     deadline_factors = [1, 2, 4, 8]
     c_values = [0, 0.2, 0.5, 0.8]
-    task_ordering_criterias = ['energy', 'power', 'runtime']
+    task_ordering_criterias = ['energy', 'power', 'runtime', 'runtime_ascending']
 
     job_count = len(workflow_providers) * len(green_power_providers)
     experiment_count = len(shift_modes) * len(deadline_factors) * len(c_values) * len(task_ordering_criterias)

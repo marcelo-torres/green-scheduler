@@ -66,6 +66,29 @@ def _get_graph_2():
     return graph, 78
 
 
+'''
+        +-> 2
+       /   
+    1-+---> 3
+       \     
+        +-> 4
+'''
+def _get_graph_3():
+    graph = TaskGraph()
+    task = graph.add_new_task(1, runtime=5, power=10)
+    graph.set_start_task(task.id)
+
+    graph.add_new_task(2, runtime=10, power=10)
+    graph.add_new_task(3, runtime=60, power=10)
+    graph.add_new_task(4, runtime=50, power=10)
+
+    graph.create_dependency(1, 2)
+    graph.create_dependency(1, 3)
+    graph.create_dependency(1, 4)
+
+    return graph, 65
+
+
 class HighestPowerFirstTest(unittest.TestCase):
 
     def test_single_task_with_no_g_energy(self):
@@ -217,3 +240,22 @@ class HighestPowerFirstTest(unittest.TestCase):
         self.assertEqual(31, scheduling[5])
         self.assertEqual(50, scheduling[6])
         self.assertEqual(60, scheduling[7])
+
+    def test_runtime_ascending(self):
+        graph, min_makespan = _get_graph_3()
+
+        scheduling = schedule_graph(graph, min_makespan * 4, [10, 10], 100, task_ordering='runtime_ascending')
+        scheduling = list(scheduling.items())
+        scheduling.sort(key=lambda schedule: schedule[1])
+
+        tasks = list(
+            map(lambda schedule: schedule[0], scheduling)
+        )
+
+        self.assertEqual(1, tasks[0])
+        self.assertEqual(2, tasks[1])
+        self.assertEqual(4, tasks[2])
+        self.assertEqual(3, tasks[3])
+
+
+

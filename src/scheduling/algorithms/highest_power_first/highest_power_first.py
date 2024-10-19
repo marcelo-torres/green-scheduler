@@ -10,6 +10,7 @@ def _get_task_ordering(key):
         'energy': lambda t: t.power * t.runtime,
         'power': lambda t: t.power,
         'runtime': lambda t: t.runtime,
+        'runtime_ascending': lambda t: -t.runtime,
     }
 
     return task_ordering[key]
