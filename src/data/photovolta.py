@@ -26,13 +26,21 @@ class PhotovoltaReader:
     def get_trace_1(self, size=1):
         file = 'photovolta_2016_part_1_0_and_1_1.csv'
         path = f'{self.resource_path}/photovolta/{file}'
-
         return _get_green_power_from(path, size=size)
 
-    def get_trace_2(self,size=20):
+    def get_trace_2(self, size=20):
         file = 'photovolta_2016_part_1_2_and_1_3.csv'
         path = f'{self.resource_path}/photovolta/{file}'
+        return _get_green_power_from(path, size=size)
 
+    def get_trace_3(self, size=20):
+        file = 'photovolta_2016_part_2_0_and_2_1.csv'
+        path = f'{self.resource_path}/photovolta/{file}'
+        return _get_green_power_from(path, size=size)
+
+    def get_trace_4(self, size=20):
+        file = 'photovolta_2016_part_2_4_and_2_5.csv'
+        path = f'{self.resource_path}/photovolta/{file}'
         return _get_green_power_from(path, size=size)
 
     def stats(self, power_trace):
