@@ -59,12 +59,20 @@ def _create_graph(task_file, random_power):
 
         tasks = data['workflow']['tasks']
 
+        powers_task_category = {}
 
         for task in tasks:
             runtime_is_seconds = round(float(task['runtimeInSeconds']))
             if runtime_is_seconds == 0: # TODO
                 runtime_is_seconds = 1
-            power = random_power()
+
+            task_category = task['category']
+            if task_category not in powers_task_category:
+                power = random_power()
+                powers_task_category[task_category] = power
+            else:
+                power = powers_task_category[task_category]
+
             graph.add_new_task(task['name'], runtime=runtime_is_seconds, power=power)
 
         for task in tasks:
