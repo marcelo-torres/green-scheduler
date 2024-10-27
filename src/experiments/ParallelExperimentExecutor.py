@@ -21,8 +21,16 @@ class ParallelExperimentExecutor:
         self.workers.append(worker)
 
     def wait_all(self):
+        joined_workers = []
         for worker in self.workers:
             worker.join()
+            joined_workers.append(worker)
+
+        for worker in joined_workers:
+            self.workers.remove(worker)
+
+    def stop(self):
+        self.wait_all()
         self.report_handler.kill()
 
     def _handle_report(self):

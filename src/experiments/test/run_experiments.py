@@ -144,6 +144,7 @@ def experiments_per_workflow(experiment_parameters, metadata, parameters_report)
     green_power = experiment_parameters['green_power']
     interval_size = experiment_parameters['interval_size']
     power_distribution = experiment_parameters['power_distribution']
+    iteration = experiment_parameters['iteration']
 
     shift_modes = experiment_parameters['shift_modes']
     deadline_factors = experiment_parameters['deadline_factors']
@@ -155,6 +156,8 @@ def experiments_per_workflow(experiment_parameters, metadata, parameters_report)
     job_count = metadata['job_count']
     experiment_count = metadata['experiment_count']
 
+    print(f'JOB {job_number} of {job_count} starting | Iteration {iteration} | {prefix}')
+
     reports = []
     i = 1
     for shift_mode in shift_modes:
@@ -163,14 +166,14 @@ def experiments_per_workflow(experiment_parameters, metadata, parameters_report)
                 for task_ordering in task_ordering_criterias:
                     parameters_report_temp = parameters_report | {
                         'experiment': f'J{job_number}_E{i}',
+                        'experiment_type': f'J{prefix}',
+                        'iteration': f'{iteration}',
                         'shift_mode': shift_mode,
                         'deadline_factor': deadline_factor,
                         'c_value': c_value,
                         'task_ordering': task_ordering,
                         'power_distribution': power_distribution,
                     }
-
-                    print(f'JOB {job_number} of {job_count} | Experiment {i} of {experiment_count} | {prefix}')
 
                     report = schedule_and_report(graph, green_power, interval_size, deadline_factor, task_ordering,
                                                  c=c_value, shift_mode=shift_mode)
@@ -179,6 +182,8 @@ def experiments_per_workflow(experiment_parameters, metadata, parameters_report)
                     reports.append(full_report)
 
                     i += 1
+
+    print(f'JOB {job_number} finished')
     return reports
 
 
@@ -221,7 +226,8 @@ def create_csv_file(start_time, headers):
 def execute_experiments():
 
     headers = [
-        'experiment', 'workflow', 'energy_trace', 'shift_mode', 'c_value', 'deadline_factor', 'deadline',
+        'experiment', 'experiment_type', 'iteration', 'workflow', 'energy_trace',
+        'shift_mode', 'c_value', 'deadline_factor', 'deadline',
         'task_ordering', 'scheduling_hash', 'power_distribution',
         'min_makespan', 'makespan', 'workflow_stretch',
         'brown_energy_used', 'green_energy_used', 'total_energy', 'green_energy_not_used',
@@ -245,7 +251,6 @@ def execute_experiments():
         ('uniform', random_uniform),
         ('gaussian', random_gauss),
         ('exponential', random_expovariate),
-        ('inverted_exponential', random_expovariate_inverse),
     ]
 
     workflow_providers = [
@@ -261,60 +266,79 @@ def execute_experiments():
 
     green_power_providers = [
         ('trace-1', lambda: photovolta_reader.get_trace_1(size=30)),
-        ('trace-2', lambda: photovolta_reader.get_trace_2(size=30))
+        ('trace-2', lambda: photovolta_reader.get_trace_2(size=30)),
+        ('trace-3', lambda: photovolta_reader.get_trace_2(size=30)),
+        ('trace-4', lambda: photovolta_reader.get_trace_2(size=30)),
     ]
 
     # Process parameters
+    experiment_repetitions = 10
     shift_modes = ['none', 'left', 'right-left']
-    deadline_factors = [1, 2, 4, 8]
-    c_values = [0, 0.2, 0.5, 0.8]
+    deadline_factors = [2, 4, 8]
+    c_values = [0, 0.5, 0.8]
     task_ordering_criterias = ['energy', 'power', 'runtime', 'runtime_ascending']
 
-    job_count = len(random_functions) * len(workflow_providers) * len(green_power_providers)
+    # shift_modes = ['none']
+    # deadline_factors = [2]
+    # c_values = [0]
+    # task_ordering_criterias = ['energy']
+
+    job_count = len(random_functions) * len(workflow_providers) * len(green_power_providers) * experiment_repetitions
     experiment_count = len(shift_modes) * len(deadline_factors) * len(c_values) * len(task_ordering_criterias)
 
-    print(f'{experiment_count} experiments will be executed.')
+    print(f'{experiment_count} experiments will be executed in {job_count} jobs. Total: {job_count * experiment_count}\n')
 
     executor.start()
+
+    stopwatch = Stopwatch()
+    stopwatch.start()
 
     j = 1
     for distribution_name, random_function in random_functions:
         for workflow_name, workflow_provider in workflow_providers:
-            graph = workflow_provider(random_function)
+            for i in range(experiment_repetitions):
+                graph = workflow_provider(random_function)
 
-            for g_trace_name, trace_provider in green_power_providers:
-                green_power = trace_provider()
+                for g_trace_name, trace_provider in green_power_providers:
+                    green_power = trace_provider()
 
-                experiment_parameters = {
-                    'graph': graph,
-                    'green_power': green_power,
-                    'interval_size': interval_size,
-                    'power_distribution': distribution_name,
+                    experiment_parameters = {
+                        'graph': graph,
+                        'green_power': green_power,
+                        'interval_size': interval_size,
+                        'power_distribution': distribution_name,
 
-                    'shift_modes': shift_modes,
-                    'deadline_factors': deadline_factors,
-                    'c_values': c_values,
-                    'task_ordering_criterias': task_ordering_criterias,
-                }
+                        'shift_modes': shift_modes,
+                        'deadline_factors': deadline_factors,
+                        'c_values': c_values,
+                        'task_ordering_criterias': task_ordering_criterias,
+                        'iteration': i,
+                    }
 
-                metadata = {
-                    'prefix': f'{workflow_name}_{g_trace_name}',
-                    'job_number': j,
-                    'job_count': job_count,
-                    'experiment_count': experiment_count,
-                }
+                    metadata = {
+                        'prefix': f'{workflow_name}_{g_trace_name}_{distribution_name}',
+                        'job_number': j,
+                        'job_count': job_count,
+                        'experiment_count': experiment_count,
+                    }
 
-                parameters_report = {
-                    'workflow': '' + workflow_name,
-                    'energy_trace': '' + g_trace_name,
-                }
+                    parameters_report = {
+                        'workflow': '' + workflow_name,
+                        'energy_trace': '' + g_trace_name,
+                    }
 
-                executor.run_experiment_async(
-                    lambda: experiments_per_workflow(experiment_parameters, metadata, parameters_report)
-                )
-                j += 1
+                    executor.run_experiment_async(
+                        lambda: experiments_per_workflow(experiment_parameters, metadata, parameters_report)
+                    )
+                    j += 1
 
-    executor.wait_all()
+            executor.wait_all()
+            finished_jobs = '%.2f' % (100 * ((j-1) / float(job_count)))
+            elapsed_time = seconds_to_hours(stopwatch.get_elapsed_time())
+            print(f'{finished_jobs}% | {j-1} of {job_count} | {elapsed_time}')
+
+    executor.stop()
+
 
     #import os
     #os.system("shutdown now -h")
@@ -341,15 +365,37 @@ def simple_execution():
     #graph = wfcommons_reader.read_soykb_workflow(1000, 3.85224364443, random_gauss)
 
 
+
     schedule_and_report(graph, green_power, interval_size, deadline_factor, c=0.2, show='last', shift_mode='left',
                         task_ordering='energy', print_resport=True)
 
+def calc_min_makespans_of_workflows():
+    wfcommons_reader = WfCommonsWorkflowReader(synthetic_path)
+    photovoltaReader = PhotovoltaReader(resources_path)
+    green_power = photovoltaReader.get_trace_1(size=30)
+
+    workflows = [
+        ('blast', lambda random_power: wfcommons_reader.read_blast_workflow(1000, 11.4492900609, random_power)),
+        ('bwa', lambda random_power: wfcommons_reader.read_bwa_workflow(1000, 52.2248138958, random_power)),
+        ('cycles', lambda random_power: wfcommons_reader.read_cycles_workflow(1000, 31.0991735531, random_power)),
+        ('genome', lambda random_power: wfcommons_reader.read_genome_workflow(1000, 35.7812995246, random_power)),
+        ('soykb', lambda random_power: wfcommons_reader.read_soykb_workflow(1000, 3.85224364443, random_power)),
+        ('srasearch', lambda random_power: wfcommons_reader.read_srasearch_workflow(1000, 1.26845637583, random_power)),
+        ('montage', lambda random_power: wfcommons_reader.read_montage_workflow(1000, 11.17646556189, random_power)),
+        ('seismology', lambda random_power: wfcommons_reader.read_seismology_workflow(1000, 4000, random_power)),
+    ]
+
+    for name, workflow_provider in workflows:
+        workflow = workflow_provider(random_gauss)
+        min_makespan = calc_critical_path_length(workflow)
+        print(f'\t{name}\tmin_makespan: {min_makespan:,}s ({seconds_to_hours(min_makespan)})')
 
 if __name__ == '__main__':
     stopwatch = Stopwatch()
     stopwatch.start()
 
-    simple_execution()
-    #execute_experiments()
+    #calc_min_makespans_of_workflows()
+    #simple_execution()
+    execute_experiments()
 
     print(f'\n\nOverall execution: ', seconds_to_hours(stopwatch.get_elapsed_time()))
