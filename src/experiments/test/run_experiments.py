@@ -173,6 +173,7 @@ def experiments_per_workflow(experiment_parameters, metadata, parameters_report)
                         'c_value': c_value,
                         'task_ordering': task_ordering,
                         'power_distribution': power_distribution,
+                        'job_number': job_number
                     }
 
                     report = schedule_and_report(graph, green_power, interval_size, deadline_factor, task_ordering,
@@ -226,7 +227,7 @@ def create_csv_file(start_time, headers):
 def execute_experiments():
 
     headers = [
-        'experiment', 'experiment_type', 'iteration', 'workflow', 'energy_trace',
+        'job_number', 'experiment', 'experiment_type', 'iteration', 'workflow', 'energy_trace',
         'shift_mode', 'c_value', 'deadline_factor', 'deadline',
         'task_ordering', 'scheduling_hash', 'power_distribution',
         'min_makespan', 'makespan', 'workflow_stretch',
