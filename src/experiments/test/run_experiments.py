@@ -251,7 +251,7 @@ def execute_experiments():
     random_functions = [
         ('uniform', random_uniform),
         ('gaussian', random_gauss),
-        ('exponential', random_expovariate),
+        ('inverted_exponential', random_expovariate_inverse),
     ]
 
     workflow_providers = [
