@@ -39,8 +39,8 @@ class BoundaryCalculator:
                 Right Variable Boundary (RVB)
         """
 
-        lcb, is_limited_by_scheduled_predecessor = calculate_left_boundary(task, scheduling)
-        rcb, is_limited_by_scheduled_successor = calculate_right_boundary(task, scheduling, self.deadline)
+        lcb, is_there_any_scheduled_predecessor = calculate_left_boundary(task, scheduling)
+        rcb, is_there_any_scheduled_successor = calculate_right_boundary(task, scheduling, self.deadline)
 
         available_time = abs(self.deadline - lcb - rcb)
         available_time_to_use = round((1-self.c) * available_time)
@@ -54,12 +54,12 @@ class BoundaryCalculator:
 
         # If it is the first time stamp (lcb == 0) or the task is limited by a scheduled predecessor, then there is no
         # need of lvb > 0.
-        if lcb == 0 or is_limited_by_scheduled_predecessor:
+        if lcb == 0 or is_there_any_scheduled_predecessor:
             lvb = 0
 
         # If it is the last time stamp (lrb == 0) or the task is limited by a scheduled successor, then there is no
         # need of rvb > 0.
-        if rcb == 0 or is_limited_by_scheduled_successor:
+        if rcb == 0 or is_there_any_scheduled_successor:
             rvb = 0
 
         # If there is no enough time to execute the task, then the variable boundaries are set to zero.

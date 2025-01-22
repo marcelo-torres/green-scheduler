@@ -43,7 +43,7 @@ def _apply_shift(shift_mode, graph, scheduling, boundary_calc, deadline, energy_
 
     return previous_scheduling
 
-def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None, max_power=60, figure_file=None,
+def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None, max_power=None, figure_file=None,
                    task_ordering='energy', shift_mode='left'):
     _validate_shift_mode(shift_mode)
 
@@ -53,11 +53,11 @@ def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None
     def show_draw_if(conditions):
         if show in conditions:
             drawer = draw_scheduling(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph,
-                                  max_power)
+                                  max_power=max_power)
             drawer.show()
 
     def save_draw(file):
-        drawer = draw_scheduling(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph, max_power)
+        drawer = draw_scheduling(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph, max_power=max_power)
         drawer.save(file)
 
     tasks = graph.list_of_tasks()
@@ -82,6 +82,7 @@ def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None
 
         show_draw_if(['all'])
 
+    lcb = lvb = rcb = rvb = 0
     show_draw_if(['all'])
 
     scheduling = _apply_shift(shift_mode, graph, scheduling, boundary_calc, deadline, energy_usage_calculator)

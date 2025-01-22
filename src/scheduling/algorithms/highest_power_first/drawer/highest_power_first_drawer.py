@@ -80,7 +80,7 @@ def draw_line(drawer, events, color='blue'):
     return max_power
 
 
-def draw_scheduling(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, scheduling, graph, max_power=60):
+def draw_scheduling(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, scheduling, graph, max_power=None):
     drawer = Drawer(max_power, deadline)
     drawer.add_constant_boundary(0, lcb)
     drawer.add_variable_boundary(lcb, lvb)
@@ -109,9 +109,10 @@ def draw_scheduling(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, s
 
     is_a_lot_of_events = len(events) > 50
     if is_a_lot_of_events:
-        max_power = draw_line(drawer, events)
+        current_max_power = draw_line(drawer, events)
     else:
-        max_power = draw_rectangles(drawer, events)
+        current_max_power = draw_rectangles(drawer, events)
 
-    drawer.height = 1.5 * max_power
+    if max_power is None:
+        drawer.height = 1.5 * current_max_power
     return drawer

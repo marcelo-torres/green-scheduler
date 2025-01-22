@@ -5,7 +5,7 @@ import matplotlib
 
 matplotlib.use(matplotlib.get_backend()) #https://stackoverflow.com/a/52221178
 
-def draw_task_graph(graph):
+def draw_task_graph(graph, with_labels=False):
 
     G = _create_nx_graph(graph)
 
@@ -20,7 +20,7 @@ def draw_task_graph(graph):
     pos = nx.multipartite_layout(G, subset_key="layer")
 
     fig, ax = plt.subplots()
-    nx.draw_networkx(G, pos=pos, ax=ax, with_labels=False)
+    nx.draw_networkx(G, pos=pos, ax=ax, with_labels=with_labels)
     ax.set_title("DAG layout in topological order")
     fig.tight_layout()
     plt.show()
