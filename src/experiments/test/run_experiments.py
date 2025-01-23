@@ -389,14 +389,16 @@ def calc_min_makespans_of_workflows():
     for name, workflow_provider in workflows:
         workflow = workflow_provider(random_gauss)
         min_makespan = calc_critical_path_length(workflow)
-        print(f'\t{name}\tmin_makespan: {min_makespan:,}s ({seconds_to_hours(min_makespan)})')
+        #print(f'\t{name}\tmin_makespan: {min_makespan:,}s ({seconds_to_hours(min_makespan)})\t tasks: {len(workflow.list_of_tasks())}')
+        print(
+            f'{min_makespan}')
 
 if __name__ == '__main__':
     stopwatch = Stopwatch()
     stopwatch.start()
 
-    #calc_min_makespans_of_workflows()
+    calc_min_makespans_of_workflows()
     #simple_execution()
-    execute_experiments()
+    #execute_experiments()
 
     print(f'\n\nOverall execution: ', seconds_to_hours(stopwatch.get_elapsed_time()))
