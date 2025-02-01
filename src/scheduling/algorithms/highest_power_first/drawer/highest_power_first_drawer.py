@@ -19,7 +19,7 @@ def draw_rectangles(drawer, events):
             current_power = 0
 
             for active_task in active_tasks:
-                drawer.add_rectangle(duration, active_task.power, last_time, current_power, description=active_task.id)
+                drawer.add_task(duration, active_task.power, last_time, current_power, description=active_task.id)
                 current_power += active_task.power
 
             if current_power > max_power:
@@ -80,12 +80,13 @@ def draw_line(drawer, events, color='blue'):
     return max_power
 
 
-def draw_scheduling(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, scheduling, graph, max_power=None):
-    drawer = Drawer(max_power, deadline)
-    drawer.add_constant_boundary(0, lcb)
-    drawer.add_variable_boundary(lcb, lvb)
-    drawer.add_variable_boundary(deadline - rvb - rcb, rvb)
-    drawer.add_constant_boundary(deadline - rcb, rcb)
+def draw_scheduling(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, scheduling, graph, max_power=None, show_boundaries=True):
+    drawer = Drawer(max_power, deadline, show_boundaries=show_boundaries)
+    if show_boundaries:
+        drawer.add_constant_boundary(0, lcb)
+        drawer.add_variable_boundary(lcb, lvb)
+        drawer.add_variable_boundary(deadline - rvb - rcb, rvb)
+        drawer.add_constant_boundary(deadline - rcb, rcb)
 
     interval_start = 0
     for power in green_energy:

@@ -28,7 +28,7 @@ def _sum_runtime(task_ids, graph):
     return runtime
 
 
-def task_flow_schedule(graph, green_power, interval_size, show='None', max_power=None):
+def task_flow_schedule(graph, green_power, interval_size, show='None', max_power=None, chart_x_end=None, graph_boundaries=True):
 
     # 1) Split tasks in critical and noncritical tasks
     min_start_time = compute_min_start_time(graph)
@@ -43,8 +43,9 @@ def task_flow_schedule(graph, green_power, interval_size, show='None', max_power
 
     def show_draw_if(conditions):
         if show in conditions:
-            drawer = draw_scheduling(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph,
-                                     max_power=max_power)
+            x_end = deadline if chart_x_end is None else chart_x_end
+            drawer = draw_scheduling(lcb, lvb, rcb, rvb, x_end, green_power, interval_size, scheduling, graph,
+                                     max_power=max_power, show_boundaries=graph_boundaries)
             drawer.show()
 
     boundary_calc = BoundaryCalculator(graph, deadline, 0)
