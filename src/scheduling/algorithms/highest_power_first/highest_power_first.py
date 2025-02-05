@@ -43,6 +43,63 @@ def _apply_shift(shift_mode, graph, scheduling, boundary_calc, deadline, energy_
 
     return previous_scheduling
 
+def highest_power_first(graph, deadline, c, clusters, task_sort='energy', shift_mode='left', show=None, max_power=None, figure_file=None):
+    _validate_shift_mode(shift_mode)
+
+    scheduling = {}
+    lcb = lvb = rcb = rvb = 0
+
+    green_power = clusters[0].power_series.green_power_list
+    interval_size = clusters[0].power_series.interval_length
+
+    def show_draw_if(conditions):
+        if show in conditions:
+            drawer = draw_scheduling(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph, max_power=max_power)
+            drawer.show()
+
+    def save_draw(file):
+        drawer = draw_scheduling(lcb, lvb, rcb, rvb, deadline, green_power, interval_size, scheduling, graph, max_power=max_power)
+        drawer.save(file)
+
+    tasks = graph.list_of_tasks()
+
+    # 1) Order all tasks - default criteria: by energy usage (power * runtime)
+    tasks.sort(key=_get_task_ordering(task_sort), reverse=True)
+
+    for cluster in clusters:
+        boundary_calc = BoundaryCalculator(graph, deadline, c)
+        energy_usage_calculator = EnergyUsageCalculator(green_power, interval_size)
+
+
+        # TODO get a list of available cores
+
+        for task in tasks:
+            # 2.1)  Calculate boundaries to avoid that a single task gets all slack time
+            lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling)
+            lb = lcb + lvb
+            rb = rcb + rvb
+
+            # 2.2) Schedule each task when it uses less brown energy as early as possible
+            start_time = find_min_brown_energy(task, lb, rb, deadline,
+                                               energy_usage_calculator.get_green_power_available())
+
+            scheduling[task.id] = start_time
+            energy_usage_calculator.add_scheduled_task(task, start_time)
+
+            show_draw_if(['all'])
+
+        lcb = lvb = rcb = rvb = 0
+        show_draw_if(['all'])
+
+        scheduling = _apply_shift(shift_mode, graph, scheduling, boundary_calc, deadline, energy_usage_calculator)
+
+    show_draw_if(['last', 'all'])
+
+    if figure_file:
+        save_draw(figure_file)
+
+    return scheduling
+
 def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None, max_power=None, figure_file=None,
                    task_ordering='energy', shift_mode='left'):
     _validate_shift_mode(shift_mode)

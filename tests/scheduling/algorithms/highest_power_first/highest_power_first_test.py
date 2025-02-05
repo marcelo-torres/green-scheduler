@@ -1,6 +1,9 @@
 import unittest
 
-from src.scheduling.algorithms.highest_power_first.highest_power_first import schedule_graph
+from src.scheduling.algorithms.highest_power_first.highest_power_first import highest_power_first
+from src.scheduling.model.cluster import Cluster
+from src.scheduling.model.machine import Machine
+from src.scheduling.model.power_series import PowerSeries
 from src.scheduling.model.task_graph import TaskGraph
 
 '''
@@ -89,6 +92,13 @@ def _get_graph_3():
     return graph, 65
 
 
+def create_single_machine_cluster(green_power, interval_length, cores=100):
+    power_series = PowerSeries('g1', green_power, interval_length)
+    machine = Machine('m1', cores, 0)
+    return [
+        Cluster('c1', power_series, [machine])
+    ]
+
 class HighestPowerFirstTest(unittest.TestCase):
 
     def test_single_task_with_no_g_energy(self):
@@ -96,7 +106,9 @@ class HighestPowerFirstTest(unittest.TestCase):
         task = graph.add_new_task(1, runtime=100, power=10)
         graph.set_start_task(task.id)
 
-        scheduling = schedule_graph(graph, task.runtime * 4, [], 0)
+        clusters = create_single_machine_cluster([], 0)
+
+        scheduling = highest_power_first(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(0, scheduling[task.id])
 
@@ -105,7 +117,9 @@ class HighestPowerFirstTest(unittest.TestCase):
         task = graph.add_new_task(1, runtime=100, power=10)
         graph.set_start_task(task.id)
 
-        scheduling = schedule_graph(graph, task.runtime * 2, [], 0)
+        clusters = create_single_machine_cluster([], 0)
+
+        scheduling = highest_power_first(graph, task.runtime * 2, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(0, scheduling[task.id])
 
@@ -114,7 +128,9 @@ class HighestPowerFirstTest(unittest.TestCase):
         task = graph.add_new_task(1, runtime=100, power=10)
         graph.set_start_task(task.id)
 
-        scheduling = schedule_graph(graph, task.runtime * 4, [0, 10, 0, 10], 40)
+        clusters = create_single_machine_cluster([0, 10, 0, 10], 40)
+
+        scheduling = highest_power_first(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(40, scheduling[task.id])
 
@@ -123,7 +139,10 @@ class HighestPowerFirstTest(unittest.TestCase):
         task = graph.add_new_task(1, runtime=100, power=10)
         graph.set_start_task(task.id)
 
-        scheduling = schedule_graph(graph, task.runtime * 2, [0, 10, 20, 30, 40, 50, 60], 20)
+        clusters = create_single_machine_cluster([0, 10, 20, 30, 40, 50, 60], 20)
+
+        scheduling = highest_power_first(graph, task.runtime * 2, 0.5, clusters, task_sort='energy',
+                                         shift_mode='left')
 
         self.assertEqual(20, scheduling[task.id])
 
@@ -132,7 +151,9 @@ class HighestPowerFirstTest(unittest.TestCase):
         task = graph.add_new_task(1, runtime=100, power=10)
         graph.set_start_task(task.id)
 
-        scheduling = schedule_graph(graph, task.runtime * 2, [60, 50, 40, 30, 20, 10, 0], 20)
+        clusters = create_single_machine_cluster([60, 50, 40, 30, 20, 10, 0], 20)
+
+        scheduling = highest_power_first(graph, task.runtime * 2, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(0, scheduling[task.id])
 
@@ -141,8 +162,9 @@ class HighestPowerFirstTest(unittest.TestCase):
         task = graph.add_new_task(1, runtime=100, power=10)
         graph.set_start_task(task.id)
 
-        scheduling = schedule_graph(graph, task.runtime * 4, [0, 10, 20, 10, 0, 0, 0, 5, 10, 5, 0, 0, 0, 50, 20, 10, 0],
-                                    20)
+        clusters = create_single_machine_cluster([0, 10, 20, 10, 0, 0, 0, 5, 10, 5, 0, 0, 0, 50, 20, 10, 0], 20)
+
+        scheduling = highest_power_first(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(0, scheduling[task.id])
 
@@ -151,15 +173,18 @@ class HighestPowerFirstTest(unittest.TestCase):
         task = graph.add_new_task(1, runtime=100, power=10)
         graph.set_start_task(task.id)
 
-        scheduling = schedule_graph(graph, task.runtime * 4, [0, 10, 20, 10, 0, 0, 0, 5, 10, 5, 0, 0, 0, 50, 20, 10, 1],
-                                    20)
+        clusters = create_single_machine_cluster([0, 10, 20, 10, 0, 0, 0, 5, 10, 5, 0, 0, 0, 50, 20, 10, 1], 20)
+
+        scheduling = highest_power_first(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(240, scheduling[task.id])
 
     def test_multiple_tasks_g1_with_no_g_energy(self):
         graph, min_makespan = _get_graph_1()
 
-        scheduling = schedule_graph(graph, min_makespan * 4, [], 0)
+        clusters = create_single_machine_cluster([], 0)
+
+        scheduling = highest_power_first(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(0, scheduling[1])
         self.assertEqual(10, scheduling[2])
@@ -172,7 +197,9 @@ class HighestPowerFirstTest(unittest.TestCase):
     def test_multiple_tasks_g2_with_no_g_energy(self):
         graph, min_makespan = _get_graph_2()
 
-        scheduling = schedule_graph(graph, min_makespan * 4, [], 0)
+        clusters = create_single_machine_cluster([], 0)
+
+        scheduling = highest_power_first(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(0, scheduling[1])
         self.assertEqual(3, scheduling[2])
@@ -183,7 +210,9 @@ class HighestPowerFirstTest(unittest.TestCase):
     def test_multiple_tasks_g1_with_g_energy(self):
         graph, min_makespan = _get_graph_1()
 
-        scheduling = schedule_graph(graph, min_makespan * 2, [0, 10, 20, 20, 0, 20, 40, 20, 0, 0, 0, 30, 0], 10)
+        clusters = create_single_machine_cluster([0, 10, 20, 20, 0, 20, 40, 20, 0, 0, 0, 30, 0], 10)
+
+        scheduling = highest_power_first(graph, min_makespan * 2, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(10, scheduling[1])
         self.assertEqual(20, scheduling[2])
@@ -199,7 +228,9 @@ class HighestPowerFirstTest(unittest.TestCase):
         min_makespan += 1
         graph.get_task(6).runtime = 10
 
-        scheduling = schedule_graph(graph, min_makespan * 2, [0, 10, 20, 10, 0, 20, 40, 20, 0, 0, 0, 30, 0], 10)
+        clusters = create_single_machine_cluster([0, 10, 20, 10, 0, 20, 40, 20, 0, 0, 0, 30, 0], 10)
+
+        scheduling = highest_power_first(graph, min_makespan * 2, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(10, scheduling[1])
         self.assertEqual(20, scheduling[2])
@@ -215,7 +246,9 @@ class HighestPowerFirstTest(unittest.TestCase):
         min_makespan += 1
         graph.get_task(6).runtime = 10
 
-        scheduling = schedule_graph(graph, min_makespan * 2, [0, 10, 20, 10, 0, 20, 40, 20, 0, 0, 0, 30, 0], 10, shift_mode='right-left')
+        clusters = create_single_machine_cluster([0, 10, 20, 10, 0, 20, 40, 20, 0, 0, 0, 30, 0], 10)
+
+        scheduling = highest_power_first(graph, min_makespan * 2, 0.5, clusters, task_sort='energy', shift_mode='right-left')
 
         self.assertEqual(10, scheduling[1])
         self.assertEqual(20, scheduling[2])
@@ -231,7 +264,9 @@ class HighestPowerFirstTest(unittest.TestCase):
         min_makespan += 1
         graph.get_task(6).runtime = 10
 
-        scheduling = schedule_graph(graph, min_makespan * 4, [0, 10, 20, 10, 0, 20, 40, 20, 0, 0, 0, 30, 0], 10)
+        clusters = create_single_machine_cluster([0, 10, 20, 10, 0, 20, 40, 20, 0, 0, 0, 30, 0], 10)
+
+        scheduling = highest_power_first(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(10, scheduling[1])
         self.assertEqual(20, scheduling[2])
@@ -244,7 +279,10 @@ class HighestPowerFirstTest(unittest.TestCase):
     def test_runtime_ascending(self):
         graph, min_makespan = _get_graph_3()
 
-        scheduling = schedule_graph(graph, min_makespan * 4, [10, 10], 100, task_ordering='runtime_ascending')
+        clusters = create_single_machine_cluster([10, 10], 100)
+
+        scheduling = highest_power_first(graph, min_makespan * 4, 0.5, clusters, task_sort='runtime_ascending', shift_mode='left')
+
         scheduling = list(scheduling.items())
         scheduling.sort(key=lambda schedule: schedule[1])
 
