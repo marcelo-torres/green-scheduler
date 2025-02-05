@@ -1,7 +1,7 @@
 import os
 import pathlib
 from wfcommons.wfchef.recipes import EpigenomicsRecipe
-from wfcommons import WorkflowGenerator, SrasearchRecipe, MontageRecipe, SeismologyRecipe
+from wfcommons import WorkflowGenerator, SrasearchRecipe, MontageRecipe, SeismologyRecipe, SoykbRecipe
 
 from src.data.photovolta import PhotovoltaReader
 from src.data.wfcommons_reader import _create_graph, _create_graph_from_real_trace
@@ -15,12 +15,27 @@ from src.scheduling.util.critical_path_length_calculator import calc_critical_pa
 from src.scheduling.util.makespan_calculator import calc_makespan
 from src.scheduling.util.topological_ordering import calculate_upward_rank
 
+import random
+MIN_TASK_POWER_DEFAULT = 1
+MAX_TASK_POWER_DEFAULT = 5
+
+
+def random_gauss():
+    mu = 3  # Mean
+    sigma = 0.9  # Standard deviation
+
+    value = random.gauss(mu, sigma)
+    while value < MIN_TASK_POWER_DEFAULT or value > MAX_TASK_POWER_DEFAULT:
+        value = random.gauss(mu, sigma)
+    return value
+
 
 def report_graph(graph):
     min_makespan = calc_critical_path_length(graph)
 
     print(f'\tMin makespan: {min_makespan}s')
     print(f'\tNumber of tasks: {len(graph.tasks)}')
+
 
 def reduce_workflow_srasearch(graph):
     ranks = calculate_upward_rank(graph)
@@ -56,10 +71,13 @@ def execute_generator():
 
     # Workflow generation
     synthetic_path = f'{resources_path}/wfcommons/synthetic'
-    num_tasks = 1000 #10000
+    num_tasks = 24 #98 #24 #10000
     runtime_factor = 2.0
     generator = WorkflowGenerator(SrasearchRecipe.from_num_tasks(num_tasks, runtime_factor=runtime_factor))
     workflow_name = f'{synthetic_path}/srasearch-workflow-t{num_tasks}-r{runtime_factor * 10}.json'
+
+    # generator = WorkflowGenerator(SoykbRecipe.from_num_tasks(num_tasks, runtime_factor=runtime_factor))
+    # workflow_name = f'{synthetic_path}/soykb-workflow-t{num_tasks}-r{runtime_factor * 10}.json'
 
     # generator = WorkflowGenerator(MontageRecipe.from_num_tasks(num_tasks, runtime_factor=runtime_factor))
     # workflow_name = f'{synthetic_path}/montage-workflow-t{num_tasks}-r{runtime_factor * 10}.json'
@@ -72,20 +90,21 @@ def execute_generator():
             workflow.write_json(pathlib.Path(workflow_name))
 
     # Workflow WfCommons to graph
-    graph = _create_graph(workflow_name, min_task_power, max_task_power)
+    graph = _create_graph(workflow_name, random_gauss)
 
     #reduce_workflow_srasearch(graph)
     report_graph(graph)
 
-
+    #draw_task_graph(graph)
 
     # Green power data
     photovoltaReader = PhotovoltaReader(resources_path)
     green_power = photovoltaReader.get_trace_1(size=30)
+    #green_power = [5, 10, 20, 40, 10, 5] * 100
     interval_size = 300
 
     min_makespan = calc_critical_path_length(graph)
-    scheduling = schedule_graph(graph, min_makespan * 2, green_power, interval_size, c=0.8, show='last', max_power=max_green_power, shift_mode='right-left')
+    scheduling = schedule_graph(graph, min_makespan * 4, green_power, interval_size, c=0.8, show='all', max_power=max_green_power, shift_mode='none', task_ordering='runtime_ascending')
 
     #draw(graph, scheduling)
 

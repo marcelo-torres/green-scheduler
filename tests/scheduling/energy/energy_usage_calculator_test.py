@@ -1,8 +1,8 @@
 import unittest
 
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
-from src.scheduling.task_graph.task import Task
-from src.scheduling.task_graph.task_graph import TaskGraph
+from src.scheduling.model.task import Task
+from src.scheduling.model.task_graph import TaskGraph
 
 
 class EnergyUsageCalculatorTest(unittest.TestCase):

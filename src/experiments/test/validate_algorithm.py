@@ -5,7 +5,7 @@ from src.scheduling.algorithms.highest_power_first.highest_power_first import sc
 from src.scheduling.drawer.active_tasks_drawer import ActiveTasksDrawer
 from src.scheduling.drawer.ranks_drawer import draw
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
-from src.scheduling.task_graph.task_graph import TaskGraph
+from src.scheduling.model.task_graph import TaskGraph
 from src.scheduling.util.count_active_tasks import count_active_tasks
 from src.scheduling.util.critical_path_length_calculator import calc_critical_path_length
 from src.scheduling.util.makespan_calculator import calc_makespan

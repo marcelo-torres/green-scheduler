@@ -1,7 +1,7 @@
 import unittest
 
 from src.scheduling.algorithms.task_flow.task_flow import task_flow_schedule
-from src.scheduling.task_graph.task_graph import TaskGraph
+from src.scheduling.model.task_graph import TaskGraph
 
 
 def _get_graph_1():

@@ -5,8 +5,8 @@ from src.scheduling.energy.find_min_brown_energy import _slice_green_power_avail
     _find_min_brown_energy_in_interval, _calculate_brown_energy_of_task, IntervalException, \
     find_min_brown_energy
 from src.scheduling.energy.find_min_brown_energy_greedy import find_min_brown_energy_greedy
-from src.scheduling.task_graph.task import Task
-from src.scheduling.task_graph.task_graph import TaskGraph
+from src.scheduling.model.task import Task
+from src.scheduling.model.task_graph import TaskGraph
 
 
 def test_task_power_equal_to_zero_():

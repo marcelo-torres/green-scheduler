@@ -5,7 +5,7 @@ import pathlib
 from wfcommons import WorkflowGenerator, SrasearchRecipe, MontageRecipe, SeismologyRecipe, BlastRecipe, BwaRecipe, \
     CyclesRecipe, GenomeRecipe, SoykbRecipe
 
-from src.scheduling.task_graph.task_graph import TaskGraph
+from src.scheduling.model.task_graph import TaskGraph
 
 
 def _create_graph_from_real_trace(task_file, random_power):

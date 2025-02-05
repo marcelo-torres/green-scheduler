@@ -1,7 +1,7 @@
 import unittest
 
-from src.scheduling.task_graph.create_graph_exception import CreateGraphException
-from src.scheduling.task_graph.task_graph import TaskGraph
+from src.scheduling.model.create_graph_exception import CreateGraphException
+from src.scheduling.model.task_graph import TaskGraph
 from src.scheduling.util.critical_path_length_calculator import calc_critical_path_length
 from tests.scheduling.graph_utils import get_pipeline_graph, get_stencil_graph, get_multidependency_graph, \
     get_parallel_graph

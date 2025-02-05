@@ -5,7 +5,7 @@ from src.scheduling.algorithms.highest_power_first.shift_left.shift import shift
 from src.scheduling.algorithms.highest_power_first.shift_left.shift_greedy import \
     shift_tasks_to_save_energy_greedy
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
-from src.scheduling.task_graph.task_graph import TaskGraph
+from src.scheduling.model.task_graph import TaskGraph
 from tests.scheduling.graph_utils import get_pipeline_graph
 
 

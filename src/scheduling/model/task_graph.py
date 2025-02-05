@@ -1,5 +1,5 @@
-from src.scheduling.task_graph.create_graph_exception import CreateGraphException
-from src.scheduling.task_graph.task import Task
+from src.scheduling.model.create_graph_exception import CreateGraphException
+from src.scheduling.model.task import Task
 
 
 class TaskGraph:

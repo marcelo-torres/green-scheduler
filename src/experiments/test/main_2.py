@@ -10,7 +10,7 @@ from src.scheduling.util.count_active_tasks import count_active_tasks
 from src.scheduling.util.critical_path_length_calculator import calc_critical_path_length
 from src.scheduling.util.makespan_calculator import calc_makespan
 from src.scheduling.util.scheduling_check import check
-from src.scheduling.task_graph.task_graph import TaskGraph
+from src.scheduling.model.task_graph import TaskGraph
 
 
 # Project structure https://docs.python-guide.org/writing/structure/

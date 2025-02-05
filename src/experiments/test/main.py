@@ -1,7 +1,6 @@
 from src.scheduling.algorithms.highest_power_first.highest_power_first import schedule_graph
-from src.scheduling.drawer.task_graph_drawer import draw_task_graph
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
-from src.scheduling.task_graph.task_graph import TaskGraph
+from src.scheduling.model.task_graph import TaskGraph
 
 
 # Project structure https://docs.python-guide.org/writing/structure/

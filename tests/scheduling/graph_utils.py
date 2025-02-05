@@ -1,4 +1,4 @@
-from src.scheduling.task_graph.task_graph import TaskGraph
+from src.scheduling.model.task_graph import TaskGraph
 
 
 def get_pipeline_graph():
