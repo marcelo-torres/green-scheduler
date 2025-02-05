@@ -102,7 +102,7 @@ def run_single_test():
     green_power = [5, 15, 35, 30, 25, 15, 8, 0, 5, 15, 15, 30, 40]
 
     min_makespan = calc_critical_path_length(graph)
-    scheduling = schedule_graph(graph, min_makespan * 3, green_power, interval_size, c=0.0, show='last', task_ordering='energy', max_power=50, shift_mode='left')
+    scheduling = schedule_graph(graph, min_makespan * 3, green_power, interval_size, c=0.5, show='all', task_ordering='energy', max_power=50, shift_mode='left')
     report_schedule(scheduling, graph, 5, green_power, interval_size)
 
 
@@ -111,9 +111,11 @@ def run_task_flow():
     interval_size = 22
     green_power = [5, 15, 35, 30, 25, 15, 8, 0, 5, 15, 15, 30, 40]
 
+    # TODO change green power!!
+
     graph = create_graph()
     # 30m de algoritmo
-    schedule = task_flow_schedule(graph, [5, 30, 20, 30, 10, 40, 20], 10, show='last')
+    schedule = task_flow_schedule(graph, green_power, interval_size, show='last',  max_power=50, chart_x_end=177, graph_boundaries=False)
     report_schedule(schedule, graph, 5, green_power, interval_size)
 
 if __name__ == '__main__':
