@@ -2,10 +2,11 @@ import time
 
 from src.data.photovolta import PhotovoltaReader
 from src.data.workflow_parquet_reader import WorkflowTraceArchiveReader
-from src.scheduling.algorithms.highest_power_first.highest_power_first import schedule_graph
+from src.scheduling.algorithms.highest_power_first.highest_power_first import highest_power_first
 from src.scheduling.drawer.active_tasks_drawer import ActiveTasksDrawer
 from src.scheduling.drawer.ranks_drawer import draw
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
+from src.scheduling.model.cluster import create_single_machine_cluster
 from src.scheduling.util.count_active_tasks import count_active_tasks
 from src.scheduling.util.critical_path_length_calculator import calc_critical_path_length
 from src.scheduling.util.makespan_calculator import calc_makespan
@@ -43,34 +44,6 @@ def create_graph():
     return graph
 
 
-def run_all_tests():
-    green_intervals = [
-        ('#1', 10, [2, 7, 10, 18, 23, 27, 30, 27, 24, 21, 18, 14, 7]),
-        ('#2', 10, [20, 40, 30, 20, 10, 5, 3, 2, 1, 4, 5, 6, 8, 5]),
-        ('#3', 10, [40, 20, 30, 20, 10, 5, 1, 5, 10, 20, 30, 20, 40, 8])
-    ]
-
-    c_values = [0, 0.75]
-    #c_values = [0, 0.1, 0.25, 0.5, 0.75]
-
-    graph = create_graph()
-
-    for name, interval_size, green_power in green_intervals:
-        for c in c_values:
-            print(c)
-            scheduling = schedule_graph(graph, 124, green_power, interval_size, c=c, show='all')
-            calculator = EnergyUsageCalculator(green_power, interval_size)
-            brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(scheduling, graph)
-            last_task = graph.get_task(7)
-            makespan = scheduling[last_task.id] + last_task.runtime
-            print(f'c={c}:\tbrown_energy_used: {brown_energy_used}J | makespan: {makespan}s')
-        print()
-
-
-
-
-
-
 def run_single_test():
     resources_path = '../../../resources'
 
@@ -95,7 +68,10 @@ def run_single_test():
     interval_size = 100 #int(min_makespan / len(green_power)) + 1
 
     # TODO - test Experiment 4/55: epigenomics trace_1 deadline_factor=1 c=0.3
-    scheduling = schedule_graph(graph, min_makespan * 2, green_power, interval_size, c=0.3, show='last', max_power=max_green_power)
+
+    cluster = create_single_machine_cluster(green_power, interval_size)
+    scheduling = highest_power_first(graph, min_makespan * 2, 0.3, [cluster], task_sort='energy', shift_mode='left', show='last',
+                            max_power=max_green_power)
     draw(graph, scheduling)
 
     calculator = EnergyUsageCalculator(green_power, interval_size)
@@ -117,11 +93,11 @@ def run_single_test():
 
     print(f'max_active_tasks: {max_active_tasks}')
 
+
 if __name__ == '__main__':
 
     start_time = time.time()
 
-    #run_all_tests()
     run_single_test()
 
     print("--- %s seconds ---" % (time.time() - start_time))

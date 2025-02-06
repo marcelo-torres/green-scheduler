@@ -1,6 +1,7 @@
-from src.scheduling.algorithms.highest_power_first.highest_power_first import schedule_graph
+from src.scheduling.algorithms.highest_power_first.highest_power_first import highest_power_first
 from src.scheduling.algorithms.task_flow.task_flow import task_flow_schedule
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
+from src.scheduling.model.cluster import create_single_machine_cluster
 from src.scheduling.model.task_graph import TaskGraph
 from src.scheduling.util.critical_path_length_calculator import calc_critical_path_length
 
@@ -79,47 +80,35 @@ def create_graph():
 
     return graph
 
-def report_schedule(schedule, graph, last_task_id, green_power, interval_size):
+def report_schedule(schedule, graph, last_task_id, clusters):
 
     min_makespan = calc_critical_path_length(graph)
     print(f'min makespan: {min_makespan}s')
 
-    calculator = EnergyUsageCalculator(green_power, interval_size)
+    calculator = EnergyUsageCalculator(clusters.power_series.green_power_list, clusters.power_series.interval_length)
     brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(schedule, graph)
     last_task = graph.get_task(5)
     makespan = schedule[last_task.id] + last_task.runtime
 
     print(f'brown_energy_used: {brown_energy_used}J | total_energy: {total_energy} | makespan: {makespan}s | min_makespan: {min_makespan}')
 
-def run_single_test():
-    graph = create_graph()
-    #draw_task_graph(graph, with_labels=True)
 
-    #interval_size = 15
-    #green_power = [5, 15, 35, 40, 25, 15, 8, 0, 5, 15, 15, 30, 40]
-
-    interval_size = 22
-    green_power = [5, 15, 35, 30, 25, 15, 8, 0, 5, 15, 15, 30, 40]
-
+def plot_highest_power_first_figure(graph, cluster):
     min_makespan = calc_critical_path_length(graph)
-    scheduling = schedule_graph(graph, min_makespan * 3, green_power, interval_size, c=0.5, show='all', task_ordering='energy', max_power=50, shift_mode='left')
-    report_schedule(scheduling, graph, 5, green_power, interval_size)
+    scheduling = highest_power_first(graph, min_makespan * 3, 0.5, [cluster], task_sort='energy', shift_mode='left', show='last', max_power=50)
+
+    report_schedule(scheduling, graph, 5, cluster)
 
 
-def run_task_flow():
+def plot_task_flow_figure(graph, cluster): #TODO!
 
-    interval_size = 22
-    green_power = [5, 15, 35, 30, 25, 15, 8, 0, 5, 15, 15, 30, 40]
+    schedule = task_flow_schedule(graph, [cluster], show='last', max_power=50, chart_x_end=177, graph_boundaries=False)
+    report_schedule(schedule, graph, 5, cluster)
 
-    # TODO change green power!!
-
-    graph = create_graph()
-    # 30m de algoritmo
-    schedule = task_flow_schedule(graph, green_power, interval_size, show='last',  max_power=50, chart_x_end=177, graph_boundaries=False)
-    report_schedule(schedule, graph, 5, green_power, interval_size)
 
 if __name__ == '__main__':
-    #run_all_tests()
-    #run_single_test()
-    run_task_flow()
+    graph = create_graph()
+    cluster = create_single_machine_cluster([5, 15, 35, 30, 25, 15, 8, 0, 5, 15, 15, 30, 40], 22)
 
+    #plot_highest_power_first_figure(graph, cluster)
+    plot_task_flow_figure(graph, cluster)

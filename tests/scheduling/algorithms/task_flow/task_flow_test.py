@@ -1,6 +1,7 @@
 import unittest
 
 from src.scheduling.algorithms.task_flow.task_flow import task_flow_schedule
+from src.scheduling.model.cluster import create_single_machine_cluster
 from src.scheduling.model.task_graph import TaskGraph
 
 
@@ -42,7 +43,8 @@ class TaskFlowTest(unittest.TestCase):
         task = graph.add_new_task(1, runtime=100, power=10)
         graph.set_start_task(task.id)
 
-        scheduling = task_flow_schedule(graph, [], 0)
+        cluster = create_single_machine_cluster([], 0)
+        scheduling = task_flow_schedule(graph, [cluster])
 
         self.assertEqual(0, scheduling[task.id])
 
@@ -51,13 +53,15 @@ class TaskFlowTest(unittest.TestCase):
         task = graph.add_new_task(1, runtime=100, power=10)
         graph.set_start_task(task.id)
 
-        scheduling = task_flow_schedule(graph, [0, 0, 0, 1000], 100)
+        cluster = create_single_machine_cluster([0, 0, 0, 1000], 100)
+        scheduling = task_flow_schedule(graph, [cluster])
 
         self.assertEqual(0, scheduling[task.id])
 
     def test_default_graph_no_energy(self):
         graph = _get_graph_1()
-        scheduling = task_flow_schedule(graph, [], 0)
+        cluster = create_single_machine_cluster([], 0)
+        scheduling = task_flow_schedule(graph, [cluster])
 
         self.assertEqual(0, scheduling[0])
         self.assertEqual(0, scheduling[1])
@@ -70,7 +74,8 @@ class TaskFlowTest(unittest.TestCase):
 
     def test_default_graph_energy(self):
         graph = _get_graph_1()
-        scheduling = task_flow_schedule(graph, [5, 30, 20, 30, 10, 40, 20], 10, )
+        cluster = create_single_machine_cluster([5, 30, 20, 30, 10, 40, 20], 10)
+        scheduling = task_flow_schedule(graph, [cluster])
 
         self.assertEqual(0, scheduling[0])
         self.assertEqual(5, scheduling[1])

@@ -28,7 +28,9 @@ def _sum_runtime(task_ids, graph):
     return runtime
 
 
-def task_flow_schedule(graph, green_power, interval_size, show='None', max_power=None, chart_x_end=None, graph_boundaries=True):
+
+
+def task_flow_schedule(graph, clusters, show='None', max_power=None, chart_x_end=None, graph_boundaries=True):
 
     # 1) Split tasks in critical and noncritical tasks
     min_start_time = compute_min_start_time(graph)
@@ -39,45 +41,107 @@ def task_flow_schedule(graph, green_power, interval_size, show='None', max_power
     deadline = _sum_runtime(critical_tasks, graph)
 
     scheduling = {}
-    lcb = lvb = rcb = rvb = 0
 
-    def show_draw_if(conditions):
-        if show in conditions:
-            x_end = deadline if chart_x_end is None else chart_x_end
-            drawer = draw_scheduling(lcb, lvb, rcb, rvb, x_end, green_power, interval_size, scheduling, graph,
-                                     max_power=max_power, show_boundaries=graph_boundaries)
-            drawer.show()
 
-    boundary_calc = BoundaryCalculator(graph, deadline, 0)
-    energy_usage_calculator = EnergyUsageCalculator(green_power, interval_size)
+    for cluster in clusters:
+        lcb = lvb = rcb = rvb = 0
 
-    # 2) Schedule critical path
-    for task_id in critical_tasks:
-        task = graph.get_task(task_id)
-        start_time = min_start_time[task.id]
+        green_power = clusters[0].power_series.green_power_list
+        interval_size = clusters[0].power_series.interval_length
 
-        scheduling[task.id] = start_time
-        energy_usage_calculator.add_scheduled_task(task, start_time)
+        def show_draw_if(conditions):
+            if show in conditions:
+                x_end = deadline if chart_x_end is None else chart_x_end
+                drawer = draw_scheduling(lcb, lvb, rcb, rvb, x_end, green_power, interval_size, scheduling, graph,
+                                         max_power=max_power, show_boundaries=graph_boundaries)
+                drawer.show()
 
-        show_draw_if(['all'])
+        boundary_calc = BoundaryCalculator(graph, deadline, 0)
+        energy_usage_calculator = EnergyUsageCalculator(green_power, interval_size)
 
-    # 3) Schedule noncritical path tasks
-    for task_id in non_critical_tasks:
-        task = graph.get_task(task_id)
-        # Calculate boundaries to avoid that a single task gets all slack time
-        lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling)
-        lb = lcb + lvb
-        rb = rcb + rvb
+        # 2) Schedule critical path
+        for task_id in critical_tasks:
+            task = graph.get_task(task_id)
+            start_time = min_start_time[task.id]
 
-        # Schedule each task when it uses less brown energy as early as possible
-        start_time = find_min_brown_energy(task, lb, rb, deadline, energy_usage_calculator.get_green_power_available())
+            scheduling[task.id] = start_time
+            energy_usage_calculator.add_scheduled_task(task, start_time)
 
-        scheduling[task.id] = start_time
-        energy_usage_calculator.add_scheduled_task(task, start_time)
+            show_draw_if(['all'])
 
-        show_draw_if(['all'])
+        # 3) Schedule noncritical path tasks
+        for task_id in non_critical_tasks:
+            task = graph.get_task(task_id)
+            # Calculate boundaries to avoid that a single task gets all slack time
+            lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling)
+            lb = lcb + lvb
+            rb = rcb + rvb
 
-    lcb = lvb = rcb = rvb = 0
-    show_draw_if(['last', 'all'])
+            # Schedule each task when it uses less brown energy as early as possible
+            start_time = find_min_brown_energy(task, lb, rb, deadline,
+                                               energy_usage_calculator.get_green_power_available())
 
-    return scheduling
+            scheduling[task.id] = start_time
+            energy_usage_calculator.add_scheduled_task(task, start_time)
+
+            show_draw_if(['all'])
+
+        lcb = lvb = rcb = rvb = 0
+        show_draw_if(['last', 'all'])
+
+        return scheduling
+
+
+# def task_flow_schedule_old(graph, green_power, interval_size, show='None', max_power=None, chart_x_end=None, graph_boundaries=True):
+#
+#     # 1) Split tasks in critical and noncritical tasks
+#     min_start_time = compute_min_start_time(graph)
+#     slack = calculate_slack_time(graph, min_start_time)
+#     critical_tasks, non_critical_tasks = _split_tasks(slack)
+#
+#     # The deadline is the critical path length
+#     deadline = _sum_runtime(critical_tasks, graph)
+#
+#     scheduling = {}
+#     lcb = lvb = rcb = rvb = 0
+#
+#     def show_draw_if(conditions):
+#         if show in conditions:
+#             x_end = deadline if chart_x_end is None else chart_x_end
+#             drawer = draw_scheduling(lcb, lvb, rcb, rvb, x_end, green_power, interval_size, scheduling, graph,
+#                                      max_power=max_power, show_boundaries=graph_boundaries)
+#             drawer.show()
+#
+#     boundary_calc = BoundaryCalculator(graph, deadline, 0)
+#     energy_usage_calculator = EnergyUsageCalculator(green_power, interval_size)
+#
+#     # 2) Schedule critical path
+#     for task_id in critical_tasks:
+#         task = graph.get_task(task_id)
+#         start_time = min_start_time[task.id]
+#
+#         scheduling[task.id] = start_time
+#         energy_usage_calculator.add_scheduled_task(task, start_time)
+#
+#         show_draw_if(['all'])
+#
+#     # 3) Schedule noncritical path tasks
+#     for task_id in non_critical_tasks:
+#         task = graph.get_task(task_id)
+#         # Calculate boundaries to avoid that a single task gets all slack time
+#         lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling)
+#         lb = lcb + lvb
+#         rb = rcb + rvb
+#
+#         # Schedule each task when it uses less brown energy as early as possible
+#         start_time = find_min_brown_energy(task, lb, rb, deadline, energy_usage_calculator.get_green_power_available())
+#
+#         scheduling[task.id] = start_time
+#         energy_usage_calculator.add_scheduled_task(task, start_time)
+#
+#         show_draw_if(['all'])
+#
+#     lcb = lvb = rcb = rvb = 0
+#     show_draw_if(['last', 'all'])
+#
+#     return scheduling

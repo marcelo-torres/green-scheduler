@@ -6,8 +6,9 @@ import os
 from src.data.photovolta import PhotovoltaReader
 from src.data.wfcommons_reader import WfCommonsWorkflowReader
 from src.experiments.ParallelExperimentExecutor import ParallelExperimentExecutor
-from src.scheduling.algorithms.highest_power_first.highest_power_first import schedule_graph
+from src.scheduling.algorithms.highest_power_first.highest_power_first import highest_power_first
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
+from src.scheduling.model.cluster import create_single_machine_cluster
 from src.scheduling.util.count_active_tasks import count_active_tasks
 from src.scheduling.util.critical_path_length_calculator import calc_critical_path_length
 from src.scheduling.util.makespan_calculator import calc_makespan
@@ -111,8 +112,8 @@ def schedule_and_report(graph, green_power, interval_size, deadline_factor, task
         print(f'\tDeadline: {deadline:,}s ({seconds_to_hours(deadline)})')
         print(f'\tNumber of tasks: {number_of_tasks:,.{2}f}')
 
-    scheduling = schedule_graph(graph, deadline, green_power, interval_size, c=c, show=show, shift_mode=shift_mode,
-                                task_ordering=task_ordering)
+    cluster = create_single_machine_cluster(green_power, interval_size)
+    scheduling = highest_power_first(graph, deadline, c, [cluster], task_sort=task_ordering, shift_mode=shift_mode, show=show)
 
     energy_calculator = EnergyUsageCalculator(green_power, interval_size)
     scheduling_report = report_scheduling(scheduling, graph, energy_calculator, print_resport=print_resport)

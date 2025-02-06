@@ -5,9 +5,7 @@ from src.scheduling.model.power_series import PowerSeries
 def create_single_machine_cluster(green_power, interval_length, cores=100):
     power_series = PowerSeries('g1', green_power, interval_length)
     machine = Machine('m1', cores, 0)
-    return [
-        Cluster('c1', power_series, [machine])
-    ]
+    return Cluster('c1', power_series, [machine])
 
 class Cluster:
 
