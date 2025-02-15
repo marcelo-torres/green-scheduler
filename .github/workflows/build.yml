@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature-multi-core
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
