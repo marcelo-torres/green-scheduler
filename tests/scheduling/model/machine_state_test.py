@@ -32,6 +32,14 @@ class MachineStateTest(unittest.TestCase):
         state = create_state(10, 20)
         self.assertEqual(10, state.min_free_cores_in(0, 20))
 
+    def test_core_usages_at_same_time(self):
+        state = create_state(10, 20)
+        state.use_cores(2, 3, 6)
+        state.use_cores(2, 3, 1)
+        self.assert_min_cores_in(state, 10, 0, 2)
+        self.assert_min_cores_in(state, 3, 2, 5)
+        self.assert_min_cores_in(state, 10, 5, 20)
+
     def test_if_no_cores_available_throw_exception(self):
         state = create_state(10, 20)
         with self.assertRaises(Exception):
@@ -106,6 +114,85 @@ class MachineStateTest(unittest.TestCase):
         self.assert_min_cores_in(state, 20, 14, 16)
         self.assert_min_cores_in(state, 1, 16, 19)
         self.assert_min_cores_in(state, 0, 19, 20)
+
+    def test_free_cores_more_than_available(self):
+        state = create_state(10, 20)
+        with self.assertRaises(Exception):
+            state.free_cores(0, 1, 11)
+
+    def test_min_cores_of_sigle_time_unit(self):
+        state = create_state(10, 20)
+        self.assert_min_cores_in(state, 10, 0, 0)
+        self.assert_min_cores_in(state, 10, 1, 1)
+        self.assert_min_cores_in(state, 10, 20, 20)
+
+    def test_free_all_cores(self):
+        state = create_state(10, 20)
+        state.use_cores(0, 20, 10)
+        state.free_cores(0, 20, 10)
+        self.assert_min_cores_in(state, 10, 0, 20)
+
+    def test_free_cores_in_middle_of_interval(self):
+        state = _get_state_1()
+        state.free_cores(11, 2, 1)
+
+        self.assert_min_cores_in(state, 15, 0, 5)
+        self.assert_min_cores_in(state, 13, 5, 9)
+
+        self.assert_min_cores_in(state, 18, 9, 11)
+        self.assert_min_cores_in(state, 19, 11, 13)
+        self.assert_min_cores_in(state, 18, 13, 14)
+
+        self.assert_min_cores_in(state, 20, 14, 16)
+        self.assert_min_cores_in(state, 1, 16, 20)
+
+    def test_free_cores_splitting_an_interval(self):
+        state = _get_state_1()
+        state.free_cores(4, 3, 4)
+
+        self.assert_min_cores_in(state, 15, 0, 4)
+        self.assert_min_cores_in(state, 19, 4, 5)
+        self.assert_min_cores_in(state, 17, 5, 7)
+        self.assert_min_cores_in(state, 13, 7, 9)
+
+        self.assert_min_cores_in(state, 18, 9, 14)
+        self.assert_min_cores_in(state, 20, 14, 16)
+        self.assert_min_cores_in(state, 1, 16, 20)
+
+    def test_free_cores_n_intervals(self):
+        state = _get_state_1()
+        state.free_cores(0, 14, 1)
+
+        self.assert_min_cores_in(state, 16, 0, 5)
+        self.assert_min_cores_in(state, 14, 5, 9)
+        self.assert_min_cores_in(state, 19, 9, 14)
+        self.assert_min_cores_in(state, 20, 14, 16)
+        self.assert_min_cores_in(state, 1, 16, 20)
+
+    def test_free_cores_usage_start(self):
+        state = _get_state_1()
+        state.free_cores(0, 7, 2)
+
+        self.assert_min_cores_in(state, 17, 0, 5)
+        self.assert_min_cores_in(state, 15, 5, 7)
+        self.assert_min_cores_in(state, 13, 7, 9)
+
+        self.assert_min_cores_in(state, 18, 9, 14)
+        self.assert_min_cores_in(state, 20, 14, 16)
+        self.assert_min_cores_in(state, 1, 16, 20)
+
+    def test_free_cores_usage_end(self):
+        state = _get_state_1()
+        state.free_cores(7, 7, 1)
+
+        self.assert_min_cores_in(state, 15, 0, 5)
+
+        self.assert_min_cores_in(state, 13, 5, 7)
+        self.assert_min_cores_in(state, 14, 7, 9)
+        self.assert_min_cores_in(state, 19, 9, 14)
+
+        self.assert_min_cores_in(state, 20, 14, 16)
+        self.assert_min_cores_in(state, 1, 16, 20)
 
     def assert_min_cores_in(self, state, min_cores, start, end):
         self.assertEqual(min_cores, state.min_free_cores_in(start, end))

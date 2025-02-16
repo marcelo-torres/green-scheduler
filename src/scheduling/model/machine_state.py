@@ -21,40 +21,82 @@ class MachineState:
 
         # TreeSlice[s1:e1] -> TreeSlice object, with keys in range s1 <= key < e1
         current_events = list(self.events[start:end].items())
-        if len(current_events) == 0 or current_events[0][0] is not start: # TODO  teste or
+        if len(current_events) == 0:
             previous_time = self.events.floor_key(start)
             current_available_cores = self.events[previous_time] - amount
+            self._validate_new_cores_used(current_available_cores, amount)
             self.events[start] = current_available_cores
             last_cores_available = current_available_cores
 
         for time, cores in current_events:
-            self.events[time] = cores - amount
-            last_cores_available = cores - amount
+            current_available_cores = cores - amount
+            self._validate_new_cores_used(current_available_cores, amount)
+            self.events[time] = current_available_cores
+            last_cores_available = current_available_cores
 
         if end not in self.events:
-            self.events[end] = last_cores_available + amount
+            current_available_cores = last_cores_available + amount
+            self._validate_new_cores_used(current_available_cores, amount)
+            self.events[end] = current_available_cores
 
-    def free_cores(self, start, duration, amount): # TODO teste
+    def free_cores(self, start, duration, amount):
         end = start + duration
 
-        last_time = self.events.ceiling_key(end)
-        current_events = list(self.events[start:last_time].items())
+        last_cores_available = float('-inf')
+
+        # Create start event
+        if start not in self.events:
+            previous_time = self.events.floor_key(start)  # key <= e1
+            cores = self.events[previous_time]
+            current_cores_available = cores + amount
+            self._validate_new_free_cores(current_cores_available)
+            self.events[start] = current_cores_available
+            last_cores_available = cores
+
+            current_events = list(self.events[start+1:end].items())  # s1+1 <= key < e1 => s1 < key < e1
+        else:
+            current_events = list(self.events[start:end].items())  # s1 <= key < e1 => s1 <= key < e1
+
+        # Update events
+        for time, cores in current_events:
+            current_cores_available = cores + amount
+            self._validate_new_free_cores(current_cores_available)
+            self.events[time] = current_cores_available
+            last_cores_available = cores
+
+        # Create end event
+        if end not in self.events:
+            self.events[end] = last_cores_available
+
+    def free_cores_old(self, start, duration, amount):
+        end = start + duration
+
+        current_events = list(self.events[start+1:end].items()) # s1 <= key < e1+1 => s1 <= key <= e1
 
         last_cores_available = -1
-        if len(current_events) > 0 and current_events[0][0] is not start:
-            last_cores_available = current_events[0][1]
-            current_events.pop()
-
-        if len(current_events) == 0:
-            self.events[start] = amount
-        elif current_events[0][0] is not start:
-            self.events[start] = last_cores_available + amount
+        first_time = self.events.ceiling_key(start)  # key <= e1
+        if first_time is not start:
+            previous_time = self.events.floor_key(start)
+            last_cores_available = self.events[previous_time]
+            current_cores_available = last_cores_available + amount
+            self._validate_new_free_cores(current_cores_available)
+            self.events[start] = current_cores_available
 
         for time, cores in current_events:
-            self.events[time] = cores + amount
+            current_cores_available = cores + amount
+            self._validate_new_free_cores(current_cores_available)
+
+            self.events[time] = current_cores_available
+            last_cores_available = cores
+
+        if len(current_events) == 0 or end is not current_events[-1][0]:
+            self.events[end] = last_cores_available
 
     def min_free_cores_in(self, start, end):
         previous_time = self.events.floor_key(start)
+
+        if start == end:
+            return self.events[previous_time]
 
         min_cores = float('inf')
         for time, available_cores in self.events[previous_time:end].items():
@@ -62,3 +104,11 @@ class MachineState:
                 min_cores = available_cores
 
         return min_cores
+
+    def _validate_new_cores_used(self, current_cores_available, amount):
+        if current_cores_available < 0:
+            raise Exception(f' Attempted to use {amount} cores, but machine cannot have {current_cores_available} free cores!')
+
+    def _validate_new_free_cores(self, current_cores_available):
+        if current_cores_available > self.machine.cores:
+            raise Exception(f'A machine with {self.machine.cores} cores cannot have {current_cores_available} free cores!')
