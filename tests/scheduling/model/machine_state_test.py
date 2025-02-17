@@ -3,9 +3,11 @@ import unittest
 from src.scheduling.model.machine import Machine
 from src.scheduling.model.machine_state import MachineState
 
-def create_state(cores, deadline):
+
+def create_state(cores):
     machine = Machine('id', cores=cores)
-    return MachineState(machine, deadline)
+    return MachineState(machine)
+
 
 def _get_state_1():
     '''
@@ -17,7 +19,7 @@ def _get_state_1():
         | [ 16s, 20s]  |      19     |    01     |
     :return:
     '''
-    state = create_state(20, 20)
+    state = create_state(20)
     state.use_cores(5, 4, 7)
     state.use_cores(16, 4, 19)
     state.use_cores(0, 5, 5)
@@ -29,11 +31,11 @@ def _get_state_1():
 class MachineStateTest(unittest.TestCase):
 
     def test_min_free_cores_no_usage(self):
-        state = create_state(10, 20)
+        state = create_state(10)
         self.assertEqual(10, state.min_free_cores_in(0, 20))
 
     def test_core_usages_at_same_time(self):
-        state = create_state(10, 20)
+        state = create_state(10)
         state.use_cores(2, 3, 6)
         state.use_cores(2, 3, 1)
         self.assert_min_cores_in(state, 10, 0, 2)
@@ -41,12 +43,12 @@ class MachineStateTest(unittest.TestCase):
         self.assert_min_cores_in(state, 10, 5, 20)
 
     def test_if_no_cores_available_throw_exception(self):
-        state = create_state(10, 20)
+        state = create_state(10)
         with self.assertRaises(Exception):
             state.use_cores(1, 2, 11)
 
     def test_min_free_cores_single_usage(self):
-        state = create_state(10, 20)
+        state = create_state(10)
         state.use_cores(5, 10, 6)
         self.assert_min_cores_in(state, 4, 0, 20)
         self.assert_min_cores_in(state, 10, 0, 5)
@@ -116,18 +118,18 @@ class MachineStateTest(unittest.TestCase):
         self.assert_min_cores_in(state, 0, 19, 20)
 
     def test_free_cores_more_than_available(self):
-        state = create_state(10, 20)
+        state = create_state(10)
         with self.assertRaises(Exception):
             state.free_cores(0, 1, 11)
 
     def test_min_cores_of_sigle_time_unit(self):
-        state = create_state(10, 20)
+        state = create_state(10)
         self.assert_min_cores_in(state, 10, 0, 0)
         self.assert_min_cores_in(state, 10, 1, 1)
         self.assert_min_cores_in(state, 10, 20, 20)
 
     def test_free_all_cores(self):
-        state = create_state(10, 20)
+        state = create_state(10)
         state.use_cores(0, 20, 10)
         state.free_cores(0, 20, 10)
         self.assert_min_cores_in(state, 10, 0, 20)
@@ -193,6 +195,26 @@ class MachineStateTest(unittest.TestCase):
 
         self.assert_min_cores_in(state, 20, 14, 16)
         self.assert_min_cores_in(state, 1, 16, 20)
+
+    def test_next_key(self):
+        state = _get_state_1()
+
+        self.assertEqual(5, state.next_start(0))
+        self.assertEqual(5, state.next_start(1))
+        self.assertEqual(5, state.next_start(4))
+
+        self.assertEqual(9, state.next_start(5))
+
+    def test_previous_key(self):
+        state = _get_state_1()
+
+        self.assertEqual(0, state.previous_start(1))
+        self.assertEqual(0, state.previous_start(5))
+
+        self.assertEqual(5, state.previous_start(6))
+        self.assertEqual(5, state.previous_start(9))
+
+        self.assertEqual(16, state.previous_start(20))
 
     def assert_min_cores_in(self, state, min_cores, start, end):
         self.assertEqual(min_cores, state.min_free_cores_in(start, end))

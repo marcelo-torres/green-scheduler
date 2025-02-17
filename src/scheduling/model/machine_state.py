@@ -4,12 +4,12 @@ from bintrees import AVLTree
 
 class MachineState:
 
-    def __init__(self, machine, deadline):
+    def __init__(self, machine):
         self.machine = machine
 
         self.events = AVLTree()
         self.events.insert(0, machine.cores)
-        self.events.insert(deadline, machine.cores)
+        self.events.insert(float('inf'), machine.cores)
 
     def use_cores(self, start, duration, amount):
 
@@ -68,30 +68,6 @@ class MachineState:
         if end not in self.events:
             self.events[end] = last_cores_available
 
-    def free_cores_old(self, start, duration, amount):
-        end = start + duration
-
-        current_events = list(self.events[start+1:end].items()) # s1 <= key < e1+1 => s1 <= key <= e1
-
-        last_cores_available = -1
-        first_time = self.events.ceiling_key(start)  # key <= e1
-        if first_time is not start:
-            previous_time = self.events.floor_key(start)
-            last_cores_available = self.events[previous_time]
-            current_cores_available = last_cores_available + amount
-            self._validate_new_free_cores(current_cores_available)
-            self.events[start] = current_cores_available
-
-        for time, cores in current_events:
-            current_cores_available = cores + amount
-            self._validate_new_free_cores(current_cores_available)
-
-            self.events[time] = current_cores_available
-            last_cores_available = cores
-
-        if len(current_events) == 0 or end is not current_events[-1][0]:
-            self.events[end] = last_cores_available
-
     def min_free_cores_in(self, start, end):
         previous_time = self.events.floor_key(start)
 
@@ -104,6 +80,13 @@ class MachineState:
                 min_cores = available_cores
 
         return min_cores
+
+    def next_start(self, current_start):
+        return self.events.ceiling_key(current_start+1)
+
+    def previous_start(self, current_start):
+        return self.events.floor_key(current_start-1)
+
 
     def _validate_new_cores_used(self, current_cores_available, amount):
         if current_cores_available < 0:
