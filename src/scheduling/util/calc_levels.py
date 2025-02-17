@@ -13,7 +13,7 @@ def calc_levels_recursive(task, current_level, levels, visited_tasks):
     if task.id in levels and current_level <= levels[task.id]:
         return levels[task.id]
 
-    if not (task.id in levels) or levels[task.id] < current_level:
+    if task.id not in levels or levels[task.id] < current_level:
         levels[task.id] = current_level
     else:
         current_level = levels[task.id]
