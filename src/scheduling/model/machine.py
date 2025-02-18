@@ -18,7 +18,7 @@ class Machine:
         self.state.free_cores(start_time, task.runtime, CORES_PER_TASK)
 
     def can_schedule_task_in(self, task, start, end):
-        return start - end >= task.runtime and self.state.min_free_cores_in(start, end) >= CORES_PER_TASK
+        return end - start >= task.runtime and self.state.min_free_cores_in(start, end) >= CORES_PER_TASK
 
 
 
