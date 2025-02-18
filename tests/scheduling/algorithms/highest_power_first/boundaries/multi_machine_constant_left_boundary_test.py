@@ -86,7 +86,7 @@ class MultiMachineConstantLeftBoundaryTest(unittest.TestCase):
         graph, min_makespan = _get_graph_1()
         machine = Machine('m1', 1)
 
-        start, is_limited = calculate_constant_left_boundary(graph.get_first_task(), {}, machine)
+        start, is_limited = calculate_constant_left_boundary(graph.get_first_task(), {}, [machine])
 
         self.assertEqual(0, start)
         self.assertFalse(is_limited)
@@ -95,7 +95,7 @@ class MultiMachineConstantLeftBoundaryTest(unittest.TestCase):
         graph, min_makespan = _get_graph_2()
         machine = Machine('m1', 1)
 
-        start, is_limited = calculate_constant_left_boundary(graph.get_first_task(), {}, machine)
+        start, is_limited = calculate_constant_left_boundary(graph.get_first_task(), {}, [machine])
 
         self.assertEqual(0, start)
         self.assertFalse(is_limited)
@@ -104,7 +104,7 @@ class MultiMachineConstantLeftBoundaryTest(unittest.TestCase):
         graph, min_makespan = _get_graph_2()
         machine = Machine('m1', 1)
 
-        start, is_limited = calculate_constant_left_boundary(graph.tasks[5], {}, machine)
+        start, is_limited = calculate_constant_left_boundary(graph.tasks[5], {}, [machine])
 
         self.assertEqual(79, start)
         self.assertFalse(is_limited)
@@ -113,7 +113,7 @@ class MultiMachineConstantLeftBoundaryTest(unittest.TestCase):
         graph, min_makespan = _get_graph_2()
         machine = Machine('m1', 1)
 
-        start, is_limited = calculate_constant_left_boundary(graph.tasks[3], {}, machine)
+        start, is_limited = calculate_constant_left_boundary(graph.tasks[3], {}, [machine])
 
         self.assertEqual(73, start)
         self.assertFalse(is_limited)
@@ -122,7 +122,7 @@ class MultiMachineConstantLeftBoundaryTest(unittest.TestCase):
         graph, min_makespan = _get_graph_3()
         machine = Machine('m1', 1)
 
-        start, is_limited = calculate_constant_left_boundary(graph.tasks[5], {}, machine)
+        start, is_limited = calculate_constant_left_boundary(graph.tasks[5], {}, [machine])
 
         self.assertEqual(125, start)
         self.assertFalse(is_limited)
@@ -131,7 +131,7 @@ class MultiMachineConstantLeftBoundaryTest(unittest.TestCase):
         graph, min_makespan = _get_graph_3()
         machine = Machine('m1', 3)
 
-        start, is_limited = calculate_constant_left_boundary(graph.tasks[5], {}, machine)
+        start, is_limited = calculate_constant_left_boundary(graph.tasks[5], {}, [machine])
 
         self.assertEqual(65, start)
         self.assertFalse(is_limited)

@@ -1,33 +1,36 @@
 from src.scheduling.model.machine import CORES_PER_TASK
 
 
-def calculate_constant_left_boundary(task, schedule, machine):
-
-    temp_schedule = {}
+def calculate_constant_left_boundary(task, schedule, machines):
 
     if len(task.predecessors) == 0:
         return 0, False
 
+    temp_schedule = {}
+
     is_limited_by_scheduled_predecessor = False
     max_earliest_predecessor_finish_time = -1
+    max_predecessor = None
     for p in task.predecessors:
-
-        p_earliest_finish_time = _min_finish_time(p, schedule, machine, temp_schedule)
+        p_earliest_finish_time = _min_finish_time(p, schedule, machines, temp_schedule)
 
         if p_earliest_finish_time > max_earliest_predecessor_finish_time:
             max_earliest_predecessor_finish_time = p_earliest_finish_time
-            is_limited_by_scheduled_predecessor = (p.id in schedule)
+            max_predecessor = p
 
-    start = _find_min_task_start_with_enough_cores(task, machine, max_earliest_predecessor_finish_time)
+    if max_predecessor is not None:
+        is_limited_by_scheduled_predecessor = (max_predecessor.id in schedule)
+
+    start, _ = _find_machine(task, machines, max_earliest_predecessor_finish_time)
 
     for task_id, d in list(temp_schedule.items()):
         t, s, m = d
-        machine.unschedule_task(t, s)
+        m.unschedule_task(t, s)
 
     return start, is_limited_by_scheduled_predecessor
 
 
-def _min_finish_time(task, schedule, machine, temp_schedule):
+def _min_finish_time(task, schedule, machines, temp_schedule):
     if task.id in schedule:
         start_time = schedule[task.id]
         return task.runtime + start_time
@@ -37,33 +40,44 @@ def _min_finish_time(task, schedule, machine, temp_schedule):
         return task.runtime + start_time
 
     if len(task.predecessors) == 0:
-        start = _find_and_schedule_min(task, machine, 0, temp_schedule)
+        start = _temp_schedule_task(task, machines, 0, temp_schedule)
         return start + task.runtime
 
     max_predecessor_finish_time = -1
     for p in task.predecessors:
-        p_earliest_finish_time = _min_finish_time(p, schedule, machine, temp_schedule)
+        p_earliest_finish_time = _min_finish_time(p, schedule, machines, temp_schedule)
         if p_earliest_finish_time > max_predecessor_finish_time:
             max_predecessor_finish_time = p_earliest_finish_time
 
-    start = _find_and_schedule_min(task, machine, max_predecessor_finish_time, temp_schedule)
+    start = _temp_schedule_task(task, machines, max_predecessor_finish_time, temp_schedule)
 
     return start + task.runtime
 
 
-def _find_and_schedule_min(task, machine, max_predecessor_finish_time, temp_schedule):
-    start = _find_min_task_start_with_enough_cores(task, machine, max_predecessor_finish_time)
+def _temp_schedule_task(task, machines, max_predecessor_finish_time, temp_schedule):
+    start, machine = _find_machine(task, machines, max_predecessor_finish_time)
+
     machine.schedule_task(task, start)
-
-    temp_schedule[task.id] = (task, start, machine.id)
-
-    return start
-
-
-def _find_min_task_start_with_enough_cores(task, machine, max_predecessor_finish_time):
-    # TODO - improve search for time slot with available cores
-    start = max_predecessor_finish_time
-    while machine.state.min_free_cores_in(start, start + task.runtime) < CORES_PER_TASK:
-        start = machine.state.next_start(start)
+    temp_schedule[task.id] = (task, start, machine)
 
     return start
+
+
+def _find_machine(task, machines, max_predecessor_finish_time):
+
+    min_start = float('inf')
+    min_machine = None
+
+    for machine in machines:
+        start = max_predecessor_finish_time
+        i = 0
+
+        while not machine.can_schedule_task_in(task, start, start + task.runtime) and i < 100:
+            start = machine.state.next_start(start) # TODO improve iteration strategy
+            i+=1
+
+        if start < min_start and start < float('inf'):
+            min_start = start
+            min_machine = machine
+
+    return min_start, min_machine
