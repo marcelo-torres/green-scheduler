@@ -8,7 +8,6 @@ def calculate_constant_left_boundary(task, schedule, machines):
 
     temp_schedule = {}
 
-    is_limited_by_scheduled_predecessor = False
     max_earliest_predecessor_finish_time = -1
     max_predecessor = None
     for p in task.predecessors:
@@ -18,8 +17,7 @@ def calculate_constant_left_boundary(task, schedule, machines):
             max_earliest_predecessor_finish_time = p_earliest_finish_time
             max_predecessor = p
 
-    if max_predecessor is not None:
-        is_limited_by_scheduled_predecessor = (max_predecessor.id in schedule)
+    is_limited_by_scheduled_predecessor = (max_predecessor.id in schedule)
 
     start, _ = _find_machine(task, machines, max_earliest_predecessor_finish_time)
 
@@ -70,13 +68,10 @@ def _find_machine(task, machines, max_predecessor_finish_time):
 
     for machine in machines:
         start = max_predecessor_finish_time
-        i = 0
-
-        while not machine.can_schedule_task_in(task, start, start + task.runtime) and i < 100:
+        while not machine.can_schedule_task_in(task, start, start + task.runtime):
             start = machine.state.next_start(start) # TODO improve iteration strategy
-            i+=1
 
-        if start < min_start and start < float('inf'):
+        if start < min_start:
             min_start = start
             min_machine = machine
 
