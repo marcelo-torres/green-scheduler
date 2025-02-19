@@ -20,10 +20,7 @@ def calculate_constant_left_boundary(task, schedule, machines):
     is_limited_by_scheduled_predecessor = (max_predecessor.id in schedule)
 
     start, _ = _find_machine(task, machines, max_earliest_predecessor_finish_time)
-
-    for task_id, d in list(temp_schedule.items()):
-        t, s, m = d
-        m.unschedule_task(t, s)
+    _unschedule(temp_schedule)
 
     return start, is_limited_by_scheduled_predecessor
 
@@ -76,3 +73,8 @@ def _find_machine(task, machines, max_predecessor_finish_time):
             min_machine = machine
 
     return min_start, min_machine
+
+def _unschedule(temp_schedule):
+    for task_id, d in list(temp_schedule.items()):
+        t, s, m = d
+        m.unschedule_task(t, s)
