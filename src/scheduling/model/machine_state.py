@@ -21,7 +21,7 @@ class MachineState:
 
         # TreeSlice[s1:e1] -> TreeSlice object, with keys in range s1 <= key < e1
         current_events = list(self.events[start:end].items())
-        if len(current_events) == 0:
+        if len(current_events) == 0 or start not in self.events:
             previous_time = self.events.floor_key(start)
             current_available_cores = self.events[previous_time] - amount
             self._validate_new_cores_used(current_available_cores, amount)

@@ -216,5 +216,21 @@ class MachineStateTest(unittest.TestCase):
 
         self.assertEqual(16, state.previous_start(20))
 
+    def test_bug_start_not_added(self):
+        state = create_state(3)
+
+        state.use_cores(173, 13, 1)
+        state.use_cores(171, 2, 1)
+        state.use_cores(170, 3, 1)
+        state.use_cores(166, 7, 1)
+
+        state.free_cores(173, 13, 1)
+        state.free_cores(171, 2, 1)
+        state.free_cores(170, 3, 1)
+        state.free_cores(166, 7, 1)
+
+        self.assert_min_cores_in(state, 3, 0, 186)
+
     def assert_min_cores_in(self, state, min_cores, start, end):
         self.assertEqual(min_cores, state.min_free_cores_in(start, end))
+
