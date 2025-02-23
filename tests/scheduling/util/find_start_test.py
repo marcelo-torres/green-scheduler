@@ -94,6 +94,33 @@ class FindStartTest(unittest.TestCase):
         self.assertEqual('m2', min_machine.id)
 
 
+    def test_find_min_full_machine(self):
+        graph, _ = _get_graph()
+        task = graph.tasks[1]
+
+        machine = Machine('m1', 1)
+        machine.schedule_task(graph.tasks[2], 0)
+        machine.schedule_task(graph.tasks[3], 15)
+
+        min_start, min_machine = find_min_start_machine(task, [machine], 0, end_limit=0)
+
+        self.assertEqual(float('inf'), min_start) # Schedule violation
+        self.assertIsNone(min_machine)
+
+    def test_find_min_full_machine_2(self):
+        graph, _ = _get_graph()
+        task = graph.tasks[1]
+
+        machine1 = Machine('m1', 1)
+        machine2 = Machine('m1', 1)
+        machine1.schedule_task(graph.tasks[2], 0)
+        machine1.schedule_task(graph.tasks[3], 10)
+
+        min_start, min_machine = find_min_start_machine(task, [machine1, machine2], 0, end_limit=0)
+
+        self.assertEqual(float('inf'), min_start)
+        self.assertIsNone(min_machine)
+
     def test_find_max_should_iterate_until_start(self):
         graph, min_makespan = _get_graph()
         task = graph.tasks[1]
