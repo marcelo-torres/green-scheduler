@@ -1,4 +1,5 @@
 from src.scheduling.model.machine import CORES_PER_TASK
+from src.scheduling.util.find_start import find_min_start_machine
 
 
 def calculate_constant_left_boundary(task, schedule, machines):
@@ -19,7 +20,7 @@ def calculate_constant_left_boundary(task, schedule, machines):
 
     is_limited_by_scheduled_predecessor = (max_predecessor.id in schedule)
 
-    start, _ = _find_machine(task, machines, max_earliest_predecessor_finish_time)
+    start, _ = find_min_start_machine(task, machines, max_earliest_predecessor_finish_time)
     _unschedule(temp_schedule)
 
     return start, is_limited_by_scheduled_predecessor
@@ -50,29 +51,13 @@ def _min_finish_time(task, schedule, machines, temp_schedule):
 
 
 def _temp_schedule_task(task, machines, max_predecessor_finish_time, temp_schedule):
-    start, machine = _find_machine(task, machines, max_predecessor_finish_time)
+    start, machine = find_min_start_machine(task, machines, max_predecessor_finish_time)
 
     machine.schedule_task(task, start)
     temp_schedule[task.id] = (task, start, machine)
 
     return start
 
-
-def _find_machine(task, machines, max_predecessor_finish_time):
-
-    min_start = float('inf')
-    min_machine = None
-
-    for machine in machines:
-        start = max_predecessor_finish_time
-        while not machine.can_schedule_task_in(task, start, start + task.runtime):
-            start = machine.state.next_start(start) # TODO improve iteration strategy
-
-        if start < min_start:
-            min_start = start
-            min_machine = machine
-
-    return min_start, min_machine
 
 def _unschedule(temp_schedule):
     for task_id, d in list(temp_schedule.items()):

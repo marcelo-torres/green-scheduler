@@ -1,4 +1,5 @@
 from src.scheduling.model.machine import CORES_PER_TASK
+from src.scheduling.util.find_start import find_max_start_machine
 
 
 def calculate_constant_right_boundary(task, schedule, machines, deadline):
@@ -19,7 +20,7 @@ def calculate_constant_right_boundary(task, schedule, machines, deadline):
 
     is_limited_by_scheduled_successor = (min_successor.id in schedule)
 
-    start, _ = _find_machine(task, machines, min_successor_start_time)
+    start, _ = find_max_start_machine(task, machines, min_successor_start_time)
     _unschedule(temp_schedule)
 
     return deadline - (start + task.runtime), is_limited_by_scheduled_successor
@@ -54,7 +55,7 @@ def max_start_time(task, schedule, machine, deadline, temp_schedule):
 
 
 def _temp_schedule_task(task, machines, max_successor_start_time, temp_schedule):
-    start, machine = _find_machine(task, machines, max_successor_start_time)
+    start, machine = find_max_start_machine(task, machines, max_successor_start_time)
 
     machine.schedule_task(task, start)
     temp_schedule[task.id] = (task, start, machine)
@@ -62,23 +63,7 @@ def _temp_schedule_task(task, machines, max_successor_start_time, temp_schedule)
     return start
 
 
-def _find_machine(task, machines, max_successor_start_time):
 
-    max_end = float('-inf')
-    max_machine = None
-
-    for machine in machines:
-        start = max_successor_start_time - task.runtime
-        end = start + task.runtime
-        while not machine.can_schedule_task_in(task, start, end):
-            end = machine.state.previous_start(end) # TODO improve iteration strategy
-            start = end - task.runtime
-
-        if end > max_end:
-            max_end = end
-            max_machine = machine
-
-    return max_end - task.runtime, max_machine
 
 
 def _unschedule(temp_schedule):
