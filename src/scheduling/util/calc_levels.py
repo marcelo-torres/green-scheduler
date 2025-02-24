@@ -19,7 +19,7 @@ def calc_levels_recursive(task, current_level, levels, visited_tasks):
         current_level = levels[task.id]
 
     next_level = current_level + 1
-    current_max_level = next_level
+    current_max_level = current_level
 
     for s in task.successors:
         max_level = calc_levels_recursive(s, next_level, levels, visited_tasks)

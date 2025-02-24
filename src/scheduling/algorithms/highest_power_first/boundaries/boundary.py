@@ -47,7 +47,7 @@ class BoundaryCalculator:
         time_to_variable_boundary = abs(available_time_to_use - available_time)
 
         task_level = float(self.task_levels[task.id])
-        left_c = task_level / self.max_level
+        left_c = task_level / (self.max_level + 1)
 
         lvb = round(time_to_variable_boundary * left_c)
         rvb = time_to_variable_boundary - lvb
