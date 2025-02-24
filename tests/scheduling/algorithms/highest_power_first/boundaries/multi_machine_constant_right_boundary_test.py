@@ -211,3 +211,12 @@ class MultiMachineConstantLeftBoundaryTest(unittest.TestCase):
 
         self.assertEqual(20, rb)
         self.assertTrue(is_limited)
+
+    def test_bug_rb_length_not_correct(self):
+        graph, min_makespan = _get_graph_3()
+        machines = [Machine('m1', 1), Machine('m2', 2)]
+
+        rb, is_limited = calculate_constant_right_boundary(graph.tasks[1], {}, machines, min_makespan * 2)
+
+        self.assertEqual(81, rb)
+        self.assertFalse(is_limited)

@@ -29,28 +29,24 @@ def calculate_constant_right_boundary(task, schedule, machines, deadline):
 def max_start_time(task, schedule, machine, deadline, temp_schedule):
     if task.id in schedule:
         start_time = schedule[task.id]
-        #return deadline - start_time
         return start_time
 
     if task.id in temp_schedule:
         _, start_time, _ = temp_schedule[task.id]
-        #return deadline - start_time
         return start_time
 
     if len(task.successors) == 0:
         start = _temp_schedule_task(task, machine, deadline, temp_schedule)
-        #return start + task.runtime
         return start
 
-    max_successor_start_time = -1
+    min_successor_earliest_st = float('inf')
     for s in task.successors:
         s_max_start_time = max_start_time(s, schedule, machine, deadline, temp_schedule)
-        if s_max_start_time > max_successor_start_time:
-            max_successor_start_time = s_max_start_time
+        if s_max_start_time < min_successor_earliest_st:
+            min_successor_earliest_st = s_max_start_time
 
-    start = _temp_schedule_task(task, machine, max_successor_start_time, temp_schedule)
+    start = _temp_schedule_task(task, machine, min_successor_earliest_st, temp_schedule)
 
-    #return start + task.runtime
     return start
 
 
