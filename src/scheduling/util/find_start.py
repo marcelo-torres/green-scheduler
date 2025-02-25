@@ -29,7 +29,7 @@ def find_max_start_machine(task, machines, max_successor_start_time, start_limit
             end = machine.state.previous_start(end) # TODO improve iteration strategy
             start = end - task.runtime
 
-        if end > max_end:
+        if end > max_end and start >= start_limit:
             max_end = end
             max_machine = machine
 

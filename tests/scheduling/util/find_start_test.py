@@ -93,7 +93,6 @@ class FindStartTest(unittest.TestCase):
         self.assertEqual(5, min_start)
         self.assertEqual('m2', min_machine.id)
 
-
     def test_find_min_full_machine(self):
         graph, _ = _get_graph()
         task = graph.tasks[1]
@@ -165,3 +164,20 @@ class FindStartTest(unittest.TestCase):
 
         self.assertEqual(deadline - min_makespan, max_start)
         self.assertEqual('m1', max_machine.id)
+
+    def test_find_max_should_stop_in_limit(self):
+        graph, min_makespan = _get_graph()
+        task = graph.tasks[1]
+
+        machine = Machine('m1', 1)
+
+        machine.schedule_task(graph.tasks[2], 5)
+        machine.schedule_task(graph.tasks[3], 15)
+        machine.schedule_task(graph.tasks[4], 75)
+        machine.schedule_task(graph.tasks[5], 126)
+
+        max_start, max_machine = find_max_start_machine(task, [machine], 5, start_limit=75)
+
+        self.assertEqual(float('-inf'), max_start)
+        self.assertIsNone(max_machine)
+
