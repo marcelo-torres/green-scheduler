@@ -2,7 +2,6 @@ from src.scheduling.util.makespan_calculator import calc_makespan
 from src.scheduling.util.topological_ordering import sort_topologically
 
 
-# TODO testcif machine is full!!!
 def estimate_min_makespan(graph, machines):
     temp_schedule = {}
     unschedule_list = []
