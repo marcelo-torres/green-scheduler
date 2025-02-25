@@ -14,6 +14,6 @@ def calc_stretch(graph, scheduling, makespan=None, ignore_fake_task=True):
     scheduling_items = list(scheduling.items())
     scheduling_items.sort(key=lambda schedule: schedule[1])  # Sort by start time
 
-    workflow_start_time = scheduling_items[0][1] if len(scheduling_items) > 0 else 0
+    workflow_start_time = scheduling_items[0][1][0] if len(scheduling_items) > 0 else 0
 
     return makespan - workflow_start_time

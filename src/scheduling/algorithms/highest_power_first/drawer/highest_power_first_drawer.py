@@ -94,7 +94,8 @@ def draw_scheduling(lcb, lvb, rcb, rvb, deadline, green_energy, interval_size, s
         interval_start += interval_size
 
     events = []
-    for task_id, start_time in scheduling.items():
+    for task_id, s in scheduling.items():
+        start_time, machine = s
         task = graph.get_task(task_id)
         events.append(
             (task, start_time, 'start')

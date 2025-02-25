@@ -2,7 +2,8 @@ def calc_makespan(scheduling, graph):
 
     max_finish_time = -1
 
-    for task_id, start_time in scheduling.items():
+    for task_id, d in scheduling.items():
+        start_time, machine = d
         task = graph.get_task(task_id)
         finish_time = start_time + task.runtime
 

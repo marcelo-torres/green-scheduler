@@ -1,4 +1,6 @@
 from src.scheduling.algorithms.highest_power_first.boundaries.boundary import BoundaryCalculator
+from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine_boundary import \
+    MultiMachineBoundaryCalculator
 from src.scheduling.algorithms.highest_power_first.drawer.highest_power_first_drawer import draw_scheduling
 from src.scheduling.algorithms.highest_power_first.shift_left.shift import shift_tasks_to_save_energy
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
@@ -66,33 +68,35 @@ def highest_power_first(graph, deadline, c, clusters, task_sort='energy', shift_
     # 1) Order all tasks - default criteria: by energy usage (power * runtime)
     tasks.sort(key=_get_task_ordering(task_sort), reverse=True)
 
-    for cluster in clusters:
-        boundary_calc = BoundaryCalculator(graph, deadline, c)
-        energy_usage_calculator = EnergyUsageCalculator(green_power, interval_size)
+    cluster = clusters[0] # TODO - implement multi-cluster
+    machines = cluster.machines_list  # TODO - implement multi-machine
 
+    boundary_calc = BoundaryCalculator(graph, deadline, c)
+    #boundary_calc = MultiMachineBoundaryCalculator(graph, deadline, c, machines)
+    energy_usage_calculator = EnergyUsageCalculator(green_power, interval_size)
 
-        # TODO for each machine..
-        # TODO get a list of available cores
+    # TODO get a list of available cores
 
-        for task in tasks:
-            # 2.1)  Calculate boundaries to avoid that a single task gets all slack time
-            lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling)
-            lb = lcb + lvb
-            rb = rcb + rvb
+    for task in tasks:
+        # 2.1)  Calculate boundaries to avoid that a single task gets all slack time
+        lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling)
+        lb = lcb + lvb
+        rb = rcb + rvb
 
-            # 2.2) Schedule each task when it uses less brown energy as early as possible
-            start_time = find_min_brown_energy(task, lb, rb, deadline,
-                                               energy_usage_calculator.get_green_power_available())
+        # 2.2) Schedule each task when it uses less brown energy as early as possible
+        start_time = find_min_brown_energy(task, lb, rb, deadline,
+                                           energy_usage_calculator.get_green_power_available())
 
-            scheduling[task.id] = start_time
-            energy_usage_calculator.add_scheduled_task(task, start_time)
+        scheduling[task.id] = start_time, machines[0] # TODO machine
+        cluster.machines_list[0].schedule_task(task, start_time) # TODO
+        energy_usage_calculator.add_scheduled_task(task, start_time)
 
-            show_draw_if(['all'])
-
-        lcb = lvb = rcb = rvb = 0
         show_draw_if(['all'])
 
-        scheduling = _apply_shift(shift_mode, graph, scheduling, boundary_calc, deadline, energy_usage_calculator)
+    lcb = lvb = rcb = rvb = 0
+    show_draw_if(['all'])
+
+    scheduling = _apply_shift(shift_mode, graph, scheduling, boundary_calc, deadline, energy_usage_calculator)
 
     show_draw_if(['last', 'all'])
 
@@ -100,6 +104,7 @@ def highest_power_first(graph, deadline, c, clusters, task_sort='energy', shift_
         save_draw(figure_file)
 
     return scheduling
+
 
 # def schedule_graph(graph, deadline, green_power, interval_size, c=0.5, show=None, max_power=None, figure_file=None,
 #                    task_ordering='energy', shift_mode='left'):

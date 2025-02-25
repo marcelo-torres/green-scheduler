@@ -110,7 +110,7 @@ class EnergyUsageCalculatorTest(unittest.TestCase):
         graph.add_new_task(1, 10, 5)
 
         scheduling = {
-            1: 0
+            1: (0, None)
         }
 
         calculator = EnergyUsageCalculator(green_energy, interval_size)
@@ -128,7 +128,7 @@ class EnergyUsageCalculatorTest(unittest.TestCase):
         graph.add_new_task(1, 41, 5)
 
         scheduling = {
-            1: 0
+            1: (0, None)
         }
 
         calculator = EnergyUsageCalculator(green_energy, interval_size)
@@ -148,8 +148,8 @@ class EnergyUsageCalculatorTest(unittest.TestCase):
         graph.add_new_task(2, 5, 20)
 
         scheduling = {
-            1: 0,
-            2: 10
+            1: (0, None),
+            2: (10, None)
         }
 
         calculator = EnergyUsageCalculator(green_energy, interval_size)

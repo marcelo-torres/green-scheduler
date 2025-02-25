@@ -11,10 +11,10 @@ def estimate_min_makespan(graph, machines):
 
     for task_id in tasks:
         task = graph.tasks[task_id]
-        min_s = _min_start(task, temp_schedule, graph)
+        min_s = _min_start(task, temp_schedule)
         start, machine = _find_min_start(task, min_s, machines)
 
-        temp_schedule[task.id] = start
+        temp_schedule[task.id] = start, None  # Task schedule in none machine
         machine.schedule_task(task, start)
 
         unschedule_list.append(
@@ -27,13 +27,15 @@ def estimate_min_makespan(graph, machines):
 
     return min_makespan
 
-def _min_start(task, temp_schedule, graph):
+
+def _min_start(task, temp_schedule):
     max_pred_ft = 0
     for pred in task.predecessors:
-        ft = temp_schedule[pred.id] + pred.runtime
+        ft = temp_schedule[pred.id][0] + pred.runtime
         if ft > max_pred_ft:
             max_pred_ft = ft
     return max_pred_ft
+
 
 def _find_min_start(task, min_start, machines):
     min_s = float('inf')

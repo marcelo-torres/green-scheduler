@@ -110,7 +110,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         scheduling = highest_power_first(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
-        self.assertEqual(0, scheduling[task.id])
+        self.assertEqual(0, scheduling[task.id][0])
 
     def test_single_task_with_no_g_energy_and_no_slack(self):
         graph = TaskGraph()
@@ -121,7 +121,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         scheduling = highest_power_first(graph, task.runtime * 2, 0.5, clusters, task_sort='energy', shift_mode='left')
 
-        self.assertEqual(0, scheduling[task.id])
+        self.assertEqual(0, scheduling[task.id][0])
 
     def test_single_task_with_g_energy(self):
         graph = TaskGraph()
@@ -132,7 +132,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         scheduling = highest_power_first(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
-        self.assertEqual(40, scheduling[task.id])
+        self.assertEqual(40, scheduling[task.id][0])
 
     def test_single_task_with_increasing_g_energy(self):
         graph = TaskGraph()
@@ -144,7 +144,7 @@ class HighestPowerFirstTest(unittest.TestCase):
         scheduling = highest_power_first(graph, task.runtime * 2, 0.5, clusters, task_sort='energy',
                                          shift_mode='left')
 
-        self.assertEqual(20, scheduling[task.id])
+        self.assertEqual(20, scheduling[task.id][0])
 
     def test_single_task_with_decreasing_g_energy(self):
         graph = TaskGraph()
@@ -155,7 +155,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         scheduling = highest_power_first(graph, task.runtime * 2, 0.5, clusters, task_sort='energy', shift_mode='left')
 
-        self.assertEqual(0, scheduling[task.id])
+        self.assertEqual(0, scheduling[task.id][0])
 
     def test_single_task_with_variable_g_energy_1(self):
         graph = TaskGraph()
@@ -166,7 +166,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         scheduling = highest_power_first(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
-        self.assertEqual(0, scheduling[task.id])
+        self.assertEqual(0, scheduling[task.id][0])
 
     def test_single_task_with_variable_g_energy_2(self):
         graph = TaskGraph()
@@ -177,7 +177,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         scheduling = highest_power_first(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
-        self.assertEqual(240, scheduling[task.id])
+        self.assertEqual(240, scheduling[task.id][0])
 
     def test_multiple_tasks_g1_with_no_g_energy(self):
         graph, min_makespan = _get_graph_1()
@@ -186,13 +186,13 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         scheduling = highest_power_first(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
-        self.assertEqual(0, scheduling[1])
-        self.assertEqual(10, scheduling[2])
-        self.assertEqual(10, scheduling[3])
-        self.assertEqual(17, scheduling[4])
-        self.assertEqual(21, scheduling[5])
-        self.assertEqual(21, scheduling[6])
-        self.assertEqual(30, scheduling[7])
+        self.assertEqual(0, scheduling[1][0])
+        self.assertEqual(10, scheduling[2][0])
+        self.assertEqual(10, scheduling[3][0])
+        self.assertEqual(17, scheduling[4][0])
+        self.assertEqual(21, scheduling[5][0])
+        self.assertEqual(21, scheduling[6][0])
+        self.assertEqual(30, scheduling[7][0])
 
     def test_multiple_tasks_g2_with_no_g_energy(self):
         graph, min_makespan = _get_graph_2()
@@ -201,11 +201,11 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         scheduling = highest_power_first(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
-        self.assertEqual(0, scheduling[1])
-        self.assertEqual(3, scheduling[2])
-        self.assertEqual(73, scheduling[3])
-        self.assertEqual(78, scheduling[4])
-        self.assertEqual(79, scheduling[5])
+        self.assertEqual(0, scheduling[1][0])
+        self.assertEqual(3, scheduling[2][0])
+        self.assertEqual(73, scheduling[3][0])
+        self.assertEqual(78, scheduling[4][0])
+        self.assertEqual(79, scheduling[5][0])
 
     def test_multiple_tasks_g1_with_g_energy(self):
         graph, min_makespan = _get_graph_1()
@@ -214,13 +214,13 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         scheduling = highest_power_first(graph, min_makespan * 2, 0.5, clusters, task_sort='energy', shift_mode='left')
 
-        self.assertEqual(10, scheduling[1])
-        self.assertEqual(20, scheduling[2])
-        self.assertEqual(20, scheduling[3])
-        self.assertEqual(27, scheduling[4])
-        self.assertEqual(31, scheduling[5])
-        self.assertEqual(31, scheduling[6])
-        self.assertEqual(50, scheduling[7])
+        self.assertEqual(10, scheduling[1][0])
+        self.assertEqual(20, scheduling[2][0])
+        self.assertEqual(20, scheduling[3][0])
+        self.assertEqual(27, scheduling[4][0])
+        self.assertEqual(31, scheduling[5][0])
+        self.assertEqual(31, scheduling[6][0])
+        self.assertEqual(50, scheduling[7][0])
 
     def test_multiple_tasks_g1_with_no_slack_to_delay_and_with_g_energy(self):
         graph, min_makespan = _get_graph_1()
@@ -232,13 +232,13 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         scheduling = highest_power_first(graph, min_makespan * 2, 0.5, clusters, task_sort='energy', shift_mode='left')
 
-        self.assertEqual(10, scheduling[1])
-        self.assertEqual(20, scheduling[2])
-        self.assertEqual(20, scheduling[3])
-        self.assertEqual(27, scheduling[4])
-        self.assertEqual(31, scheduling[5])
-        self.assertEqual(47, scheduling[6])
-        self.assertEqual(57, scheduling[7])
+        self.assertEqual(10, scheduling[1][0])
+        self.assertEqual(20, scheduling[2][0])
+        self.assertEqual(20, scheduling[3][0])
+        self.assertEqual(27, scheduling[4][0])
+        self.assertEqual(31, scheduling[5][0])
+        self.assertEqual(47, scheduling[6][0])
+        self.assertEqual(57, scheduling[7][0])
 
     def test_multiple_tasks_g1_with_no_slack_to_delay_and_with_g_energy_and_right_left(self):
         graph, min_makespan = _get_graph_1()
@@ -250,13 +250,13 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         scheduling = highest_power_first(graph, min_makespan * 2, 0.5, clusters, task_sort='energy', shift_mode='right-left')
 
-        self.assertEqual(10, scheduling[1])
-        self.assertEqual(20, scheduling[2])
-        self.assertEqual(20, scheduling[3])
-        self.assertEqual(27, scheduling[4])
-        self.assertEqual(31, scheduling[5])
-        self.assertEqual(50, scheduling[6])
-        self.assertEqual(60, scheduling[7])
+        self.assertEqual(10, scheduling[1][0])
+        self.assertEqual(20, scheduling[2][0])
+        self.assertEqual(20, scheduling[3][0])
+        self.assertEqual(27, scheduling[4][0])
+        self.assertEqual(31, scheduling[5][0])
+        self.assertEqual(50, scheduling[6][0])
+        self.assertEqual(60, scheduling[7][0])
 
     def test_multiple_tasks_g1_with_slack_to_delay_and_with_g_energy(self):
         graph, min_makespan = _get_graph_1()
@@ -268,13 +268,13 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         scheduling = highest_power_first(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
-        self.assertEqual(10, scheduling[1])
-        self.assertEqual(20, scheduling[2])
-        self.assertEqual(20, scheduling[3])
-        self.assertEqual(27, scheduling[4])
-        self.assertEqual(31, scheduling[5])
-        self.assertEqual(50, scheduling[6])
-        self.assertEqual(60, scheduling[7])
+        self.assertEqual(10, scheduling[1][0])
+        self.assertEqual(20, scheduling[2][0])
+        self.assertEqual(20, scheduling[3][0])
+        self.assertEqual(27, scheduling[4][0])
+        self.assertEqual(31, scheduling[5][0])
+        self.assertEqual(50, scheduling[6][0])
+        self.assertEqual(60, scheduling[7][0])
 
     def test_runtime_ascending(self):
         graph, min_makespan = _get_graph_3()

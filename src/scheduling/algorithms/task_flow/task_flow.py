@@ -64,7 +64,7 @@ def task_flow_schedule(graph, clusters, show='None', max_power=None, chart_x_end
             task = graph.get_task(task_id)
             start_time = min_start_time[task.id]
 
-            scheduling[task.id] = start_time
+            scheduling[task.id] = start_time, None # TODO machine
             energy_usage_calculator.add_scheduled_task(task, start_time)
 
             show_draw_if(['all'])
@@ -81,7 +81,7 @@ def task_flow_schedule(graph, clusters, show='None', max_power=None, chart_x_end
             start_time = find_min_brown_energy(task, lb, rb, deadline,
                                                energy_usage_calculator.get_green_power_available())
 
-            scheduling[task.id] = start_time
+            scheduling[task.id] = start_time, None # TODO machine
             energy_usage_calculator.add_scheduled_task(task, start_time)
 
             show_draw_if(['all'])

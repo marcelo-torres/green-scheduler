@@ -12,7 +12,7 @@ class TopologicalOrderingTest(unittest.TestCase):
         task = graph.add_new_task(1, 956, 10)
 
         scheduling = {
-            task.id: 0
+            task.id: (0, None)
         }
 
         makespan = calc_makespan(scheduling, graph)
@@ -24,11 +24,11 @@ class TopologicalOrderingTest(unittest.TestCase):
         task = graph.add_new_task(1, 956, 10)
 
         scheduling = {
-            task.id: 100
+            task.id: (100, None)
         }
 
         makespan = calc_makespan(scheduling, graph)
-        self.assertEqual(task.runtime + scheduling[task.id], makespan)
+        self.assertEqual(task.runtime + scheduling[task.id][0], makespan)
 
     def test_makespan_of_tasks(self):
         graph = TaskGraph()
@@ -39,11 +39,11 @@ class TopologicalOrderingTest(unittest.TestCase):
         task_4 = graph.add_new_task(4, 12, 10)
 
         scheduling = {
-            task_1.id: 45,
-            task_2.id: 3,
-            task_3.id: 0,
-            task_4.id: 90,
+            task_1.id: (45, None),
+            task_2.id: (3, None),
+            task_3.id: (0, None),
+            task_4.id: (90, None),
         }
 
         makespan = calc_makespan(scheduling, graph)
-        self.assertEqual(task_1.runtime + scheduling[task_1.id], makespan)
+        self.assertEqual(task_1.runtime + scheduling[task_1.id][0], makespan)

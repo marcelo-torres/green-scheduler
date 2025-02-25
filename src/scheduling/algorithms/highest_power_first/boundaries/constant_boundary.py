@@ -35,7 +35,7 @@ def calculate_right_boundary(task, scheduling, deadline):
 
 def min_finish_time(task, scheduling):
     if task.id in scheduling:
-        start_time = scheduling[task.id]
+        start_time, machine = scheduling[task.id]
         return task.runtime + start_time
 
     if len(task.predecessors) == 0:
@@ -52,7 +52,7 @@ def min_finish_time(task, scheduling):
 
 def max_start_time(task, scheduling, deadline):
     if task.id in scheduling:
-        start_time = scheduling[task.id]
+        start_time, machine = scheduling[task.id]
         return deadline - start_time
 
     if len(task.successors) == 0:

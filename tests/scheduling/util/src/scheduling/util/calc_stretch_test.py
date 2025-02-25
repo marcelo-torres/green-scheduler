@@ -21,11 +21,11 @@ def get_graph():
     graph.create_dependency(task_0.id, task_4.id)
 
     scheduling = {
-        task_0.id: 0,
-        task_1.id: 45,
-        task_2.id: 3,
-        task_3.id: 47,
-        task_4.id: 90,
+        task_0.id: (0, None),
+        task_1.id: (45, None),
+        task_2.id: (3, None),
+        task_3.id: (47, None),
+        task_4.id: (90, None),
     }
 
     return graph, scheduling

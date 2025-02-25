@@ -23,13 +23,14 @@ class ShiftLeftTest(unittest.TestCase):
                 energy_usage_calc = EnergyUsageCalculator(green_power, 10)
 
                 scheduling = {
-                    1: 2,
-                    2: 21,
-                    3: 64,
-                    4: 71
+                    1: (2, None),
+                    2: (21, None),
+                    3: (64, None),
+                    4: (71, None)
                 }
 
-                for task_id, start_time in scheduling.items():
+                for task_id, s in scheduling.items():
+                    start_time, machine = s
                     task = graph.get_task(task_id)
                     energy_usage_calc.add_scheduled_task(task, start_time)
 
@@ -40,10 +41,10 @@ class ShiftLeftTest(unittest.TestCase):
                 else:
                     raise Exception(f'{shift_left_function} not defined')
 
-                self.assertEqual(scheduling[1], 0)
-                self.assertEqual(scheduling[2], 20)
-                self.assertEqual(scheduling[3], 30)
-                self.assertEqual(scheduling[4], 50)
+                self.assertEqual(scheduling[1][0], 0)
+                self.assertEqual(scheduling[2][0], 20)
+                self.assertEqual(scheduling[3][0], 30)
+                self.assertEqual(scheduling[4][0], 50)
 
     def test_schedule_pipeline_shift_right(self):
 
@@ -60,15 +61,16 @@ class ShiftLeftTest(unittest.TestCase):
         energy_usage_calc = EnergyUsageCalculator(green_power, 10)
 
         scheduling = {
-            1: 0,
-            2: 10,
+            1: (0, None),
+            2: (10, None),
         }
 
-        for task_id, start_time in scheduling.items():
+        for task_id, s in scheduling.items():
+            start_time, machine = s
             task = graph.get_task(task_id)
             energy_usage_calc.add_scheduled_task(task, start_time)
 
         shift_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energy_usage_calc, mode='right')
 
-        self.assertEqual(40, scheduling[1])
-        self.assertEqual(45, scheduling[2])
+        self.assertEqual(40, scheduling[1][0])
+        self.assertEqual(45, scheduling[2][0])

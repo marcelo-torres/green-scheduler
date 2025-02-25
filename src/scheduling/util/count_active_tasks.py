@@ -3,7 +3,8 @@ import statistics
 
 def _convert_scheduling_to_events(scheduling, graph):
     events = []
-    for task_id, start_time in scheduling.items():
+    for task_id, s in scheduling.items():
+        start_time, machine = s
         task = graph.get_task(task_id)
 
         events.append(

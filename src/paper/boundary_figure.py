@@ -88,7 +88,7 @@ def report_schedule(schedule, graph, last_task_id, clusters):
     calculator = EnergyUsageCalculator(clusters.power_series.green_power_list, clusters.power_series.interval_length)
     brown_energy_used, green_energy_not_used, total_energy = calculator.calculate_energy_usage_for_scheduling(schedule, graph)
     last_task = graph.get_task(5)
-    makespan = schedule[last_task.id] + last_task.runtime
+    makespan = schedule[last_task.id][0] + last_task.runtime
 
     print(f'brown_energy_used: {brown_energy_used}J | total_energy: {total_energy} | makespan: {makespan}s | min_makespan: {min_makespan}')
 

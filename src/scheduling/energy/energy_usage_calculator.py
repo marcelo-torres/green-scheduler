@@ -133,7 +133,8 @@ class EnergyUsageCalculator:
         self._init()
 
         # Append scheduling power events
-        for task_id, start_time in scheduling.items():
+        for task_id, s in scheduling.items():
+            start_time, machine = s
             scheduled_task = graph.get_task(task_id)
             self.power_events.append_task_power(scheduled_task, start_time)
 

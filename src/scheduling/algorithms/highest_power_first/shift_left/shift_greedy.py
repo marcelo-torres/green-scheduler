@@ -13,7 +13,7 @@ def shift_tasks_to_save_energy_greedy(graph, scheduling, boundary_calc, energy_u
 
         lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling_temp)
 
-        start_time = scheduling[task.id]
+        start_time = scheduling[task.id][0]
 
         min_brown_energy_used = energy_usage_calc.calculate_energy_usage()[0]
         energy_usage_calc.remove_scheduled_task(task)
@@ -25,8 +25,8 @@ def shift_tasks_to_save_energy_greedy(graph, scheduling, boundary_calc, energy_u
             energy_usage_calc.add_scheduled_task(task, new_start_time)
             brown_energy_used = energy_usage_calc.calculate_energy_usage()[0]
 
-            if brown_energy_used <= min_brown_energy_used and new_start_time < scheduling[task.id]:
+            if brown_energy_used <= min_brown_energy_used and new_start_time < scheduling[task.id][0]:
                 min_brown_energy_used = brown_energy_used
-                scheduling[task.id] = new_start_time
+                scheduling[task.id] = new_start_time, None # TODO machine
 
             energy_usage_calc.remove_scheduled_task(task)

@@ -4,10 +4,10 @@ def check(scheduling, graph):
 
     for task in graph.list_of_tasks():
 
-        start = scheduling[task.id]
+        start = scheduling[task.id][0]
 
         for pred in task.predecessors:
-            pred_start = scheduling[pred.id]
+            pred_start = scheduling[pred.id][0]
             pred_finish_time = pred_start + pred.runtime
 
             if pred_finish_time > start:

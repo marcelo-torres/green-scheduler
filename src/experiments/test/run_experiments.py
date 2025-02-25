@@ -112,7 +112,7 @@ def schedule_and_report(graph, green_power, interval_size, deadline_factor, task
         print(f'\tDeadline: {deadline:,}s ({seconds_to_hours(deadline)})')
         print(f'\tNumber of tasks: {number_of_tasks:,.{2}f}')
 
-    cluster = create_single_machine_cluster(green_power, interval_size)
+    cluster = create_single_machine_cluster(green_power, interval_size, cores=5000)
     scheduling = highest_power_first(graph, deadline, c, [cluster], task_sort=task_ordering, shift_mode=shift_mode, show=show)
 
     energy_calculator = EnergyUsageCalculator(green_power, interval_size)

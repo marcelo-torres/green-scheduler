@@ -46,7 +46,7 @@ class TaskFlowTest(unittest.TestCase):
         cluster = create_single_machine_cluster([], 0)
         scheduling = task_flow_schedule(graph, [cluster])
 
-        self.assertEqual(0, scheduling[task.id])
+        self.assertEqual(0, scheduling[task.id][0])
 
     def test_single_task_with_g_energy(self):
         graph = TaskGraph()
@@ -56,33 +56,33 @@ class TaskFlowTest(unittest.TestCase):
         cluster = create_single_machine_cluster([0, 0, 0, 1000], 100)
         scheduling = task_flow_schedule(graph, [cluster])
 
-        self.assertEqual(0, scheduling[task.id])
+        self.assertEqual(0, scheduling[task.id][0])
 
     def test_default_graph_no_energy(self):
         graph = _get_graph_1()
         cluster = create_single_machine_cluster([], 0)
         scheduling = task_flow_schedule(graph, [cluster])
 
-        self.assertEqual(0, scheduling[0])
-        self.assertEqual(0, scheduling[1])
-        self.assertEqual(0, scheduling[2])
-        self.assertEqual(15, scheduling[3])
-        self.assertEqual(35, scheduling[4])
-        self.assertEqual(35, scheduling[5])
-        self.assertEqual(42, scheduling[6])
-        self.assertEqual(54, scheduling[7])
+        self.assertEqual(0, scheduling[0][0])
+        self.assertEqual(0, scheduling[1][0])
+        self.assertEqual(0, scheduling[2][0])
+        self.assertEqual(15, scheduling[3][0])
+        self.assertEqual(35, scheduling[4][0])
+        self.assertEqual(35, scheduling[5][0])
+        self.assertEqual(42, scheduling[6][0])
+        self.assertEqual(54, scheduling[7][0])
 
     def test_default_graph_energy(self):
         graph = _get_graph_1()
         cluster = create_single_machine_cluster([5, 30, 20, 30, 10, 40, 20], 10)
         scheduling = task_flow_schedule(graph, [cluster])
 
-        self.assertEqual(0, scheduling[0])
-        self.assertEqual(5, scheduling[1])
-        self.assertEqual(0, scheduling[2])
-        self.assertEqual(15, scheduling[3])
-        self.assertEqual(35, scheduling[4])
-        self.assertEqual(40, scheduling[5])
-        self.assertEqual(42, scheduling[6])
-        self.assertEqual(54, scheduling[7])
+        self.assertEqual(0, scheduling[0][0])
+        self.assertEqual(5, scheduling[1][0])
+        self.assertEqual(0, scheduling[2][0])
+        self.assertEqual(15, scheduling[3][0])
+        self.assertEqual(35, scheduling[4][0])
+        self.assertEqual(40, scheduling[5][0])
+        self.assertEqual(42, scheduling[6][0])
+        self.assertEqual(54, scheduling[7][0])
 

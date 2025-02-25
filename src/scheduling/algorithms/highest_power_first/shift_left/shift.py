@@ -25,7 +25,7 @@ def shift_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energ
         # Find new start
         g_power = energy_usage_calc.get_green_power_available()
         new_start_time = find_min_brown_energy(task, lb, rb, deadline, g_power, max_start_mode=max_start_mode)
-        scheduling[task.id] = new_start_time
+        scheduling[task.id] = new_start_time, None # TODO machine
         energy_usage_calc.add_scheduled_task(task, new_start_time)
 
 
