@@ -28,7 +28,7 @@ def calculate_constant_left_boundary(task, schedule, machines):
 
 def _min_finish_time(task, schedule, machines, temp_schedule):
     if task.id in schedule:
-        start_time = schedule[task.id]
+        start_time = schedule[task.id][0]
         return task.runtime + start_time
 
     if task.id in temp_schedule:

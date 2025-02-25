@@ -28,7 +28,7 @@ def calculate_constant_right_boundary(task, schedule, machines, deadline):
 
 def max_start_time(task, schedule, machine, deadline, temp_schedule):
     if task.id in schedule:
-        start_time = schedule[task.id]
+        start_time = schedule[task.id][0]
         return start_time
 
     if task.id in temp_schedule:
@@ -65,5 +65,4 @@ def _temp_schedule_task(task, machines, max_successor_start_time, temp_schedule)
 def _unschedule(temp_schedule):
     for task_id, d in list(temp_schedule.items()):
         t, s, m = d
-        print(task_id, t, s, m)
         m.unschedule_task(t, s)

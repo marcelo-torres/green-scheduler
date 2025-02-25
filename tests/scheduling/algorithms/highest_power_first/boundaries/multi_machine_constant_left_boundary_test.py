@@ -164,7 +164,7 @@ class MultiMachineConstantLeftBoundaryTest(unittest.TestCase):
         machine2 = Machine('m2', 1)
         machine3 = Machine('m3', 1)
 
-        start, is_limited = calculate_constant_left_boundary(graph.tasks[5], {1: 15}, [machine1, machine2, machine3])
+        start, is_limited = calculate_constant_left_boundary(graph.tasks[5], {1: (15, None)}, [machine1, machine2, machine3])
 
         self.assertEqual(65 + 15, start)
         self.assertFalse(is_limited)

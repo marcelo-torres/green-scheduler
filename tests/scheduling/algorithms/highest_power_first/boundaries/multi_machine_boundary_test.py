@@ -52,7 +52,7 @@ class MultiMachineBoundaryCalculatorTest(unittest.TestCase):
     def test_if_max_predecessors_scheduled_then_lvb_must_be_zero(self):
         calculator, _, graph = self._init_default_calculator(deadline_factor=2)
 
-        lcb, lvb, rcb, rvb = calculator.calculate_boundaries(graph.tasks[5], {3: 5})
+        lcb, lvb, rcb, rvb = calculator.calculate_boundaries(graph.tasks[5], {3: (5, None)})
 
         self.assertEqual(65, lcb)
         self.assertEqual(0, lvb)
@@ -62,7 +62,7 @@ class MultiMachineBoundaryCalculatorTest(unittest.TestCase):
     def test_if_max_predecessors_not_scheduled_then_lvb_must_be_zero(self):
         calculator, _, graph = self._init_default_calculator(deadline_factor=2)
 
-        lcb, lvb, rcb, rvb = calculator.calculate_boundaries(graph.tasks[5], {2: 5})
+        lcb, lvb, rcb, rvb = calculator.calculate_boundaries(graph.tasks[5], {2: (5, None)})
 
         self.assertEqual(65, lcb)
         self.assertEqual(10, lvb)
@@ -92,7 +92,7 @@ class MultiMachineBoundaryCalculatorTest(unittest.TestCase):
     def test_if_min_successor_scheduled_then_rvb_must_be_zero(self):
         calculator, _, graph = self._init_default_calculator(deadline_factor=2)
 
-        lcb, lvb, rcb, rvb = calculator.calculate_boundaries(graph.tasks[5], {8: 150})
+        lcb, lvb, rcb, rvb = calculator.calculate_boundaries(graph.tasks[5], {8: (150, None)})
 
         self.assertEqual(65, lcb)
         self.assertEqual(10, lvb)
@@ -102,7 +102,7 @@ class MultiMachineBoundaryCalculatorTest(unittest.TestCase):
     def test_if_min_successor_not_scheduled_then_rvb_must_not_be_zero(self):
         calculator, _, graph = self._init_default_calculator(deadline_factor=2)
 
-        lcb, lvb, rcb, rvb = calculator.calculate_boundaries(graph.tasks[5], {6:153})
+        lcb, lvb, rcb, rvb = calculator.calculate_boundaries(graph.tasks[5], {6: (153, None)})
 
         self.assertEqual(65, lcb)
         self.assertEqual(10, lvb)
@@ -122,7 +122,7 @@ class MultiMachineBoundaryCalculatorTest(unittest.TestCase):
     def test_if_not_enough_time_then_volatile_boundaries_must_be_zero(self):
         calculator, _, graph = self._init_default_calculator(deadline_factor=2)
 
-        lcb, lvb, rcb, rvb = calculator.calculate_boundaries(graph.tasks[3], {1: 0, 5: 65})
+        lcb, lvb, rcb, rvb = calculator.calculate_boundaries(graph.tasks[3], {1: (0, None), 5: (65, None)})
 
         self.assertEqual(5, lcb)
         self.assertEqual(0, lvb)
@@ -132,7 +132,7 @@ class MultiMachineBoundaryCalculatorTest(unittest.TestCase):
     def test_if_not_enough_time_then_volatile_boundaries_must_be_zero_2(self):
         calculator, _, graph = self._init_default_calculator(deadline_factor=2)
 
-        lcb, lvb, rcb, rvb = calculator.calculate_boundaries(graph.tasks[3], {1: 0, 5: 66})
+        lcb, lvb, rcb, rvb = calculator.calculate_boundaries(graph.tasks[3], {1: (0, None), 5: (66, None)})
 
         self.assertEqual(5, lcb)
         self.assertEqual(0, lvb)
@@ -148,7 +148,7 @@ class MultiMachineBoundaryCalculatorTest(unittest.TestCase):
         machines[0].schedule_task(graph.tasks[4], 75)
 
 
-        lcb, lvb, rcb, rvb = calculator.calculate_boundaries(graph.tasks[3], {1: 0, 5: 125})
+        lcb, lvb, rcb, rvb = calculator.calculate_boundaries(graph.tasks[3], {1: (0, None), 5: (125, None)})
 
         self.assertEqual(5+10, lcb)
         self.assertEqual(0, lvb)

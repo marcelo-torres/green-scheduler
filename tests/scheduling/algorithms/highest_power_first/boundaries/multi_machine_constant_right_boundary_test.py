@@ -192,7 +192,7 @@ class MultiMachineConstantLeftBoundaryTest(unittest.TestCase):
 
         deadline_increase = 100
 
-        rb, is_limited = calculate_constant_right_boundary(graph.tasks[5], {8: 150}, [machine1, machine2, machine3],
+        rb, is_limited = calculate_constant_right_boundary(graph.tasks[5], {8: (150, None)}, [machine1, machine2, machine3],
                                                            min_makespan + deadline_increase)
 
         self.assertEqual(36, rb)
@@ -206,7 +206,7 @@ class MultiMachineConstantLeftBoundaryTest(unittest.TestCase):
 
         deadline_increase = 100
 
-        rb, is_limited = calculate_constant_right_boundary(graph.tasks[5], {7: 166}, [machine1, machine2, machine3],
+        rb, is_limited = calculate_constant_right_boundary(graph.tasks[5], {7: (166, None)}, [machine1, machine2, machine3],
                                                            min_makespan + deadline_increase)
 
         self.assertEqual(20, rb)
