@@ -284,7 +284,7 @@ class HighestPowerFirstTest(unittest.TestCase):
         scheduling = highest_power_first(graph, min_makespan * 4, 0.5, clusters, task_sort='runtime_ascending', shift_mode='left')
 
         scheduling = list(scheduling.items())
-        scheduling.sort(key=lambda schedule: schedule[1])
+        scheduling.sort(key=lambda schedule: schedule[1][0])
 
         tasks = list(
             map(lambda schedule: schedule[0], scheduling)

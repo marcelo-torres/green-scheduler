@@ -26,7 +26,7 @@ def _get_rank_largest_task(graph, scheduling):
     for task_id, rank in ranks.items():
         task = graph.get_task(task_id)
 
-        task_start_time = scheduling[task_id]
+        task_start_time = scheduling[task_id][0]
         task_finish_time = task_start_time + task.runtime
 
         if rank not in rank_min_start_and_max_finish:
