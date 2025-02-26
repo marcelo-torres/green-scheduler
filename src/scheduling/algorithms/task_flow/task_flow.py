@@ -78,7 +78,7 @@ def task_flow_schedule(graph, clusters, show='None', max_power=None, chart_x_end
             rb = rcb + rvb
 
             # Schedule each task when it uses less brown energy as early as possible
-            start_time = find_min_brown_energy(task, lb, rb, deadline,
+            start_time, brown_energy = find_min_brown_energy(task, lb, rb, deadline,
                                                energy_usage_calculator.get_green_power_available())
 
             scheduling[task.id] = start_time, None # TODO machine

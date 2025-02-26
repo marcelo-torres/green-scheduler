@@ -14,9 +14,9 @@ def find_min_brown_energy(task, lb, rb, deadline, green_energy_available, max_st
         raise IntervalException(task, start, end)
 
     green_power_interval = _slice_green_power_available_list(green_energy_available, start, end)
-    start_min = start + _find_min_brown_energy_in_interval(task, green_power_interval, max_start_mode=max_start_mode)
+    start_min, task_min_brown_energy_usage = _find_min_brown_energy_in_interval(task, green_power_interval, max_start_mode=max_start_mode)
 
-    return start_min
+    return start + start_min, task_min_brown_energy_usage
 
 
 def _slice_green_power_available_list(actual_green_power_available, start, end):
@@ -49,7 +49,7 @@ def _slice_green_power_available_list(actual_green_power_available, start, end):
 
 def _find_min_brown_energy_in_interval(task, green_power_interval, max_start_mode=False):
     if len(green_power_interval) == 0:
-        return 0
+        return 0, task.runtime
 
     start_times_to_verify = _start_times_to_verify(task, green_power_interval)
 
@@ -64,7 +64,7 @@ def _find_min_brown_energy_in_interval(task, green_power_interval, max_start_mod
             min_brown_energy_usage = brown_energy_usage
             start_min = start_time
 
-    return start_min
+    return start_min, min_brown_energy_usage
 
 
 def _brown_energy_in_interval(task, start_times_to_verify, green_power_interval):
@@ -150,9 +150,11 @@ def _calculate_brown_energy_of_task(task, task_start, current_green_events):
 def round_internal(value):
     return round(value, 4)
 
+
 def calculate_energy(power, time):
     result = round_internal(power) * round_internal(time)
     return round_internal(result)
+
 
 def _brown_energy_to_increase(start_time, previous_start_time, current_green_events, g_iter, task):
     current_brown_energy_usage = 0

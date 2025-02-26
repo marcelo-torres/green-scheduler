@@ -27,14 +27,17 @@ def test_interval_length_not_enough():
 
 def test_interval_length_enough():
     task = Task(1, 50, 10)
-    start_min = find_min_brown_energy(task, 25, 25, 100, [(0, 5), (50, 100)])
+    start_min, brown_energy = find_min_brown_energy(task, 25, 25, 100, [(0, 5), (50, 100)])
     assert start_min == 25
+    assert brown_energy == 25 * 5
 
 
 def test_with_green_energy_available_is_null():
     task = Task(1, 50, 10)
-    start_min = find_min_brown_energy(task, 10, 8, 100, [])
+    start_min, brown_energy = find_min_brown_energy(task, 10, 8, 100, [])
     assert start_min == 10
+    assert brown_energy == task.runtime
+
 
 @pytest.mark.parametrize(
     'expected_start_min, lb, rb, deadline, green_power, green_interval_size, task, scheduled_tasks, description',
@@ -65,13 +68,12 @@ def test_find_min_brown_energy_equal_to_greedy(expected_start_min, lb, rb, deadl
         graph.add_task(scheduled_task)
         energy_usage_calculator.add_scheduled_task(scheduled_task, start_time)
 
-    start_min = find_min_brown_energy(task, lb, rb, deadline, energy_usage_calculator.get_green_power_available())
-    start_min_greedy = find_min_brown_energy_greedy(task, lb, rb, deadline, energy_usage_calculator)
+    start_min, brown_energy = find_min_brown_energy(task, lb, rb, deadline, energy_usage_calculator.get_green_power_available())
+    start_min_greedy, brown_energy_greedy = find_min_brown_energy_greedy(task, lb, rb, deadline, energy_usage_calculator)
 
     assert start_min == expected_start_min, f'{description} failed'
-    assert start_min == start_min_greedy, f'{description} - equal to greedy failed'
-
-
+    assert start_min == start_min_greedy, f'{description} - start equal to greedy failed'
+    assert brown_energy == brown_energy_greedy, f'{description} - brown energy equal to greedy failed'
 
 
 @pytest.mark.parametrize(
@@ -121,5 +123,5 @@ def test_slice_green_power_available_list(start, end, green_power_available, exp
 )
 def test_find_min_brown_energy_in_interval(expected_start_min, green_energy_available, task_runtime, task_power):
     task = Task(1, task_runtime, task_power)
-    start_min = _find_min_brown_energy_in_interval(task, green_energy_available)
+    start_min, _ = _find_min_brown_energy_in_interval(task, green_energy_available)
     assert start_min == expected_start_min

@@ -5,6 +5,8 @@ def find_min_brown_energy_greedy(task, lb, rb, deadline, calculator):
     start_min = start
     min_brown_energy_usage = float('inf')
 
+    previous_brown_energy_used, _, _ = calculator.calculate_energy_usage()
+
     while start + task.runtime <= deadline - rb:
 
         calculator.add_scheduled_task(task, start)
@@ -15,4 +17,7 @@ def find_min_brown_energy_greedy(task, lb, rb, deadline, calculator):
             min_brown_energy_usage = brown_energy_used
             start_min = start
         start += 1
-    return start_min
+
+    task_min_brown_energy_usage = min_brown_energy_usage - previous_brown_energy_used
+
+    return start_min, task_min_brown_energy_usage
