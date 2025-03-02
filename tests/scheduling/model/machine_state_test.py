@@ -122,7 +122,7 @@ class MachineStateTest(unittest.TestCase):
         with self.assertRaises(Exception):
             state.free_cores(0, 1, 11)
 
-    def test_min_cores_of_sigle_time_unit(self):
+    def test_min_cores_of_single_time_unit(self):
         state = create_state(10)
         self.assert_min_cores_in(state, 10, 0, 0)
         self.assert_min_cores_in(state, 10, 1, 1)
@@ -231,6 +231,78 @@ class MachineStateTest(unittest.TestCase):
 
         self.assert_min_cores_in(state, 3, 0, 186)
 
+    def test_search_full_interval_available(self):
+        state = create_state(3)
+
+        intervals = list(
+            state.search_intervals_with_free_cores(0, 20, 10, 1)
+        )
+
+        self.assertEqual(1, len(intervals))
+
+        self.assert_interval(intervals[0], 0, 20)
+
+    def test_search_full_interval_available_cores_exactly(self):
+        state = create_state(3)
+
+        intervals = list(
+            state.search_intervals_with_free_cores(0, 20, 10, 3)
+        )
+
+        self.assertEqual(1, len(intervals))
+
+        self.assert_interval(intervals[0], 0, 20)
+
+    def test_search_full_interval_not_available(self):
+        state = create_state(3)
+
+        intervals = list(
+            state.search_intervals_with_free_cores(0, 20, 10, 4)
+        )
+
+        self.assertEqual(0, len(intervals))
+
+    def test_search_no_interval_available(self):
+        state = _get_state_1()
+
+        intervals = list(
+            state.search_intervals_with_free_cores(0, 20, 1, 21)
+        )
+
+        self.assertEqual(0, len(intervals))
+
+    def test_search_interval_by_end_of_other(self):
+        state = create_state(10)
+
+        state.use_cores(0, 5, 10)
+        state.use_cores(10, 5, 10)
+        state.use_cores(20, 5, 10)
+
+        intervals = list(
+            state.search_intervals_with_free_cores(0, 30, 1, 9)
+        )
+
+        self.assertEqual(3, len(intervals))
+
+        self.assert_interval(intervals[0], 5, 10)
+        self.assert_interval(intervals[1], 15, 20)
+        self.assert_interval(intervals[2], 25, 30)
+
+    def test_search_interval_that_spans_over_events(self):
+        state = _get_state_1()
+
+        intervals = list(
+            state.search_intervals_with_free_cores(0, 20, 1, 14)
+        )
+
+        self.assertEqual(2, len(intervals))
+
+        self.assert_interval(intervals[0], 0, 5)
+        self.assert_interval(intervals[1], 9, 16)
+
     def assert_min_cores_in(self, state, min_cores, start, end):
         self.assertEqual(min_cores, state.min_free_cores_in(start, end))
 
+    def assert_interval(self, interval, expected_start, expected_end):
+        self.assertEqual(interval[0], expected_start)
+        self.assertEqual(interval[1], expected_end)

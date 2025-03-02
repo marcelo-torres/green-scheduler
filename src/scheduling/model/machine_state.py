@@ -87,6 +87,36 @@ class MachineState:
     def previous_start(self, current_start):
         return self.events.floor_key(current_start-1)
 
+    def search_intervals_with_free_cores(self, start, end, min_duration, min_cores):
+
+        events_iterator = self.events.iter_items(self.events.floor_key(start), end)
+
+        def next_event():
+            return next(events_iterator, (None, -1))
+
+        e, cores = next_event()
+        i_start = e
+
+        while e is not None:
+
+            # Increase the interval while it has enough cores
+            if cores >= min_cores:
+                e, cores = next_event()
+                continue
+
+            # Return the interval if the interval length is greater or equal to min duration
+            i_length = e - i_start
+            if i_length >= min_duration:
+                yield i_start, e
+
+            # Next interval and next start
+            e, cores = next_event()
+            i_start = e
+
+        if i_start is not None:
+            i_length = end - i_start
+            if i_length >= min_duration:
+                yield i_start, end
 
     def _validate_new_cores_used(self, current_cores_available, amount):
         if current_cores_available < 0:
