@@ -300,6 +300,26 @@ class MachineStateTest(unittest.TestCase):
         self.assert_interval(intervals[0], 0, 5)
         self.assert_interval(intervals[1], 9, 16)
 
+    def test_search_interval_with_last_interval_with_not_enough_cores(self):
+        state = create_state(10)
+
+        state.use_cores(0, 5, 9)
+        state.use_cores(5, 5, 8)
+        state.use_cores(10, 5, 7)
+
+        state.use_cores(15, 5, 10)
+
+        state.use_cores(20, 2, 9)
+        state.use_cores(22, 2, 8)
+
+        intervals = list(
+            state.search_intervals_with_free_cores(0, 24, 5, 2)
+        )
+
+        self.assertEqual(1, len(intervals))
+
+        self.assert_interval(intervals[0], 5, 15)
+
     def assert_min_cores_in(self, state, min_cores, start, end):
         self.assertEqual(min_cores, state.min_free_cores_in(start, end))
 
