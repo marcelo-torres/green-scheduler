@@ -28,6 +28,32 @@ def _get_state_1():
     return state
 
 
+def _get_state_increase():
+    state = create_state(10)
+
+    state.use_cores(0, 1, 1)
+    state.use_cores(1, 2, 2)
+    state.use_cores(3, 3, 3)
+    state.use_cores(6, 4, 4)
+    state.use_cores(10, 5, 5)
+    state.use_cores(15, 6, 6)
+
+    return state
+
+
+def _get_state_decrease():
+    state = create_state(10)
+
+    state.use_cores(0, 6, 6)
+    state.use_cores(6, 5, 5)
+    state.use_cores(11, 4, 4)
+    state.use_cores(15, 3, 3)
+    state.use_cores(18, 2, 2)
+    state.use_cores(20, 1, 1)
+
+    return state
+
+
 class MachineStateTest(unittest.TestCase):
 
     def test_min_free_cores_no_usage(self):
@@ -262,6 +288,32 @@ class MachineStateTest(unittest.TestCase):
 
         self.assertEqual(0, len(intervals))
 
+    def test_search_full_interval_not_available_due_usage(self):
+        state = create_state(3)
+
+        state.use_cores(0, 20, 3)
+
+        intervals = list(
+            state.search_intervals_with_free_cores(0, 20, 10, 3)
+        )
+
+        self.assertEqual(0, len(intervals))
+
+    def test_search_full_interval_not_available_due_two_usages(self):
+        state = create_state(3)
+
+        state.use_cores(7, 13, 1)
+        state.use_cores(0, 7, 1)
+
+        state.use_cores(0, 10, 2)
+        state.use_cores(10, 10, 2)
+
+        intervals = list(
+            state.search_intervals_with_free_cores(0, 20, 10, 3)
+        )
+
+        self.assertEqual(0, len(intervals))
+
     def test_search_no_interval_available(self):
         state = _get_state_1()
 
@@ -319,6 +371,29 @@ class MachineStateTest(unittest.TestCase):
         self.assertEqual(1, len(intervals))
 
         self.assert_interval(intervals[0], 5, 15)
+
+    def test_search_interval_increase(self):
+        state = _get_state_increase()
+
+        intervals = list(
+            state.search_intervals_with_free_cores(0, 21, 1, 1)
+        )
+
+        self.assertEqual(1, len(intervals))
+
+        self.assert_interval(intervals[0], 0, 21)
+
+    def test_search_interval_decrease(self):
+        state = _get_state_decrease()
+
+        intervals = list(
+            state.search_intervals_with_free_cores(0, 21, 1, 1)
+        )
+
+        self.assertEqual(1, len(intervals))
+
+        self.assert_interval(intervals[0], 0, 21)
+
 
     def assert_min_cores_in(self, state, min_cores, start, end):
         self.assertEqual(min_cores, state.min_free_cores_in(start, end))
