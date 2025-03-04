@@ -394,6 +394,49 @@ class MachineStateTest(unittest.TestCase):
 
         self.assert_interval(intervals[0], 0, 21)
 
+    def test_bug_if_first_key_is_lesser_than_start_then_reset_to_start(self):
+        state = create_state(10)
+
+        state.use_cores(10, 10, 1)
+
+        intervals = list(
+            state.search_intervals_with_free_cores(41, 57, 10, 1)
+        )
+
+        self.assert_interval(intervals[0], 41, 57)
+
+    def test_if_last_key_is_greater_than_end_then_return_end(self):
+        state = create_state(10)
+
+        state.use_cores(40, 10, 1)
+
+        intervals = list(
+            state.search_intervals_with_free_cores(5, 51, 10, 1)
+        )
+
+        self.assert_interval(intervals[0], 5, 51)
+
+    def test_if_last_key_is_greater_than_end_then_return_end_no_cores(self):
+        state = create_state(10)
+
+        state.use_cores(40, 10, 10)
+
+        intervals = list(
+            state.search_intervals_with_free_cores(5, 51, 10, 1)
+        )
+
+        self.assert_interval(intervals[0], 5, 40)
+
+    def test_if_last_key_is_lesser_than_end_then_return_end(self):
+        state = create_state(10)
+
+        state.use_cores(40, 10, 1)
+
+        intervals = list(
+            state.search_intervals_with_free_cores(5, 47, 10, 1)
+        )
+
+        self.assert_interval(intervals[0], 5, 47)
 
     def assert_min_cores_in(self, state, min_cores, start, end):
         self.assertEqual(min_cores, state.min_free_cores_in(start, end))

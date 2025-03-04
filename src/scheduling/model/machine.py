@@ -20,5 +20,6 @@ class Machine:
     def can_schedule_task_in(self, task, start, end):
         return end - start >= task.runtime and self.state.min_free_cores_in(start, end) >= CORES_PER_TASK
 
-
+    def search_intervals_to_schedule_task(self, task, start, end):
+        return self.state.search_intervals_with_free_cores(start, end, task.runtime, CORES_PER_TASK)
 

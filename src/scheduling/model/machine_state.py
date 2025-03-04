@@ -95,6 +95,9 @@ class MachineState:
             return next(events_iterator, (None, -1))
 
         e, cores = next_event()
+        if e < start:
+            e = start
+
         i_start = e
 
         while e is not None:
