@@ -3,20 +3,18 @@ class IntervalException(Exception):
         super().__init__(f'Interval length is not enough to schedule task {task.id}: runtime={task.runtime} start={start} end={end}')
 
 
-def find_min_brown_energy(task, lb, rb, deadline, green_energy_available, max_start_mode=False):
+def find_min_brown_energy_start(task, start, end, green_energy_available, max_start_mode=False):
     if task.power == 0:
-        return lb
-
-    start = lb
-    end = deadline - rb
-
-    if end - start < task.runtime:
-        raise IntervalException(task, start, end)
+        return start
 
     green_power_interval = _slice_green_power_available_list(green_energy_available, start, end)
     start_min, task_min_brown_energy_usage = _find_min_brown_energy_in_interval(task, green_power_interval, max_start_mode=max_start_mode)
 
     return start + start_min, task_min_brown_energy_usage
+
+
+def find_min_brown_energy(task, lb, rb, deadline, green_energy_available, max_start_mode=False):  # TODO remove
+    return find_min_brown_energy_start(task, lb, deadline - rb, green_energy_available, max_start_mode=max_start_mode)
 
 
 def _slice_green_power_available_list(actual_green_power_available, start, end):
