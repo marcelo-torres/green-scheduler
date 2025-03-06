@@ -181,3 +181,23 @@ class FindStartTest(unittest.TestCase):
         self.assertEqual(float('-inf'), max_start)
         self.assertIsNone(max_machine)
 
+    def test_bug_find_max_check_start_limit_first(self):
+        graph = TaskGraph()
+        task_1 = graph.add_new_task(1, 1, 1)
+        task_2 = graph.add_new_task(2, 2, 2)
+        task_3 = graph.add_new_task(3, 3, 3)
+
+        graph.set_start_task(task_1.id)
+
+        graph.create_dependency(task_1.id, task_2.id)
+        graph.create_dependency(task_2.id, task_3.id)
+
+        machine1 = Machine('m1', 1)
+        machine2 = Machine('m2', 1)
+
+        machine2.state.use_cores(0, 100, 1)
+
+        max_start, max_machine = find_max_start_machine(task_1, [machine1, machine2], 1, start_limit=0)
+
+        self.assertEqual(0, max_start)
+

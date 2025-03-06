@@ -6,7 +6,7 @@ def find_min_start_machine(task, machines, max_predecessor_finish_time, end_limi
     for machine in machines:
         start = max_predecessor_finish_time
         end = start + task.runtime
-        while not machine.can_schedule_task_in(task, start, end) and end < end_limit: # Loop prevention
+        while end < end_limit and not machine.can_schedule_task_in(task, start, end): # Loop prevention
             start = machine.state.next_start(start) # TODO improve iteration strategy
             end = start + task.runtime
 
@@ -25,7 +25,11 @@ def find_max_start_machine(task, machines, max_successor_start_time, start_limit
     for machine in machines:
         start = max_successor_start_time - task.runtime
         end = start + task.runtime
-        while not machine.can_schedule_task_in(task, start, end) and start >= start_limit:
+
+        if start < 0:
+            print('a')
+
+        while start >= start_limit and not machine.can_schedule_task_in(task, start, end):
             end = machine.state.previous_start(end) # TODO improve iteration strategy
             start = end - task.runtime
 
