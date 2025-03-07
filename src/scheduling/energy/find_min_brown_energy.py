@@ -7,6 +7,9 @@ def find_min_brown_energy_start(task, start, end, green_energy_available, max_st
     if task.power == 0:
         return start
 
+    if end - start < task.runtime:
+        raise IntervalException(task, start, end)
+
     green_power_interval = _slice_green_power_available_list(green_energy_available, start, end)
     start_min, task_min_brown_energy_usage = _find_min_brown_energy_in_interval(task, green_power_interval, max_start_mode=max_start_mode)
 
