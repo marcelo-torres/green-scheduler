@@ -1,10 +1,9 @@
-from src.scheduling.algorithms.highest_power_first.boundaries.boundary import BoundaryCalculator
 from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine_boundary import \
     MultiMachineBoundaryCalculator
 from src.scheduling.algorithms.highest_power_first.drawer.highest_power_first_drawer import draw_scheduling
 from src.scheduling.algorithms.highest_power_first.shift_left.shift import shift_tasks_to_save_energy
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
-from src.scheduling.energy.find_min_brown_energy import find_min_brown_energy
+from src.scheduling.util.schedule_in_min_brown_energy import schedule_min_brown_energy_min_start
 
 
 def _get_task_ordering(key):
@@ -24,7 +23,7 @@ def _validate_shift_mode(mode):
         raise Exception(f"shift mode '{mode}' invalid")
 
 
-def _apply_shift(shift_mode, graph, scheduling, boundary_calc, deadline, energy_usage_calculator):
+def _apply_shift(shift_mode, graph, scheduling, machines, boundary_calc, deadline, energy_usage_calculator):
 
     if shift_mode == 'none':
         return scheduling
@@ -33,11 +32,11 @@ def _apply_shift(shift_mode, graph, scheduling, boundary_calc, deadline, energy_
     previous_scheduling = scheduling.copy()
 
     if shift_mode == 'left':
-        shift_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energy_usage_calculator)
+        shift_tasks_to_save_energy(graph, scheduling, machines, boundary_calc, deadline, energy_usage_calculator)
 
     elif shift_mode == 'right-left':
-        shift_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energy_usage_calculator, mode='right')
-        shift_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energy_usage_calculator, mode='left')
+        shift_tasks_to_save_energy(graph, scheduling, machines, boundary_calc, deadline, energy_usage_calculator, mode='right')
+        shift_tasks_to_save_energy(graph, scheduling, machines, boundary_calc, deadline, energy_usage_calculator, mode='left')
 
     new_brown_energy_used, _, _ = energy_usage_calculator.calculate_energy_usage()
     if new_brown_energy_used <= brown_energy_used:
@@ -68,46 +67,21 @@ def highest_power_first(graph, deadline, c, clusters, task_sort='energy', shift_
     cluster = clusters[0] # TODO - implement multi-cluster
     machines = cluster.machines_list  # TODO - implement multi-machine
 
-    # 1) Order all tasks - default criteria: by energy usage (power * runtime)
+    # Order all tasks - default criteria: by energy usage (power * runtime)
     tasks.sort(key=_get_task_ordering(task_sort), reverse=True)
 
     #boundary_calc = BoundaryCalculator(graph, deadline, c)
     boundary_calc = MultiMachineBoundaryCalculator(graph, deadline, c, machines)
     energy_usage_calculator = EnergyUsageCalculator(green_power, interval_size)
 
-    # TODO get a list of available cores
-
     for task in tasks:
-
-        best_machine = None
-        selected_start_time = None
-        smallest_brown_energy = float('inf')
-
-        for machine in machines:
-            # 2.1)  Calculate boundaries to avoid that a single task gets all slack time
-            lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling)
-            lb = lcb + lvb
-            rb = rcb + rvb
-
-            # 2.2) Schedule each task when it uses less brown energy as early as possible
-            start_time, brown_energy = find_min_brown_energy(task, lb, rb, deadline,
-                                               energy_usage_calculator.get_green_power_available())
-
-            if brown_energy < smallest_brown_energy:
-                best_machine = machine
-                selected_start_time = start_time
-                smallest_brown_energy = brown_energy
-
-        scheduling[task.id] = selected_start_time, best_machine
-        cluster.machines_list[0].schedule_task(task, selected_start_time)
-        energy_usage_calculator.add_scheduled_task(task, selected_start_time)
-
+        lcb, lvb, rcb, rvb = schedule_min_brown_energy_min_start(task, machines, scheduling, deadline, boundary_calc, energy_usage_calculator)
         show_draw_if(['all'])
 
-    lcb = lvb = rcb = rvb = 0
+    lcb = lvb = rcb = rvb = 0  # Reset boundaries to show final chart without boundaries
     show_draw_if(['all'])
 
-    scheduling = _apply_shift(shift_mode, graph, scheduling, boundary_calc, deadline, energy_usage_calculator)
+    scheduling = _apply_shift(shift_mode, graph, scheduling, machines, boundary_calc, deadline, energy_usage_calculator)
 
     show_draw_if(['last', 'all'])
 

@@ -23,3 +23,17 @@ def sort_topologically(graph, reverse=False):
 
     tasks = [task_rank[0] for task_rank in task_rank_list]
     return tasks
+
+def sort_topologically_scheduled_tasks(graph, schedule, reverse=False):
+    ranks = calculate_upward_rank(graph)
+
+    def sort_criteria(d):
+        task_id, rank = d
+        start_time = schedule[task_id]
+        return rank, start_time
+
+    task_rank_list = list(ranks.items())
+    task_rank_list.sort(key=sort_criteria, reverse=reverse)  # sort by (rank, start_time)
+
+    tasks = [task_rank[0] for task_rank in task_rank_list]
+    return tasks

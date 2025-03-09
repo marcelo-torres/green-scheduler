@@ -1,33 +1,41 @@
-from src.scheduling.energy.find_min_brown_energy import find_min_brown_energy
-from src.scheduling.util.topological_ordering import sort_topologically
+from src.scheduling.util.schedule_in_min_brown_energy import schedule_min_brown_energy_min_start, schedule_min_brown_energy_max_start
+from src.scheduling.util.topological_ordering import sort_topologically, sort_topologically_scheduled_tasks
 
 
-def shift_tasks_to_save_energy(graph, scheduling, boundary_calc, deadline, energy_usage_calc, mode='left'):
+def shift_tasks_to_save_energy(graph, scheduling, machines, boundary_calc, deadline, energy_usage_calc, mode='left'):
     _validate_mode(mode)
 
-    # Order tasks by topological order
-    tasks = sort_topologically(graph, reverse=(mode == 'right'))
+    machines_map = _to_machine_map(machines)
 
-    max_start_mode = (mode == 'right')
+    # Order tasks by topological order
+    tasks = sort_topologically_scheduled_tasks(graph, scheduling, reverse=(mode == 'right'))
+
 
     for i in range(len(tasks)):
+
         task = graph.get_task(tasks[i])
 
-        # Remove task from temp scheduling and from energy calculator
-        energy_usage_calc.remove_scheduled_task(task)
-        del scheduling[task.id]
+        _remove_task(task, scheduling, machines_map, energy_usage_calc)
 
-        # Compute boundaries (do not consider variable boundaries)
-        lcb, lvb, rcb, rvb = boundary_calc.calculate_boundaries(task, scheduling)
-        lb = lcb
-        rb = rcb
+        if mode == 'right':
+            schedule_min_brown_energy_max_start(task, machines, scheduling, deadline, boundary_calc, energy_usage_calc, ignore_v_boundary=True)
+        else:
+            schedule_min_brown_energy_min_start(task, machines, scheduling, deadline, boundary_calc, energy_usage_calc, ignore_v_boundary=True)
 
-        # Find new start
-        g_power = energy_usage_calc.get_green_power_available()
-        # TODO iterate ove machines
-        new_start_time, brown_energy = find_min_brown_energy(task, lb, rb, deadline, g_power, max_start_mode=max_start_mode)
-        scheduling[task.id] = new_start_time, None # TODO machine
-        energy_usage_calc.add_scheduled_task(task, new_start_time)
+def _remove_task(task, scheduling, machines_map, energy_usage_calc):
+    energy_usage_calc.remove_scheduled_task(task)
+    start_time, machine_id = scheduling[task.id]
+    machine = machines_map[machine_id]
+    machine.unschedule_task(task, start_time)
+    del scheduling[task.id]
+
+def _to_machine_map(machines):
+    machines_map = {}
+
+    for machine in machines:
+        machines_map[machine.id] = machine
+
+    return machines_map
 
 
 def _validate_mode(mode):

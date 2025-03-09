@@ -23,8 +23,6 @@ def _schedule_in_min_brown_energy(task, machines, schedule, deadline, boundary_c
         lb = lcb + lvb
         rb = rcb + rvb
 
-    # TODO DO not consider LVB and RVB for shift
-
     # Schedule each task when it uses less brown energy as early as possible
     green_power_available = energy_usage_calculator.get_green_power_available()
 
