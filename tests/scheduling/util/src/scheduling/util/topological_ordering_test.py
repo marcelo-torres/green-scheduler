@@ -143,7 +143,7 @@ class TopologicalOrderingTest(unittest.TestCase):
         self.assertEqual(9, ranks[8])
         self.assertEqual(10, ranks[9])
 
-    def test_topological_sort_scheduled_tasks_parallel_graph_reverse(self):
+    def test_topological_sort_scheduled_tasks_parallel_graph(self):
         graph = get_simple_parallel_graph()
 
         schedule = {
