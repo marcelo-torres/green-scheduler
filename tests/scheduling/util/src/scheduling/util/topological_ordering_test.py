@@ -2,9 +2,10 @@ import unittest
 
 from src.scheduling.model.create_graph_exception import CreateGraphException
 from src.scheduling.model.task_graph import TaskGraph
-from src.scheduling.util.topological_ordering import calculate_upward_rank, sort_topologically
+from src.scheduling.util.topological_ordering import calculate_upward_rank, sort_topologically, \
+    sort_topologically_scheduled_tasks
 from tests.scheduling.graph_utils import get_pipeline_graph, get_parallel_graph, get_stencil_graph, \
-    get_multidependency_graph
+    get_multidependency_graph, get_simple_parallel_graph
 
 
 class TopologicalOrderingTest(unittest.TestCase):
@@ -141,3 +142,38 @@ class TopologicalOrderingTest(unittest.TestCase):
         self.assertEqual(8, ranks[7])
         self.assertEqual(9, ranks[8])
         self.assertEqual(10, ranks[9])
+
+    def test_topological_sort_scheduled_tasks_parallel_graph_reverse(self):
+        graph = get_simple_parallel_graph()
+
+        schedule = {
+            1: (0, 'm1'),
+            2: (4, 'm1'),
+            3: (1, 'm1'),
+            4: (6, 'm1'),
+            5: (10, 'm1'),
+        }
+
+        tasks = sort_topologically_scheduled_tasks(graph, schedule, reverse=False)
+        self._assert_order(tasks, [1, 3, 2, 4, 5])
+
+    def test_topological_sort_scheduled_tasks_parallel_graph_reverse(self):
+        graph = get_simple_parallel_graph()
+
+        schedule = {
+            1: (0, 'm1'),
+            2: (4, 'm1'),
+            3: (1, 'm1'),
+            4: (6, 'm1'),
+            5: (10, 'm1'),
+        }
+
+        tasks = sort_topologically_scheduled_tasks(graph, schedule, reverse=True)
+        self._assert_order(tasks, [5, 4, 2, 3, 1])
+
+
+    def _assert_order(self, task_list, expected_order):
+        assert len(task_list) == len(expected_order)
+
+        for i in range(len(task_list)):
+            self.assertEqual(task_list[i], expected_order[i])

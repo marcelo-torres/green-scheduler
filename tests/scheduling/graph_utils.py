@@ -23,6 +23,45 @@ def get_pipeline_graph():
 
     return graph
 
+def get_simple_parallel_graph():
+    """
+          1
+          |
+          +
+         /|\
+        / | \
+       2  3 4
+       | |  |
+       \ | /
+        \|/
+         +
+         |
+         5
+
+    :return: TaskGraph
+    """
+
+    graph = TaskGraph()
+    task_1 = graph.add_new_task(1, 1, 1)
+
+    task_2 = graph.add_new_task(2, 2, 2)
+    task_3 = graph.add_new_task(3, 3, 3)
+    task_4 = graph.add_new_task(4, 4, 4)
+
+    task_5 = graph.add_new_task(5, 5, 5)
+
+    graph.set_start_task(task_1.id)
+
+    graph.create_dependency(task_1.id, task_2.id)
+    graph.create_dependency(task_1.id, task_3.id)
+    graph.create_dependency(task_1.id, task_4.id)
+
+    graph.create_dependency(task_2.id, task_5.id)
+    graph.create_dependency(task_3.id, task_5.id)
+    graph.create_dependency(task_4.id, task_5.id)
+
+    return graph
+
 
 def get_parallel_graph():
     """
