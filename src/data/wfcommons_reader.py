@@ -54,7 +54,7 @@ def _create_graph(task_file, random_power):
         graph = TaskGraph()
 
         start_task_id = '0'
-        graph.add_new_task(start_task_id, runtime=0, power=0)  # Dummy task
+        graph.add_new_task(start_task_id, runtime=1, power=0)  # Dummy task
         graph.set_start_task(start_task_id)
 
         tasks = data['workflow']['tasks']
@@ -99,7 +99,7 @@ def _get_full_name(synthetic_path, name, num_tasks, runtime_factor):
 
 def _create_wfcommons_graph(workflow_name, recipe):
 
-    if not os.path.isfile(workflow_name):
+    if os.path.exists(workflow_name):
         raise Exception('Workflow file already exists')
 
     generator = WorkflowGenerator(recipe)

@@ -13,7 +13,11 @@ class MachineState:
 
     def use_cores(self, start, duration, amount):
 
+        if duration == 0:
+            return
+
         end = start + duration
+
         if amount > self.min_free_cores_in(start, end):
             raise Exception(f'There is not enough cores to use between {start} and {end}')
 
