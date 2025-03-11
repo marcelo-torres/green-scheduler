@@ -26,9 +26,6 @@ def find_max_start_machine(task, machines, max_successor_start_time, start_limit
         start = max_successor_start_time - task.runtime
         end = start + task.runtime
 
-        if start < 0:
-            print('a')
-
         while start >= start_limit and not machine.can_schedule_task_in(task, start, end):
             end = machine.state.previous_start(end) # TODO improve iteration strategy
             start = end - task.runtime

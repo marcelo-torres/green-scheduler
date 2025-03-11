@@ -5,7 +5,7 @@ class IntervalException(Exception):
 
 def find_min_brown_energy_start(task, start, end, green_energy_available, max_start_mode=False):
     if task.power == 0:
-        return start
+        return start, 0
 
     if end - start < task.runtime:
         raise IntervalException(task, start, end)

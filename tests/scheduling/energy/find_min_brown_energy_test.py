@@ -12,8 +12,9 @@ from src.scheduling.model.task_graph import TaskGraph
 def test_task_power_equal_to_zero_():
     lb = 100
     task = Task(1, 5, 0)
-    start_min = find_min_brown_energy(task, lb, 50, 458, [])
+    start_min, brown_energy = find_min_brown_energy(task, lb, 50, 458, [])
     assert lb == start_min
+    assert brown_energy == 0
 
 
 def test_interval_length_not_enough():
