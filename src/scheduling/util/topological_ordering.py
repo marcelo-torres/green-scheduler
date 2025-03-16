@@ -29,7 +29,7 @@ def sort_topologically_scheduled_tasks(graph, schedule, reverse=False):
 
     def sort_criteria(d):
         task_id, rank = d
-        start_time = schedule[task_id]
+        start_time, _ = schedule[task_id]
         return rank, start_time
 
     task_rank_list = list(ranks.items())
