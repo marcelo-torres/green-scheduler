@@ -27,7 +27,9 @@ class HighestPowerFirstSanityTest(unittest.TestCase):
                 graph = workflow_provider[1](uniform)
                 clusters, deadline = self._create_clusters(graph, 1)
                 schedule = highest_power_first(graph, deadline, 0.8, clusters, task_sort='energy', shift_mode='right-left')
-                check(schedule, graph)
+
+                violations = check(schedule, graph)
+                self.assertEqual(0, len(violations))
 
     def test_parameters(self):
 
@@ -48,7 +50,9 @@ class HighestPowerFirstSanityTest(unittest.TestCase):
                 graph = workflow_provider[1](uniform)
                 clusters, deadline = self._create_clusters(graph, d)
                 schedule = highest_power_first(graph, deadline, c, clusters, task_sort=ordering, shift_mode=shift)
-                check(schedule, graph)
+
+                violations = check(schedule, graph)
+                self.assertEqual(0, len(violations))
 
     def _create_clusters(self, graph, deadline_factor):
         critical_path_length = calc_critical_path_length(graph)

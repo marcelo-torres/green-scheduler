@@ -1,4 +1,4 @@
-from src.scheduling.algorithms.highest_power_first.boundaries.boundary import BoundaryCalculator
+from src.scheduling.algorithms.highest_power_first.boundaries.single_machine.boundary import BoundaryCalculator
 from src.scheduling.algorithms.highest_power_first.drawer.highest_power_first_drawer import draw_scheduling
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
 from src.scheduling.energy.find_min_brown_energy import find_min_brown_energy

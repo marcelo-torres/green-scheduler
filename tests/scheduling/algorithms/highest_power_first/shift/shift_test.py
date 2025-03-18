@@ -1,6 +1,6 @@
 import unittest
 
-from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine_boundary import \
+from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.multi_machine_boundary import \
     MultiMachineBoundaryCalculator
 from src.scheduling.algorithms.highest_power_first.shift_left.shift import shift_tasks_to_save_energy
 from src.scheduling.algorithms.highest_power_first.shift_left.shift_greedy import \

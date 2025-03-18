@@ -245,8 +245,8 @@ class HighestPowerFirstTest(unittest.TestCase):
         self.assertEqual(20, scheduling[3][0])
         self.assertEqual(27, scheduling[4][0])
 
-        self.assertEqual(31, scheduling[6][0])
-        self.assertEqual(49, scheduling[5][0])
+        self.assertEqual(47, scheduling[6][0])
+        self.assertEqual(31, scheduling[5][0])
         self.assertEqual(57, scheduling[7][0])
 
     def test_multiple_tasks_g1_with_no_slack_to_delay_and_with_g_energy_and_right_left(self):
@@ -381,8 +381,8 @@ class HighestPowerFirstTest(unittest.TestCase):
         self.assertTaskIn(schedule, 2, 10, 'm1')
         self.assertTaskIn(schedule, 3, 10, 'm2')
         self.assertTaskIn(schedule, 4, 17, 'm1')
-        self.assertTaskIn(schedule, 5, 21, 'm2')
-        self.assertTaskIn(schedule, 6, 21, 'm1')
+        self.assertTaskIn(schedule, 5, 21, 'm1')
+        self.assertTaskIn(schedule, 6, 21, 'm2')
         self.assertTaskIn(schedule, 7, 30, 'm1')
 
     def test_multi_machine_graph_with_no_cores_with_g_energy_shift_left(self):
@@ -398,8 +398,8 @@ class HighestPowerFirstTest(unittest.TestCase):
         self.assertTaskIn(schedule, 2, 10, 'm2')
         self.assertTaskIn(schedule, 3, 17, 'm2')
         self.assertTaskIn(schedule, 4, 19, 'm2')
-        self.assertTaskIn(schedule, 5, 32, 'm2')
-        self.assertTaskIn(schedule, 6, 23, 'm2')
+        self.assertTaskIn(schedule, 5, 23, 'm2')
+        self.assertTaskIn(schedule, 6, 31, 'm2')
         self.assertTaskIn(schedule, 7, 40, 'm2')
 
     # def test_multi_machine_graph_with_no_cores_with_no_g_energy_shift_left(self):

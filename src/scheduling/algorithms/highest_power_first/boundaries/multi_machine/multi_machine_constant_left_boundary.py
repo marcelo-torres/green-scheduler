@@ -1,8 +1,9 @@
-from src.scheduling.model.machine import CORES_PER_TASK
+from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.multi_machine_shared import \
+    create_sort_by_max_predecessor_runtime, unschedule
 from src.scheduling.util.find_start import find_min_start_machine
 
 
-def calculate_constant_left_boundary(task, schedule, machines):
+def calculate_constant_left_boundary(task, schedule, machines, use_lpt=False):
 
     if len(task.predecessors) == 0:
         return 0, False
@@ -11,8 +12,14 @@ def calculate_constant_left_boundary(task, schedule, machines):
 
     max_earliest_predecessor_finish_time = -1
     max_predecessor = None
-    for p in task.predecessors:
-        p_earliest_finish_time = _min_finish_time(p, schedule, machines, temp_schedule)
+
+    if use_lpt:
+        sort_predecessors = create_sort_by_max_predecessor_runtime(schedule, temp_schedule)
+    else:
+        sort_predecessors = lambda t: t.predecessors
+
+    for p in sort_predecessors(task):
+        p_earliest_finish_time = _min_finish_time(p, schedule, machines, temp_schedule, sort_predecessors)
 
         if p_earliest_finish_time > max_earliest_predecessor_finish_time:
             max_earliest_predecessor_finish_time = p_earliest_finish_time
@@ -21,12 +28,12 @@ def calculate_constant_left_boundary(task, schedule, machines):
     is_limited_by_scheduled_predecessor = (max_predecessor.id in schedule)
 
     start, _ = find_min_start_machine(task, machines, max_earliest_predecessor_finish_time)
-    _unschedule(temp_schedule)
+    unschedule(temp_schedule)
 
     return start, is_limited_by_scheduled_predecessor
 
 
-def _min_finish_time(task, schedule, machines, temp_schedule):
+def _min_finish_time(task, schedule, machines, temp_schedule, sort_predecessors):
     if task.id in schedule:
         start_time = schedule[task.id][0]
         return task.runtime + start_time
@@ -40,8 +47,8 @@ def _min_finish_time(task, schedule, machines, temp_schedule):
         return start + task.runtime
 
     max_predecessor_finish_time = -1
-    for p in task.predecessors:
-        p_earliest_finish_time = _min_finish_time(p, schedule, machines, temp_schedule)
+    for p in sort_predecessors(task):
+        p_earliest_finish_time = _min_finish_time(p, schedule, machines, temp_schedule, sort_predecessors)
         if p_earliest_finish_time > max_predecessor_finish_time:
             max_predecessor_finish_time = p_earliest_finish_time
 
@@ -59,7 +66,3 @@ def _temp_schedule_task(task, machines, max_predecessor_finish_time, temp_schedu
     return start
 
 
-def _unschedule(temp_schedule):
-    for task_id, d in list(temp_schedule.items()):
-        t, s, m = d
-        m.unschedule_task(t, s)

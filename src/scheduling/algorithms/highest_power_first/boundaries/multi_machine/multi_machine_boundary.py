@@ -1,23 +1,24 @@
-from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine_constant_left_boundary import \
+from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.multi_machine_constant_left_boundary import \
     calculate_constant_left_boundary
-from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine_constant_right_boundary import \
+from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.multi_machine_constant_right_boundary import \
     calculate_constant_right_boundary
 from src.scheduling.util.calc_levels import calc_levels
 
 
 class MultiMachineBoundaryCalculator:
 
-    def __init__(self, graph, deadline, c, machines):
+    def __init__(self, graph, deadline, c, machines, use_lpt=False):
         task_levels, max_level = calc_levels(graph)
         self.task_levels = task_levels
         self.max_level = max_level
         self.deadline = deadline
         self.c = c
         self.machines = machines
+        self.use_lpt = use_lpt
 
     def calculate_boundaries(self, task, schedule):
-        lcb, is_max_predecessor_scheduled = calculate_constant_left_boundary(task, schedule, self.machines)
-        rcb, is_min_successor_scheduled = calculate_constant_right_boundary(task, schedule, self.machines, self.deadline)
+        lcb, is_max_predecessor_scheduled = calculate_constant_left_boundary(task, schedule, self.machines, use_lpt=self.use_lpt)
+        rcb, is_min_successor_scheduled = calculate_constant_right_boundary(task, schedule, self.machines, self.deadline, use_lpt=self.use_lpt)
 
         lvb, rvb = self._calc_volatile_boundary(task, lcb, rcb)
 
@@ -53,6 +54,3 @@ class MultiMachineBoundaryCalculator:
         rvb = time_to_variable_boundary - lvb
 
         return lvb, rvb
-
-
-

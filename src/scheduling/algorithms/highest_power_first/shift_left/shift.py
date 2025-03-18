@@ -2,13 +2,16 @@ from src.scheduling.util.schedule_in_min_brown_energy import schedule_min_brown_
 from src.scheduling.util.topological_ordering import sort_topologically, sort_topologically_scheduled_tasks
 
 
-def shift_tasks_to_save_energy(graph, scheduling, machines, boundary_calc, deadline, energy_usage_calc, mode='left'):
+def shift_tasks_to_save_energy(graph, scheduling, machines, boundary_calc, deadline, energy_usage_calc, mode='left', use_sort_scheduled=True):
     _validate_mode(mode)
 
     machines_map = _to_machine_map(machines)
 
     # Order tasks by topological order
-    tasks = sort_topologically_scheduled_tasks(graph, scheduling, reverse=(mode == 'right'))
+    if use_sort_scheduled:
+        tasks = sort_topologically_scheduled_tasks(graph, scheduling, reverse=(mode == 'right'))
+    else:
+        tasks = sort_topologically(graph, reverse=(mode == 'right'))
 
 
     for i in range(len(tasks)):
