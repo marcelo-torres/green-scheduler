@@ -33,7 +33,7 @@ def calculate_constant_right_boundary(task, schedule, machines, deadline, use_lp
     return deadline - (start + task.runtime), is_limited_by_scheduled_successor
 
 
-def max_start_time(task, schedule, machine, deadline, temp_schedule, sort_successors):
+def max_start_time(task, schedule, machines, deadline, temp_schedule, sort_successors):
     if task.id in schedule:
         start_time = schedule[task.id][0]
         return start_time
@@ -43,22 +43,25 @@ def max_start_time(task, schedule, machine, deadline, temp_schedule, sort_succes
         return start_time
 
     if len(task.successors) == 0:
-        start = _temp_schedule_task(task, machine, deadline, temp_schedule)
+        start = _temp_schedule_task(task, machines, deadline, temp_schedule)
         return start
 
     min_successor_earliest_st = float('inf')
     for s in sort_successors(task):
-        s_max_start_time = max_start_time(s, schedule, machine, deadline, temp_schedule, sort_successors)
+        s_max_start_time = max_start_time(s, schedule, machines, deadline, temp_schedule, sort_successors)
         if s_max_start_time < min_successor_earliest_st:
             min_successor_earliest_st = s_max_start_time
 
-    start = _temp_schedule_task(task, machine, min_successor_earliest_st, temp_schedule)
+    start = _temp_schedule_task(task, machines, min_successor_earliest_st, temp_schedule)
 
     return start
 
 
 def _temp_schedule_task(task, machines, max_successor_start_time, temp_schedule):
     start, machine = find_max_start_machine(task, machines, max_successor_start_time)
+
+    if machine is None:
+        raise Exception(f'No machine found to schedule task {task}')
 
     machine.schedule_task(task, start)
     temp_schedule[task.id] = (task, start, machine)
