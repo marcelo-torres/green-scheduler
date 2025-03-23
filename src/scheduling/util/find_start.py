@@ -34,6 +34,6 @@ def find_max_start_machine(task, machines, max_successor_start_time, start_limit
             max_end = end
             max_machine = machine
 
-    max_stat = max_end - task.runtime
+    max_start = max_end - task.runtime
 
-    return max_stat, max_machine
+    return max_start, max_machine
