@@ -11,6 +11,7 @@ class MachineState:
         self.events.insert(0, machine.cores)
         self.events.insert(float('inf'), machine.cores)
 
+
     def use_cores(self, start, duration, amount):
 
         if duration == 0:
@@ -124,6 +125,26 @@ class MachineState:
             i_length = end - i_start
             if i_length >= min_duration:
                 yield i_start, end
+
+    def total_usage(self):
+        total_usage = 0
+
+
+        last_time = 0
+        last_cores = 0
+        for time, cores in list(self.events.items()):
+            if time == float('inf'):
+                break
+
+            duration = time - last_time
+            used_cores = self.machine.cores - last_cores
+            total_usage += duration * used_cores
+
+            last_time = time
+            last_cores = cores
+
+        return total_usage
+
 
     def _validate_new_cores_used(self, current_cores_available, amount):
         if current_cores_available < 0:

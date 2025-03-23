@@ -23,3 +23,5 @@ class Machine:
     def search_intervals_to_schedule_task(self, task, start, end):
         return self.state.search_intervals_with_free_cores(start, end, task.runtime, CORES_PER_TASK)
 
+    def total_usage(self):
+        return self.state.total_usage()

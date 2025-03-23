@@ -438,6 +438,30 @@ class MachineStateTest(unittest.TestCase):
 
         self.assert_interval(intervals[0], 5, 47)
 
+    def test_cores_usage_single_usage(self):
+        state = create_state(10)
+        state.use_cores(5, 10, 1)
+        #state.use_cores(3, 5, 1)
+
+        self.assertEqual(10, state.total_usage())
+
+    def test_cores_usage_sequential(self):
+        state = create_state(10)
+        state.use_cores(5, 10, 1)
+        state.use_cores(15, 5, 1)
+
+        t = state.total_usage()
+        self.assertEqual(15, t)
+
+    def test_cores_usage_overlap(self):
+        state = create_state(10)
+        state.use_cores(5, 10, 1)
+        state.use_cores(13, 5, 1)
+
+        t = state.total_usage()
+        self.assertEqual(15, t)
+
+
     def assert_min_cores_in(self, state, min_cores, start, end):
         self.assertEqual(min_cores, state.min_free_cores_in(start, end))
 
