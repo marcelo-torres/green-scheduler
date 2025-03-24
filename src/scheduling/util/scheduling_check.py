@@ -1,8 +1,11 @@
-def check(scheduling, graph):
+def check(scheduling, graph, ignore_unscheduled_tasks=False):
 
     scheduling_violations = []
 
     for task in graph.list_of_tasks():
+
+        if ignore_unscheduled_tasks and task.id not in scheduling:
+            continue
 
         start = scheduling[task.id][0]
 
