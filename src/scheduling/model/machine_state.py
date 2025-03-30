@@ -1,4 +1,3 @@
-import pyredblack
 from bintrees import AVLTree
 
 
@@ -100,6 +99,9 @@ class MachineState:
             return next(events_iterator, (None, -1))
 
         e, cores = next_event()
+        if e is None:
+            return  # Stop iteration
+
         if e < start:
             e = start
 
