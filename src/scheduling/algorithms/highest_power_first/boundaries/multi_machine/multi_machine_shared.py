@@ -19,4 +19,12 @@ def _create_is_scheduled_task(schedule, temp_schedule):
 def unschedule(temp_schedule):
     for task_id, d in list(temp_schedule.items()):
         t, s, m = d
-        m.unschedule_task(t, s)
+        if t is not None:
+            m.unschedule_task(t, s)
+
+def copy_from_temp_schedule(temp_schedule):
+    schedule = {}
+    for task_id, d in list(temp_schedule.items()):
+        t, s, m = d
+        schedule[t.id] = s, m.id
+    return schedule
