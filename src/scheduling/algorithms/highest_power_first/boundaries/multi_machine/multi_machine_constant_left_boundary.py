@@ -1,9 +1,9 @@
 from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.multi_machine_shared import \
-    create_sort_by_max_predecessor_runtime, unschedule
+    create_sort_by_max_predecessor_runtime, unschedule, copy_from_temp_schedule
 from src.scheduling.util.find_start import find_min_start_machine
 
 
-def calculate_constant_left_boundary(task, schedule, machines, use_lpt=False):
+def calculate_constant_left_boundary(task, schedule, machines, use_lpt=False, same_level_tasks=None, schedule_debug=None):
 
     if len(task.predecessors) == 0:
         return 0, False
@@ -25,9 +25,19 @@ def calculate_constant_left_boundary(task, schedule, machines, use_lpt=False):
             max_earliest_predecessor_finish_time = p_earliest_finish_time
             max_predecessor = p
 
+    if same_level_tasks is not None:
+        for t in same_level_tasks:
+            _min_finish_time(t, schedule, machines, temp_schedule, sort_predecessors)
+
     is_limited_by_scheduled_predecessor = (max_predecessor.id in schedule)
 
     start, _ = find_min_start_machine(task, machines, max_earliest_predecessor_finish_time)
+
+    if schedule_debug is not None:
+        schedule_debug.update(
+            copy_from_temp_schedule(temp_schedule)
+        )
+
     unschedule(temp_schedule)
 
     return start, is_limited_by_scheduled_predecessor

@@ -3,7 +3,7 @@ from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.mult
 from src.scheduling.util.find_start import find_max_start_machine
 
 
-def calculate_constant_right_boundary(task, schedule, machines, deadline, use_lpt=False):
+def calculate_constant_right_boundary(task, schedule, machines, deadline, same_level_tasks=None, use_lpt=False):
 
     if len(task.successors) == 0:
         return 0, False
@@ -24,6 +24,10 @@ def calculate_constant_right_boundary(task, schedule, machines, deadline, use_lp
         if s_max_start_time < min_successor_start_time:
             min_successor_start_time = s_max_start_time
             min_successor = s
+
+    if same_level_tasks is not None:
+        for t in same_level_tasks:
+            max_start_time(t, schedule, machines, deadline, temp_schedule, sort_successors)
 
     is_limited_by_scheduled_successor = (min_successor.id in schedule)
 
