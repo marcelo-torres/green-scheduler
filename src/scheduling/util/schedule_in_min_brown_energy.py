@@ -26,6 +26,10 @@ def _schedule_in_min_brown_energy(task, machines, schedule, deadline, boundary_c
     # Schedule each task when it uses less brown energy as early as possible
     green_power_available = energy_usage_calculator.get_green_power_available()
 
+    interval_available = (deadline - rb) - lb
+    if interval_available < task.runtime:
+        raise Exception(f'Not enough time to schedule task {task.id}! Task runtime: {task.runtime}; Interval available: {interval_available}')
+
     for machine in machines:
         for start, end in machine.search_intervals_to_schedule_task(task, lb, deadline - rb):
             
