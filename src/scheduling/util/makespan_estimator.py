@@ -1,5 +1,13 @@
+from src.scheduling.model.machine import Machine
 from src.scheduling.util.makespan_calculator import calc_makespan
 from src.scheduling.util.topological_ordering import sort_topologically
+
+def estimate_min_makespan_with_enough_cores(graph):
+    machines = [
+        Machine('id1', cores=len(graph.list_of_tasks())),
+    ]
+
+    return estimate_min_makespan(graph, machines)
 
 
 def estimate_min_makespan(graph, machines):
