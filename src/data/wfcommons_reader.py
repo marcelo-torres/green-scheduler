@@ -172,6 +172,54 @@ class WfCommonsWorkflowReader:
     def read_soykb_workflow(self, num_tasks, runtime_factor, random_power, index=None):
         return self._read('soykb', num_tasks, runtime_factor, random_power, index)
 
+    def delete_srasearch_workflow(self, num_tasks, runtime_factor, index=None):
+        self._delete('srasearch', num_tasks, runtime_factor, index)
+
+    def delete_montage_workflow(self, num_tasks, runtime_factor, index=None):
+        self._delete('montage', num_tasks, runtime_factor, index)
+
+    def delete_seismology_workflow(self, num_tasks, runtime_factor, index=None):
+        self._delete('seismology', num_tasks, runtime_factor, index)
+
+    def delete_blast_workflow(self, num_tasks, runtime_factor, index=None):
+        self._delete('blast', num_tasks, runtime_factor, index)
+
+    def delete_bwa_workflow(self, num_tasks, runtime_factor, index=None):
+        self._delete('bwa', num_tasks, runtime_factor, index)
+
+    def delete_cycles_workflow(self, num_tasks, runtime_factor, index=None):
+        self._delete('cycles', num_tasks, runtime_factor, index)
+
+    def delete_genome_workflow(self, num_tasks, runtime_factor, index=None):
+        self._delete('genome', num_tasks, runtime_factor, index)
+
+    def delete_soykb_workflow(self, num_tasks, runtime_factor, index=None):
+        self._delete('soykb', num_tasks, runtime_factor, index)
+
+    def change_index_srasearch_workflow(self, num_tasks, runtime_factor, index, new_index):
+        self._change_index('srasearch', num_tasks, runtime_factor, index, new_index)
+
+    def change_index_montage_workflow(self, num_tasks, runtime_factor, index, new_index):
+        self._change_index('montage', num_tasks, runtime_factor, index, new_index)
+
+    def change_index_seismology_workflow(self, num_tasks, runtime_factor, index, new_index):
+        self._change_index('seismology', num_tasks, runtime_factor, index, new_index)
+
+    def change_index_blast_workflow(self, num_tasks, runtime_factor, index, new_index):
+        self._change_index('blast', num_tasks, runtime_factor, index, new_index)
+
+    def change_index_bwa_workflow(self, num_tasks, runtime_factor, index, new_index):
+        self._change_index('bwa', num_tasks, runtime_factor, index, new_index)
+
+    def change_index_cycles_workflow(self, num_tasks, runtime_factor, index, new_index):
+        self._change_index('cycles', num_tasks, runtime_factor, index, new_index)
+
+    def change_index_genome_workflow(self, num_tasks, runtime_factor, index, new_index):
+        self._change_index('genome', num_tasks, runtime_factor, index, new_index)
+
+    def change_index_soykb_workflow(self, num_tasks, runtime_factor, index, new_index):
+        self._change_index('soykb', num_tasks, runtime_factor, index, new_index)
+
     def _create(self, recipe_class, workflow_name, num_tasks, runtime_factor, count):
 
         paths = []
@@ -189,3 +237,18 @@ class WfCommonsWorkflowReader:
         else:
             path = _get_full_name(self.synthetic_path, workflow_name, num_tasks, runtime_factor, index)
         return _create_graph(path, random_power)
+
+    def _delete(self, workflow_name, num_tasks, runtime_factor, index):
+        if index is None:
+            path = _get_full_name_legacy(self.synthetic_path, workflow_name, num_tasks, runtime_factor)
+        else:
+            path = _get_full_name(self.synthetic_path, workflow_name, num_tasks, runtime_factor, index)
+            
+        os.remove(path)
+        
+    def _change_index(self, workflow_name, num_tasks, runtime_factor, index, new_index):
+        old_path = _get_full_name(self.synthetic_path, workflow_name, num_tasks, runtime_factor, index)
+        new_path = _get_full_name(self.synthetic_path, workflow_name, num_tasks, runtime_factor, new_index)
+        
+        os.rename(old_path, new_path)
+        
