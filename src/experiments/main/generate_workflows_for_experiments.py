@@ -1,7 +1,5 @@
 import math
 
-from pycrunch.child_runtime.exclusions import exclude_list
-
 from src.data.wfcommons_reader import WfCommonsWorkflowReader
 from src.scheduling.util.critical_path_length_calculator import calc_critical_path_length
 from src.scheduling.util.makespan_estimator import estimate_min_makespan_with_enough_cores
@@ -10,58 +8,60 @@ from src.scheduling.util.max_concurrent_tasks import count_max_parallel_tasks
 resources_path = '../../../resources'
 synthetic_path = f'{resources_path}/wfcommons/synthetic'
 
+NUM_OF_TASKS = 1000
+
 workflow_map = {
     'blast': {
-        'tasks': 1000,
+        'tasks': NUM_OF_TASKS,
         'runtime_factor': 11.4492900609,
         'reader': lambda reader: reader.read_blast_workflow,
         'change_index': lambda reader: reader.change_index_blast_workflow,
         'delete': lambda reader: reader.delete_blast_workflow,
     },
     'bwa': {
-        'tasks': 1000,
+        'tasks': NUM_OF_TASKS,
         'runtime_factor': 52.2248138958,
         'reader': lambda reader: reader.read_bwa_workflow,
         'change_index': lambda reader: reader.change_index_bwa_workflow,
         'delete': lambda reader: reader.delete_bwa_workflow,
     },
     'cycles': {
-        'tasks': 1000,
+        'tasks': NUM_OF_TASKS,
         'runtime_factor': 31.0991735531,
         'reader': lambda reader: reader.read_cycles_workflow,
         'delete': lambda reader: reader.delete_cycles_workflow,
         'change_index': lambda reader: reader.change_index_cycles_workflow,
     },
     'genome': {
-        'tasks': 1000,
+        'tasks': NUM_OF_TASKS,
         'runtime_factor': 35.7812995246,
         'reader': lambda reader: reader.read_genome_workflow,
         'delete': lambda reader: reader.delete_genome_workflow,
         'change_index': lambda reader: reader.change_index_genome_workflow,
     },
     'soykb': {
-        'tasks': 1000,
+        'tasks': NUM_OF_TASKS,
         'runtime_factor': 3.85224364443,
         'reader': lambda reader: reader.read_soykb_workflow,
         'delete': lambda reader: reader.delete_soykb_workflow,
         'change_index': lambda reader: reader.change_index_soykb_workflow,
     },
     'srasearch': {
-        'tasks': 1000,
+        'tasks': NUM_OF_TASKS,
         'runtime_factor': 1.26845637583,
         'reader': lambda reader: reader.read_srasearch_workflow,
         'delete': lambda reader: reader.delete_srasearch_workflow,
         'change_index': lambda reader: reader.change_index_srasearch_workflow,
     },
     'montage': {
-        'tasks': 1000,
+        'tasks': NUM_OF_TASKS,
         'runtime_factor': 11.17646556189,
         'reader': lambda reader: reader.read_montage_workflow,
         'delete': lambda reader: reader.delete_montage_workflow,
         'change_index': lambda reader: reader.change_index_montage_workflow,
     },
     'seismology': {
-        'tasks': 1000,
+        'tasks': NUM_OF_TASKS,
         'runtime_factor': 4000,
         'reader': lambda reader: reader.read_seismology_workflow,
         'delete': lambda reader: reader.delete_seismology_workflow,
@@ -73,14 +73,14 @@ def constant_power():
     return 1
 
 def generate_workflows(wfcommons_reader, count):
-    wfcommons_reader.create_blast_workflow(1000, 11.4492900609, count)
-    wfcommons_reader.create_bwa_workflow(1000, 52.2248138958, count)
-    wfcommons_reader.create_cycles_workflow(1000, 31.0991735531, count)
-    wfcommons_reader.create_genome_workflow(1000, 35.7812995246, count)
-    wfcommons_reader.create_soykb_workflow(1000, 3.85224364443, count)
-    wfcommons_reader.create_srasearch_workflow(1000, 1.26845637583, count)
-    wfcommons_reader.create_montage_workflow(1000, 11.17646556189, count)
-    wfcommons_reader.create_seismology_workflow(1000, 4000, count)
+    wfcommons_reader.create_blast_workflow(NUM_OF_TASKS, 11.4492900609, count)
+    wfcommons_reader.create_bwa_workflow(NUM_OF_TASKS, 52.2248138958, count)
+    wfcommons_reader.create_cycles_workflow(NUM_OF_TASKS, 31.0991735531, count)
+    wfcommons_reader.create_genome_workflow(NUM_OF_TASKS, 35.7812995246, count)
+    wfcommons_reader.create_soykb_workflow(NUM_OF_TASKS, 3.85224364443, count)
+    wfcommons_reader.create_srasearch_workflow(NUM_OF_TASKS, 1.26845637583, count)
+    wfcommons_reader.create_montage_workflow(NUM_OF_TASKS, 11.17646556189, count)
+    wfcommons_reader.create_seismology_workflow(NUM_OF_TASKS, 4000, count)
 
 def filter_workflows(wfcommons_reader, count, count_to_select):
 
@@ -173,7 +173,7 @@ def show_stats(wfcommons_reader, count):
 
 
 if __name__ == '__main__':
-    count = 50
+    count = 100
     count_to_select = 10
 
     wfcommons_reader = WfCommonsWorkflowReader(synthetic_path)

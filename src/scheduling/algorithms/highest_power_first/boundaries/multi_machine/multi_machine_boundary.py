@@ -1,5 +1,5 @@
-from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.lpt_boundary_shift_estimator import \
-    LptBoundaryShiftEstimator
+from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.lpt_boundary_estimator import \
+    LptBoundaryEstimator
 from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.multi_machine_constant_left_boundary import \
     calculate_constant_left_boundary
 from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.multi_machine_constant_right_boundary import \
@@ -26,7 +26,7 @@ class MultiMachineBoundaryCalculator:
             self.calc_rcb = lambda task, schedule: calculate_constant_right_boundary(task, schedule, self.machines, self.deadline, use_lpt=True)
 
         elif strategy == 'lpt-full':
-            self.lpt_boundary_estimator = LptBoundaryShiftEstimator(machines, graph)
+            self.lpt_boundary_estimator = LptBoundaryEstimator(machines, graph)
 
             self.calc_lcb = lambda task, schedule: self.lpt_boundary_estimator.calculate_constant_left_boundary(task, schedule)
             self.calc_rcb = lambda task, schedule: self.lpt_boundary_estimator.calculate_constant_right_boundary(task, schedule, self.deadline)
@@ -41,17 +41,6 @@ class MultiMachineBoundaryCalculator:
         rcb, is_min_successor_scheduled = self.calc_rcb(task, schedule)
 
         lvb, rvb = self._calc_volatile_boundary(task, lcb, rcb)
-
-
-        if (self.deadline - rcb) - lcb < task.runtime:
-            print(f'rcb: {rcb}\tlcb: {lcb}')
-            # self.schedule_left_debug.update(
-            #     schedule.copy()
-            # )
-            # #draw_task_graph(self.graph, with_labels=True, schedule=schedule, current_task_id=task.id)
-            # drawer = draw_scheduling(lcb, lvb, rcb, rvb, self.deadline, [0]*10, 100, schedule, self.graph,
-            #                 max_power=15)
-            # drawer.show()
 
         # If it is the first time stamp (lcb == 0) or the task is limited by a scheduled predecessor, then there is no
         # need of lvb > 0.
