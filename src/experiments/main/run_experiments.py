@@ -215,23 +215,23 @@ def execute_experiments(resources_path, synthetic_path, random_provider):
 
     green_power_providers = [
         ('trace-1', lambda: photovolta_reader.get_trace_1(size=30)),
-        # ('trace-2', lambda: photovolta_reader.get_trace_2(size=30)),
-        # ('trace-3', lambda: photovolta_reader.get_trace_2(size=30)),
-        # ('trace-4', lambda: photovolta_reader.get_trace_2(size=30)),
+        ('trace-2', lambda: photovolta_reader.get_trace_2(size=30)),
+        ('trace-3', lambda: photovolta_reader.get_trace_2(size=30)),
+        ('trace-4', lambda: photovolta_reader.get_trace_2(size=30)),
     ]
 
     # Process parameters
-    # experiment_repetitions = 10
-    # shift_modes = ['none', 'left', 'right-left']
-    # deadline_factors = [2, 4, 8]
-    # c_values = [0, 0.5, 0.8]
-    # task_ordering_criterias = ['energy', 'power', 'runtime', 'runtime_ascending']
+    experiment_repetitions = 10
+    shift_modes = ['none', 'left', 'right-left']
+    deadline_factors = [2, 4, 8]
+    c_values = [0, 0.5, 0.8]
+    task_ordering_criterias = ['energy', 'power', 'runtime', 'runtime_ascending']
 
-    experiment_repetitions = 2
-    shift_modes = ['none']
-    deadline_factors = [2]
-    c_values = [0]
-    task_ordering_criterias = ['runtime']
+    # experiment_repetitions = 2
+    # shift_modes = ['none']
+    # deadline_factors = [2]
+    # c_values = [0]
+    # task_ordering_criterias = ['runtime']
 
     boundary_strategies = [
         BOUNDARY_SINGLE,
