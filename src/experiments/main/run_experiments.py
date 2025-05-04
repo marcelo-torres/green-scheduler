@@ -5,6 +5,8 @@ from src.data.photovolta import PhotovoltaReader
 from src.data.wfcommons_reader import WfCommonsWorkflowReader
 from src.experiments.ParallelExperimentExecutor import ParallelExperimentExecutor
 from src.experiments.main.experiment_file_helper import create_csv_file, write_reports_to_csv
+from src.experiments.main.generate_workflows_for_experiments import runtime_factor_map_bigger, num_of_tasks_bigger, \
+    num_of_tasks_smaller, runtime_factor_map_smaller
 from src.experiments.random_utils import RandomProvider
 from src.scheduling.algorithms.highest_power_first.highest_power_first import highest_power_first, BOUNDARY_DEFAULT, \
     BOUNDARY_SINGLE
@@ -202,15 +204,21 @@ def execute_experiments(resources_path, synthetic_path, random_provider):
         # ('inverted_exponential', random_provider.random_expovariate_inverse),
     ]
 
+    # num_of_tasks = num_of_tasks_bigger
+    # runtime_factor_map = runtime_factor_map_bigger
+
+    num_of_tasks = num_of_tasks_smaller
+    runtime_factor_map = runtime_factor_map_smaller
+
     workflow_providers = [
-        ('blast', lambda random_power, index: wfcommons_reader.read_blast_workflow(1000, 11.4492900609, random_power, index)),
-        ('bwa', lambda random_power, index: wfcommons_reader.read_bwa_workflow(1000, 52.2248138958, random_power, index)),
-        ('cycles', lambda random_power, index: wfcommons_reader.read_cycles_workflow(1000, 31.0991735531, random_power, index)),
-        ('genome', lambda random_power, index: wfcommons_reader.read_genome_workflow(1000, 35.7812995246, random_power, index)),
-        ('soykb', lambda random_power, index: wfcommons_reader.read_soykb_workflow(1000, 3.85224364443, random_power, index)),
-        ('srasearch', lambda random_power, index: wfcommons_reader.read_srasearch_workflow(1000, 1.26845637583, random_power, index)),
-        ('montage', lambda random_power, index: wfcommons_reader.read_montage_workflow(1000, 11.17646556189, random_power, index)),
-        ('seismology', lambda random_power, index: wfcommons_reader.read_seismology_workflow(1000, 4000, random_power, index)),
+        ('blast', lambda random_power, index: wfcommons_reader.read_blast_workflow(num_of_tasks, runtime_factor_map['blast'], random_power, index)),
+        ('bwa', lambda random_power, index: wfcommons_reader.read_bwa_workflow(num_of_tasks, runtime_factor_map['bwa'], random_power, index)),
+        ('cycles', lambda random_power, index: wfcommons_reader.read_cycles_workflow(num_of_tasks, runtime_factor_map['cycles'], random_power, index)),
+        ('genome', lambda random_power, index: wfcommons_reader.read_genome_workflow(num_of_tasks, runtime_factor_map['genome'], random_power, index)),
+        ('soykb', lambda random_power, index: wfcommons_reader.read_soykb_workflow(num_of_tasks, runtime_factor_map['soykb'], random_power, index)),
+        ('srasearch', lambda random_power, index: wfcommons_reader.read_srasearch_workflow(num_of_tasks, runtime_factor_map['srasearch'], random_power, index)),
+        ('montage', lambda random_power, index: wfcommons_reader.read_montage_workflow(num_of_tasks, runtime_factor_map['montage'], random_power, index)),
+        ('seismology', lambda random_power, index: wfcommons_reader.read_seismology_workflow(num_of_tasks, runtime_factor_map['seismology'], random_power, index)),
     ]
 
     green_power_providers = [
