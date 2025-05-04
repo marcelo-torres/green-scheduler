@@ -12,95 +12,106 @@ NUM_OF_TASKS = 1000
 
 workflow_map = {
     'blast': {
-        'tasks': NUM_OF_TASKS,
-        'runtime_factor': 11.4492900609,
         'reader': lambda reader: reader.read_blast_workflow,
         'change_index': lambda reader: reader.change_index_blast_workflow,
         'delete': lambda reader: reader.delete_blast_workflow,
     },
     'bwa': {
-        'tasks': NUM_OF_TASKS,
-        'runtime_factor': 52.2248138958,
         'reader': lambda reader: reader.read_bwa_workflow,
         'change_index': lambda reader: reader.change_index_bwa_workflow,
         'delete': lambda reader: reader.delete_bwa_workflow,
     },
     'cycles': {
-        'tasks': NUM_OF_TASKS,
-        'runtime_factor': 31.0991735531,
         'reader': lambda reader: reader.read_cycles_workflow,
         'delete': lambda reader: reader.delete_cycles_workflow,
         'change_index': lambda reader: reader.change_index_cycles_workflow,
     },
     'genome': {
-        'tasks': NUM_OF_TASKS,
-        'runtime_factor': 35.7812995246,
         'reader': lambda reader: reader.read_genome_workflow,
         'delete': lambda reader: reader.delete_genome_workflow,
         'change_index': lambda reader: reader.change_index_genome_workflow,
     },
     'soykb': {
-        'tasks': NUM_OF_TASKS,
-        'runtime_factor': 3.85224364443,
         'reader': lambda reader: reader.read_soykb_workflow,
         'delete': lambda reader: reader.delete_soykb_workflow,
         'change_index': lambda reader: reader.change_index_soykb_workflow,
     },
     'srasearch': {
-        'tasks': NUM_OF_TASKS,
-        'runtime_factor': 1.26845637583,
         'reader': lambda reader: reader.read_srasearch_workflow,
         'delete': lambda reader: reader.delete_srasearch_workflow,
         'change_index': lambda reader: reader.change_index_srasearch_workflow,
     },
     'montage': {
-        'tasks': NUM_OF_TASKS,
-        'runtime_factor': 11.17646556189,
         'reader': lambda reader: reader.read_montage_workflow,
         'delete': lambda reader: reader.delete_montage_workflow,
         'change_index': lambda reader: reader.change_index_montage_workflow,
     },
     'seismology': {
-        'tasks': NUM_OF_TASKS,
-        'runtime_factor': 4000,
         'reader': lambda reader: reader.read_seismology_workflow,
         'delete': lambda reader: reader.delete_seismology_workflow,
         'change_index': lambda reader: reader.change_index_seismology_workflow,
     },
 }
 
+num_of_tasks_bigger = 1000
+runtime_factor_map_bigger = {
+    'blast': 11.4492900609,
+    'bwa': 52.2248138958,
+    'cycles': 31.0991735531,
+    'genome': 35.7812995246,
+    'soykb': 3.85224364443,
+    'srasearch': 1.26845637583,
+    'montage': 11.17646556189,
+    'seismology': 4000,
+}
+
+num_of_tasks_smaller = 200
+runtime_factor_map_smaller = {
+    'blast': runtime_factor_map_bigger['blast'] / 5,
+    'bwa': runtime_factor_map_bigger['bwa'] / 5,
+    'cycles': runtime_factor_map_bigger['cycles'] / 5,
+    'genome': runtime_factor_map_bigger['genome'] / 5,
+    'soykb': runtime_factor_map_bigger['soykb'] / 5,
+    'srasearch': runtime_factor_map_bigger['srasearch'] / 5,
+    'montage': runtime_factor_map_bigger['montage'] / 5,
+    'seismology': runtime_factor_map_bigger['seismology'] / 5,
+}
+
 def constant_power():
     return 1
 
-def generate_workflows(wfcommons_reader, count):
-    wfcommons_reader.create_blast_workflow(NUM_OF_TASKS, 11.4492900609, count)
-    wfcommons_reader.create_bwa_workflow(NUM_OF_TASKS, 52.2248138958, count)
-    wfcommons_reader.create_cycles_workflow(NUM_OF_TASKS, 31.0991735531, count)
-    wfcommons_reader.create_genome_workflow(NUM_OF_TASKS, 35.7812995246, count)
-    wfcommons_reader.create_soykb_workflow(NUM_OF_TASKS, 3.85224364443, count)
-    wfcommons_reader.create_srasearch_workflow(NUM_OF_TASKS, 1.26845637583, count)
-    wfcommons_reader.create_montage_workflow(NUM_OF_TASKS, 11.17646556189, count)
-    wfcommons_reader.create_seismology_workflow(NUM_OF_TASKS, 4000, count)
+def _generate_workflows(wfcommons_reader, count, num_of_tasks, runtime_factor_map):
+    wfcommons_reader.create_blast_workflow(num_of_tasks, runtime_factor_map['blast'], count)
+    wfcommons_reader.create_bwa_workflow(num_of_tasks, runtime_factor_map['bwa'], count)
+    wfcommons_reader.create_cycles_workflow(num_of_tasks, runtime_factor_map['cycles'], count)
+    wfcommons_reader.create_genome_workflow(num_of_tasks, runtime_factor_map['genome'], count)
+    wfcommons_reader.create_soykb_workflow(num_of_tasks, runtime_factor_map['soykb'], count)
+    wfcommons_reader.create_srasearch_workflow(num_of_tasks, runtime_factor_map['srasearch'], count)
+    wfcommons_reader.create_montage_workflow(num_of_tasks, runtime_factor_map['montage'], count)
+    wfcommons_reader.create_seismology_workflow(num_of_tasks, runtime_factor_map['seismology'], count)
 
-def filter_workflows(wfcommons_reader, count, count_to_select):
+
+def _filter_workflows(wfcommons_reader, count, count_to_select, num_of_tasks, runtime_factor_map):
 
     assert count >= count_to_select
     
     for name, workflow_data in workflow_map.items():
 
-        workflows_stats = _get_critical_path_length_of(wfcommons_reader, workflow_data, count)
-        workflows_stats.sort(key=lambda x: x[1])
-        selected_workflows, exclude_list = select_middle_elements(workflows_stats, count, count_to_select)
-        _log_delete_list(name, exclude_list)
-        _delete_workflows_in(exclude_list, wfcommons_reader, workflow_data)
-        _rename_workflows_in(selected_workflows, wfcommons_reader, workflow_data)
+        runtime_factor = runtime_factor_map[name]
 
-def _get_critical_path_length_of(wfcommons_reader, workflow_data, count):
+        workflows_stats = _get_critical_path_length_of(wfcommons_reader, workflow_data, count, num_of_tasks, runtime_factor)
+        workflows_stats.sort(key=lambda x: x[1])
+        selected_workflows, exclude_list = _select_middle_elements(workflows_stats, count, count_to_select)
+        _log_delete_list(name, exclude_list)
+        _delete_workflows_in(exclude_list, wfcommons_reader, workflow_data, num_of_tasks, runtime_factor)
+        _rename_workflows_in(selected_workflows, wfcommons_reader, workflow_data, num_of_tasks, runtime_factor)
+
+def _get_critical_path_length_of(wfcommons_reader, workflow_data, count, num_of_tasks, runtime_factor):
     workflows_stats = []
 
     workflow_provider = workflow_data['reader'](wfcommons_reader)
     for index in range(count):
-        workflow = workflow_provider(workflow_data['tasks'], workflow_data['runtime_factor'], constant_power, index)
+        workflow = workflow_provider(num_of_tasks, runtime_factor, constant_power, index)
         critical_path_length = calc_critical_path_length(workflow)
 
         workflows_stats.append(
@@ -109,7 +120,7 @@ def _get_critical_path_length_of(wfcommons_reader, workflow_data, count):
 
     return workflows_stats
 
-def select_middle_elements(list_of_elements, count, count_to_select):
+def _select_middle_elements(list_of_elements, count, count_to_select):
     assert count >= count_to_select
 
     start = math.floor(
@@ -127,57 +138,53 @@ def _log_delete_list(workflow_name, exclude_list):
         print(f'{calc_critical_path_length}', end='\t')
     print()
 
-def _delete_workflows_in(exclude_list, wfcommons_reader, workflow_data):
+def _delete_workflows_in(exclude_list, wfcommons_reader, workflow_data, num_of_tasks, runtime_factor):
     for index, _ in exclude_list:
-        workflow_data['delete'](wfcommons_reader)(workflow_data['tasks'], workflow_data['runtime_factor'], index)
+        workflow_data['delete'](wfcommons_reader)(num_of_tasks, runtime_factor, index)
 
-def _rename_workflows_in(selected_workflows, wfcommons_reader, workflow_data):
+def _rename_workflows_in(selected_workflows, wfcommons_reader, workflow_data, num_of_tasks, runtime_factor):
 
     selected_workflows.sort(key=lambda x: x[0])
 
     new_index = 0
     for index, _ in selected_workflows:
-        workflow_data['change_index'](wfcommons_reader)(workflow_data['tasks'], workflow_data['runtime_factor'], index, new_index)
+        workflow_data['change_index'](wfcommons_reader)(num_of_tasks, runtime_factor, index, new_index)
         new_index += 1
 
 
 
-def show_stats(wfcommons_reader, count):
-    workflow_providers = [
-        ('blast', lambda index: wfcommons_reader.read_blast_workflow(1000, 11.4492900609, lambda: 1, index)),
-        ('bwa', lambda index: wfcommons_reader.read_bwa_workflow(1000, 52.2248138958, lambda: 1, index)),
-        ('cycles', lambda index: wfcommons_reader.read_cycles_workflow(1000, 31.0991735531, lambda: 1, index)),
-        ('genome', lambda index: wfcommons_reader.read_genome_workflow(1000, 35.7812995246, lambda: 1, index)),
-        ('soykb', lambda index: wfcommons_reader.read_soykb_workflow(1000, 3.85224364443, lambda: 1, index)),
-        ('srasearch', lambda index: wfcommons_reader.read_srasearch_workflow(1000, 1.26845637583, lambda: 1, index)),
-        ('montage', lambda index: wfcommons_reader.read_montage_workflow(1000, 11.17646556189, lambda: 1, index)),
-        ('seismology', lambda index: wfcommons_reader.read_seismology_workflow(1000, 4000, lambda: 1, index)),
-    ]
+def show_stats(wfcommons_reader, count, workflow_map, num_of_tasks, runtime_factor_map):
 
     separator = '\t'
 
-    headers = ['workflow', 'index', 'tasks', 'max_parallel_tasks', 'critical_path_length', 'min_makespan_lpt']
+    headers = ['workflow', 'index', 'tasks', 'max_parallel_tasks', 'min_makespan_lpt']
 
     print(separator.join(headers))
 
-    for name, workflow_provider in workflow_providers:
+    for name, workflow_data in workflow_map.items():
+        workflow_provider = workflow_data['reader'](wfcommons_reader)
+        runtime_factor = runtime_factor_map[name]
         for i in range(count):
-            workflow = workflow_provider(i)
+            workflow = workflow_provider(num_of_tasks, runtime_factor, constant_power, i)
 
             print(name, end=separator)
             print(i, end=separator)
             print(len(workflow.list_of_tasks()), end=separator)
             print(count_max_parallel_tasks(workflow), end=separator)
-            print(calc_critical_path_length(workflow), end=separator)
             print(estimate_min_makespan_with_enough_cores(workflow))
 
+
+def generate_workflows_for_experiments(count, count_to_select, num_of_tasks, runtime_factor_map):
+    wfcommons_reader = WfCommonsWorkflowReader(synthetic_path)
+
+    #_generate_workflows(wfcommons_reader, count, num_of_tasks, runtime_factor_map)
+    _filter_workflows(wfcommons_reader, count, count_to_select, num_of_tasks, runtime_factor_map)
+    show_stats(wfcommons_reader, count_to_select, workflow_map, num_of_tasks, runtime_factor_map)
 
 if __name__ == '__main__':
     count = 100
     count_to_select = 10
 
-    wfcommons_reader = WfCommonsWorkflowReader(synthetic_path)
+    #generate_workflows_for_experiments(count, count_to_select, num_of_tasks_bigger, runtime_factor_map_bigger)
+    generate_workflows_for_experiments(count, count_to_select, num_of_tasks_smaller, runtime_factor_map_smaller)
 
-    generate_workflows(wfcommons_reader, count)
-    filter_workflows(wfcommons_reader, count, count_to_select)
-    show_stats(wfcommons_reader, count_to_select)
