@@ -90,7 +90,7 @@ def task_flow_schedule(graph, clusters, show='None', max_power=None, chart_x_end
         show_draw_if(['last', 'all'])
 
         return scheduling
-
+    return None
 
 # def task_flow_schedule_old(graph, green_power, interval_size, show='None', max_power=None, chart_x_end=None, graph_boundaries=True):
 #
