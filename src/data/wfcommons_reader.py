@@ -15,7 +15,7 @@ def _create_graph_from_real_trace(task_file, random_power):
         graph = TaskGraph()
 
         start_task_id = '0'
-        graph.add_new_task(start_task_id, runtime=0, power=0)  # Dummy task
+        graph.add_new_task(start_task_id, runtime=1, power=0)  # Dummy task
         graph.set_start_task(start_task_id)
 
         task_runtimes = {}
@@ -26,14 +26,26 @@ def _create_graph_from_real_trace(task_file, random_power):
             task_name = task['id']
             task_runtimes[task_name] = runtime_is_seconds
 
-        tasks = data['workflow']['specification']['tasks']
+        tasks_specification = data['workflow']['specification']['tasks']
+        tasks = data['workflow']['execution']['tasks']
+
+        powers_task_category = {}
 
         for task in tasks:
-            runtime_is_seconds = task_runtimes[task['name']]
-            power = random_power()
-            graph.add_new_task(task['name'], runtime=runtime_is_seconds, power=power)
+            runtime_is_seconds = task_runtimes[task['id']]
+            if runtime_is_seconds == 0: # TODO
+                runtime_is_seconds = 1
 
-        for task in tasks:
+            task_category = task['command']['program']
+            if task_category not in powers_task_category:
+                power = random_power()
+                powers_task_category[task_category] = power
+            else:
+                power = powers_task_category[task_category]
+
+            graph.add_new_task(task['id'], runtime=runtime_is_seconds, power=power)
+
+        for task in tasks_specification:
             current_task_name = task['name']
             parents = task['parents']
             children = task['children']
@@ -115,6 +127,36 @@ def _create_wfcommons_graph(workflow_names, recipe):
 
 def _workflow_name_i(workflow_name, i):
     return workflow_name.replace('.json', f'-{i}.json')
+
+class WfCommonsRealWorkflowReader:
+
+    def __init__(self, real_traces_path):
+        self.real_traces_path = real_traces_path
+
+    def get_genome(self, random_power):
+        return _create_graph_from_real_trace(f'{self.real_traces_path}/1000genome-chameleon-22ch-250k-001.json', random_power)
+
+    def get_soykb(self, random_power):
+        return _create_graph_from_real_trace(f'{self.real_traces_path}/soykb-chameleon-50fastq-20ch-001.json', random_power)
+
+    def get_cycles(self, random_power):
+        return _create_graph_from_real_trace(f'{self.real_traces_path}/cycles-chameleon-10l-3c-12p-001.json', random_power)
+
+    def get_blast(self, random_power):
+        return _create_graph_from_real_trace(f'{self.real_traces_path}/blast-chameleon-large-005.json', random_power)
+
+    def get_bwa(self, random_power):
+        return _create_graph_from_real_trace(f'{self.real_traces_path}/bwa-chameleon-large-005.json', random_power)
+
+    def get_seismology(self, random_power):
+        return _create_graph_from_real_trace(f'{self.real_traces_path}/seismology-chameleon-1100p-001.json', random_power)
+
+    def get_montage(self, random_power):
+        return _create_graph_from_real_trace(f'{self.real_traces_path}/montage-chameleon-2mass-20d-001.json', random_power)
+
+    def get_srasearch(self, random_power):
+        return _create_graph_from_real_trace(f'{self.real_traces_path}/srasearch-chameleon-50a-005(1).json', random_power)
+
 
 class WfCommonsWorkflowReader:
 
