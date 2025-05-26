@@ -1,4 +1,5 @@
 from src.scheduling.algorithms.highest_power_first.highest_power_first import highest_power_first
+from src.scheduling.algorithms.lpt.longest_processing_time_first import lpt
 from src.scheduling.algorithms.task_flow.task_flow import task_flow_schedule
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
 from src.scheduling.model.cluster import create_single_machine_cluster
@@ -67,8 +68,8 @@ def create_graph():
     graph.set_start_task(1)
 
     graph.add_new_task(1, runtime=5, power=10)
-    graph.add_new_task(2, runtime=14, power=15)
-    graph.add_new_task(3, runtime=14, power=10)
+    graph.add_new_task(2, runtime=12, power=15)
+    graph.add_new_task(3, runtime=15, power=10)
     graph.add_new_task(4, runtime=20, power=30)
     graph.add_new_task(5, runtime=20, power=20)
 
@@ -95,14 +96,19 @@ def report_schedule(schedule, graph, last_task_id, clusters):
 
 def plot_highest_power_first_figure(graph, cluster):
     min_makespan = calc_critical_path_length(graph)
-    scheduling = highest_power_first(graph, min_makespan * 3, 0.5, [cluster], task_sort='energy', shift_mode='left', show='last', max_power=50)
+    scheduling = highest_power_first(graph, min_makespan * 3, 0.5, [cluster], task_sort='energy', shift_mode='left', show='all', max_power=35)
 
     report_schedule(scheduling, graph, 5, cluster)
 
 
-def plot_task_flow_figure(graph, cluster): #TODO!
+def plot_task_flow_figure(graph, cluster):
 
-    schedule = task_flow_schedule(graph, [cluster], show='last', max_power=50, chart_x_end=177, graph_boundaries=False)
+    schedule = task_flow_schedule(graph, [cluster], show='all', max_power=35, chart_x_end=180, graph_boundaries=False)
+    report_schedule(schedule, graph, 5, cluster)
+
+def plot_lpt_figure(graph, cluster):
+
+    schedule = lpt(graph, [cluster], show='last', max_power=35, chart_x_end=180)
     report_schedule(schedule, graph, 5, cluster)
 
 
@@ -110,5 +116,8 @@ if __name__ == '__main__':
     graph = create_graph()
     cluster = create_single_machine_cluster([5, 15, 35, 30, 25, 15, 8, 0, 5, 15, 15, 30, 40], 22)
 
-    #plot_highest_power_first_figure(graph, cluster)
-    plot_task_flow_figure(graph, cluster)
+    plot_highest_power_first_figure(graph, cluster)
+    #plot_task_flow_figure(graph, cluster)
+    #plot_lpt_figure(graph, cluster)
+
+
