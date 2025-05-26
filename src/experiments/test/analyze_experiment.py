@@ -5,6 +5,8 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import matplotlib.lines as mlines
 from matplotlib.gridspec import GridSpec, GridSpecFromSubplotSpec
 
+resources_path = '../../../resources/'
+
 workflows = [
     'blast',
      'bwa',
@@ -39,7 +41,7 @@ class Mapper:
         return self._get_color_and_marker(df_row, self.mapping)
 
 
-DEFAULT_SHAPE_SIZE = 25
+DEFAULT_SHAPE_SIZE = 35
 
 deadline_factor_map = Mapper(
     {
@@ -157,15 +159,29 @@ def _build_all_map():
 
     def _build_legend_lines():
         legend_lines = {}
-        for shift_mode, symbols in shift_symbols.items():
-            legend_lines[f'Shift {shift_mode}'] = ('black', symbols, DEFAULT_SHAPE_SIZE)
-
-        for task_ordering, color_tone_mapping in tasks_ordering_and_c_values_colors.items():
-            for c_value, color in color_tone_mapping.items():
-                legend_lines[f'{task_ordering} - {c_value}'] = (color, 'o', DEFAULT_SHAPE_SIZE)
 
         for deadline_factor, size in deadline_factor_sizes.items():
             legend_lines[f'Factor {deadline_factor}'] = ('black', 'o', size)
+
+        for shift_mode, symbols in shift_symbols.items():
+            if shift_mode == 'none':
+                label = 'No-shift'
+            else:
+                label = f'Shift-{shift_mode}'
+            legend_lines[label] = ('black', symbols, DEFAULT_SHAPE_SIZE)
+
+        for task_ordering, color_tone_mapping in tasks_ordering_and_c_values_colors.items():
+            for c_value, color in color_tone_mapping.items():
+
+                friendly_name_map = {
+                    'energy': 'Energy',
+                    'power': 'Power',
+                    'runtime': 'LPT',
+                    'runtime_ascending': 'SPT'
+                }
+                friendly_name = friendly_name_map[task_ordering]
+
+                legend_lines[f'{friendly_name} c={c_value}'] = (color, 'o', DEFAULT_SHAPE_SIZE)
 
         return legend_lines
 
@@ -248,13 +264,25 @@ def all_key(df_row):
     return f'{df_row.shift_mode}_{df_row.deadline_factor}_{str(df_row.c_value)}_{df_row.task_ordering}'
 
 
-def load_data():
-    resources_path = '../../../resources/'
-    relative_path = 'experiments-shift/experiments_2024-10-30_01-58-50/'
-    file_name = 'report_experiments_2024-10-30_01-58-50_data_aggregation.csv'
-
+def _load_data(resources_path, relative_path, file_name):
     file = f'{resources_path}{relative_path}{file_name}'
     return pd.read_csv(file)
+
+def load_data():
+    #return load_small_workflows_results()  # 200
+    return load_large_workflows_results()  # 1000
+
+
+def load_large_workflows_results():  # 1000
+    relative_path = 'experiments/experiments_2025-05-01_16-15-28/'
+    file_name = 'report_experiments_2025-05-01_16-15-28_consolidated.csv'
+    return _load_data(resources_path, relative_path, file_name)
+
+
+def load_small_workflows_results():  # 200 tasks
+    relative_path = 'experiments/experiments_2025-05-04_02-54-15/'
+    file_name = 'report_experiments_2025-05-04_02-54-15_consolidated.csv'
+    return _load_data(resources_path, relative_path, file_name)
 
 
 def get_canvas_workflow_by_trace(df, color_and_marker_getter=lambda x:('red', 'o', DEFAULT_SHAPE_SIZE)):
@@ -322,7 +350,7 @@ def plot_all_workflows(mapper, power_distribution, legend_mapper=None):
     if power_distribution is not None:
         df = df[df['power_distribution'] == power_distribution]
 
-    fig, ax = plt.subplots(n_rows, n_cols, figsize=(10, 5))
+    fig, ax = plt.subplots(n_rows, n_cols, figsize=(40, 20))
 
     g_row = 0
     g_col = 0
@@ -357,6 +385,117 @@ def plot_all_workflows(mapper, power_distribution, legend_mapper=None):
 
     #plt.legend(handles=handles, loc='upper center', bbox_to_anchor=(-1, -0.1), ncol=len(mapper.mapping))
     fig.tight_layout(pad=0)
+    plt.savefig("teste.svg")
+    plt.show()
+
+
+def _apply_filters(filters, df):
+    df_workflow = df[df['workflow'] == filters['workflow']]
+    df_workflow = df_workflow[df_workflow['power_distribution'] == filters['power_distribution']]
+
+    for filter_name, values in filters['multi-value-filters'].items():
+        df_workflow = df_workflow[df_workflow[filter_name].isin(values)]
+
+    return df_workflow
+
+def plot_workflows_comparations(mapper, legend_mapper):
+
+
+    name_map = {
+        'genome': '                  1000Genome',
+        'cycles': '            Cycles',
+        'blast': '             BLAST',
+        'srasearch': '                SRA Search',
+    }
+
+    filters_list = [
+        {
+            'workflow': 'genome',
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'shift_mode': ['none'],
+                'task_ordering': ['energy']
+            }
+        },
+        {
+            'workflow': 'cycles',
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'shift_mode': ['none', 'left', 'right-left'],
+                'c_value': [0.8],
+                'deadline_factor': [8]
+            }
+        },
+        {
+            'workflow': 'blast',
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'shift_mode': ['none', 'right-left'],
+                'task_ordering': ['runtime_ascending'],
+                'deadline_factor': [8],
+            }
+        },
+        {
+            'workflow': 'srasearch',
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'shift_mode': ['none'],
+                'deadline_factor': [8],
+            }
+        }
+    ]
+
+    n_rows = 2
+    n_cols = 4
+
+    large_workflows_df = load_large_workflows_results()
+    small_workflows_df = load_small_workflows_results()
+
+    #fig, ax = plt.subplots(n_rows, n_cols, figsize=(20, 10))
+    fig = plt.figure(figsize=(40, 20))
+
+    gs_main = GridSpec(n_rows, n_cols, figure=fig, hspace=0.2, wspace=0.2)
+
+
+    letters_by_row_and_column = [
+        ['a)', 'b)', 'c)', 'd)'],
+        ['e)', 'f)', 'g)', 'h)']
+    ]
+    title_font_size = 20
+
+    g_col = 0
+    for filters in filters_list:
+        large_workflows_df_filtered = _apply_filters(filters, large_workflows_df)
+
+        gs_nested = GridSpecFromSubplotSpec(2, 2, subplot_spec=gs_main[0, g_col], hspace=0, wspace=0)
+        axs = gs_nested.subplots(sharex='col', sharey='row')
+
+        axs[0][0].set_title(
+            name_map[filters['workflow']],
+            fontsize=title_font_size
+        )
+        if g_col == 0:
+            axs[0][0].set_ylabel('1.000 Tasks        ', fontsize=title_font_size)
+
+        _add_subplot_of_traces(large_workflows_df_filtered, axs, color_and_marker_getter=mapper.get_color_and_marker,
+                               controller=None, sub_plot_id=letters_by_row_and_column[0][g_col])
+
+
+        small_workflows_df_filtered = _apply_filters(filters, small_workflows_df)
+
+        gs_nested = GridSpecFromSubplotSpec(2, 2, subplot_spec=gs_main[1, g_col], hspace=0, wspace=0)
+        axs = gs_nested.subplots(sharex='col', sharey='row')
+        _add_subplot_of_traces(small_workflows_df_filtered, axs, color_and_marker_getter=mapper.get_color_and_marker,
+                               controller=None, sub_plot_id=letters_by_row_and_column[1][g_col], show_legends=g_col==0)
+        if g_col == 0:
+            axs[0][0].set_ylabel('200 Tasks', fontsize=title_font_size)
+
+        g_col +=1
+
+    _create_legend_for_dynamic(fig, legend_mapper, None, frameon=False)
+
+    fig.tight_layout(pad=0)
+    plt.savefig("teste.svg")
     plt.show()
 
 
@@ -529,7 +668,7 @@ def show_dynamic_plot(mapper, power_distribution, legend_mapper=None, controller
     plt.show()
 
 
-def _add_subplot_of_traces(df, axs, color_and_marker_getter=lambda x:('red', 'o', DEFAULT_SHAPE_SIZE), controller=None):
+def _add_subplot_of_traces(df, axs, color_and_marker_getter=lambda x:('red', 'o', DEFAULT_SHAPE_SIZE), controller=None, sub_plot_id=None, show_legends=False):
 
     n_rows = 2
     n_cols = 2
@@ -545,6 +684,14 @@ def _add_subplot_of_traces(df, axs, color_and_marker_getter=lambda x:('red', 'o'
 
         ax = axs[g_row, g_col]
 
+        if sub_plot_id and g_row == g_col == 0:
+            ax.text(0.04, 0.96, sub_plot_id,
+                    transform=ax.transAxes,  # Use axes coordinates
+                    fontsize=15,  # Font size of the title
+                    verticalalignment='top',  # Align text to the top
+                    horizontalalignment='left',  # Align text to the left
+                    )
+
         ax.text(0.96, 0.96, trace,
                 transform=ax.transAxes,  # Use axes coordinates
                 fontsize=10,  # Font size of the title
@@ -552,10 +699,10 @@ def _add_subplot_of_traces(df, axs, color_and_marker_getter=lambda x:('red', 'o'
                 horizontalalignment='right',  # Align text to the right
                 bbox=dict(facecolor='white', alpha=0.6))
 
-        if g_row == 0:
-            ax.set_xlabel('Makespan (minutes)')
 
-        if g_col == n_cols - 1:
+
+        if show_legends and g_row == 1 and g_col == 0:
+            ax.set_xlabel('Makespan (minutes)')
             ax.set_ylabel('Brown energy (kJ)')
 
         for row in df_workflow.itertuples(index=True, name='Pandas'):
@@ -595,7 +742,7 @@ def _get_on_legend_click(legend, legend_mapper, controller, fig):
     return on_legend_click
 
 
-def _create_legend_for_dynamic(fig, legend_mapper, controller, pickradius=5):
+def _create_legend_for_dynamic(fig, legend_mapper, controller, pickradius=5, frameon=True):
 
     # Draw legend
     handles = []
@@ -603,7 +750,7 @@ def _create_legend_for_dynamic(fig, legend_mapper, controller, pickradius=5):
         color, shape, size = d
         handle = mlines.Line2D([], [], color=color, marker=shape, linestyle='None', markersize=size / 10, label=label)
         handles.append(handle)
-    legend = plt.legend(handles=handles, loc='upper left', bbox_to_anchor=(-7.1, -0.1), ncol=9)
+    legend = plt.legend(handles=handles, loc='upper left', bbox_to_anchor=(-7.1, -0.1), ncol=6, frameon=frameon)
     #legend = plt.legend(handles=handles, ncol=9)
 
     legend.set_draggable(True)
@@ -638,4 +785,6 @@ if __name__ == '__main__':
     #plot_all_workflows(all_map, 'gaussian')
     #plot_all_workflows(all_map, 'inverted_exponential')
 
-    show_dynamic_plot(all_map, 'uniform', legend_lines, AxeVisibilityController())
+    #show_dynamic_plot(all_map, 'uniform', legend_lines, AxeVisibilityController())
+
+    plot_workflows_comparations(all_map, legend_lines)

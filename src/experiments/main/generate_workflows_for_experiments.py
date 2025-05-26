@@ -178,13 +178,13 @@ def generate_workflows_for_experiments(count, count_to_select, num_of_tasks, run
     wfcommons_reader = WfCommonsWorkflowReader(synthetic_path)
 
     #_generate_workflows(wfcommons_reader, count, num_of_tasks, runtime_factor_map)
-    _filter_workflows(wfcommons_reader, count, count_to_select, num_of_tasks, runtime_factor_map)
+    #_filter_workflows(wfcommons_reader, count, count_to_select, num_of_tasks, runtime_factor_map)
     show_stats(wfcommons_reader, count_to_select, workflow_map, num_of_tasks, runtime_factor_map)
 
 if __name__ == '__main__':
     count = 100
     count_to_select = 10
 
-    #generate_workflows_for_experiments(count, count_to_select, num_of_tasks_bigger, runtime_factor_map_bigger)
-    generate_workflows_for_experiments(count, count_to_select, num_of_tasks_smaller, runtime_factor_map_smaller)
+    generate_workflows_for_experiments(count, count_to_select, num_of_tasks_bigger, runtime_factor_map_bigger)
+    #generate_workflows_for_experiments(count, count_to_select, num_of_tasks_smaller, runtime_factor_map_smaller)
 
