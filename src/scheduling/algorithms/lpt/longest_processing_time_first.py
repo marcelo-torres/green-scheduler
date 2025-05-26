@@ -1,14 +1,26 @@
+from src.scheduling.algorithms.highest_power_first.drawer.highest_power_first_drawer import draw_scheduling
 from src.scheduling.util.lpt_topological_sort import LtpTopologicalSort
 
 
-def lpt(graph, clusters):
+def lpt(graph, clusters, show='None', max_power=None, chart_x_end=None):
 
     cluster = clusters[0] # TODO - implement multi-cluster
     machines = cluster.machines_list
 
     schedule = {}
-
     sorter = LtpTopologicalSort(graph)
+
+    def show_draw_if(conditions):
+        if show in conditions:
+            green_power = clusters[0].power_series.green_power_list
+            interval_size = clusters[0].power_series.interval_length
+
+            x_end = chart_x_end
+            drawer = draw_scheduling(0, 0, 0, 0, x_end, green_power, interval_size, schedule, graph,
+                                     max_power=max_power, show_boundaries=False)
+            drawer.show()
+
+
 
     for task in sorter.get_lpt_topological_list():
 
@@ -25,6 +37,9 @@ def lpt(graph, clusters):
 
         min_machine.schedule_task(task, min_start)
         schedule[task.id] = min_start, min_machine.id
+        show_draw_if(['all'])
+
+    show_draw_if(['last', 'all'])
 
     return schedule
 
