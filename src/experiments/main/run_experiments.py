@@ -3,13 +3,11 @@ from datetime import datetime
 
 from src.data.photovolta import PhotovoltaReader
 from src.data.wfcommons_reader import WfCommonsWorkflowReader
-from src.experiments.ParallelExperimentExecutor import ParallelExperimentExecutor
-from src.experiments.main.experiment_file_helper import create_csv_file, write_reports_to_csv
-from src.experiments.main.generate_workflows_for_experiments import runtime_factor_map_bigger, num_of_tasks_bigger, \
-    num_of_tasks_smaller, runtime_factor_map_smaller
-from src.experiments.random_utils import RandomProvider
-from src.scheduling.algorithms.highest_power_first.highest_power_first import highest_power_first, BOUNDARY_DEFAULT, \
-    BOUNDARY_SINGLE
+from src.experiments.shared.ParallelExperimentExecutor import ParallelExperimentExecutor
+from src.experiments.shared.experiment_file_helper import create_csv_file, write_reports_to_csv
+from src.experiments.main.generate_workflows_for_experiments import num_of_tasks_smaller, runtime_factor_map_smaller
+from src.experiments.shared.random_utils import RandomProvider
+from src.scheduling.algorithms.bounded_boundary_search.bounded_boundary_search import bbs, BOUNDARY_SINGLE
 from src.scheduling.algorithms.lpt.longest_processing_time_first import lpt
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
 from src.scheduling.model.cluster import Cluster
@@ -84,7 +82,7 @@ def schedule_and_report(graph, green_power, interval_size, min_makespan, deadlin
 
     cluster = cluster_factory()
 
-    scheduling = highest_power_first(graph, deadline, c, [cluster], task_sort=task_ordering, shift_mode=shift_mode, boundary_strategy=boundary_strategy, show=show)
+    scheduling = bbs(graph, deadline, c, [cluster], task_sort=task_ordering, shift_mode=shift_mode, boundary_strategy=boundary_strategy, show=show)
 
     energy_calculator = EnergyUsageCalculator(green_power, interval_size)
     scheduling_report = report_scheduling(scheduling, graph, energy_calculator, print_resport=print_resport)

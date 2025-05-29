@@ -1,5 +1,5 @@
-from src.scheduling.algorithms.highest_power_first.boundaries.single_machine.boundary import BoundaryCalculator
-from src.scheduling.algorithms.highest_power_first.drawer.highest_power_first_drawer import draw_scheduling
+from src.scheduling.algorithms.bounded_boundary_search.boundaries.single_machine.boundary import BoundaryCalculator
+from src.scheduling.algorithms.bounded_boundary_search.drawer.bounded_boundary_search_drawer import draw_scheduling
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
 from src.scheduling.energy.find_min_brown_energy import find_min_brown_energy
 from src.scheduling.util.slack_time_calculator import compute_min_start_time, calculate_slack_time

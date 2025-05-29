@@ -47,7 +47,7 @@ class Drawer:
 
     BOUNDARY_HEIGHT = 5
 
-    def __init__(self, height, width, color_palette=COLORBLIND_FRIENDLY_PALETTE, show_boundaries=True):
+    def __init__(self, height, width, color_palette=COLORBLIND_FRIENDLY_PALETTE, show_boundaries=True, show_legends=False):
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111)
 
@@ -56,22 +56,22 @@ class Drawer:
 
         self.color_palette = color_palette
         self.show_boundaries = show_boundaries
+        self.show_legends = show_legends
 
     def add_constant_boundary(self, start, width):
-        rect = patches.Rectangle((start, -Drawer.BOUNDARY_HEIGHT), width, Drawer.BOUNDARY_HEIGHT, linewidth=1, edgecolor=self.color_palette.constant_boundary_edge, facecolor=self.color_palette.constant_boundary_face)
+        rect = self._build_constant_boundary_rectangle((start, -Drawer.BOUNDARY_HEIGHT), width, Drawer.BOUNDARY_HEIGHT)
         self.ax.add_patch(rect)
 
     def add_variable_boundary(self, start, width):
-        rect = patches.Rectangle((start, -Drawer.BOUNDARY_HEIGHT), width, Drawer.BOUNDARY_HEIGHT, linewidth=1, edgecolor=self.color_palette.variable_boundary_edge, facecolor=self.color_palette.variable_boundary_face, hatch='x')
+        rect = self._build_variable_boundary_rectangle((start, -Drawer.BOUNDARY_HEIGHT), width, Drawer.BOUNDARY_HEIGHT)
         self.ax.add_patch(rect)
 
     def add_green_energy_availability(self, start, width, power):
-        rect = patches.Rectangle((start, 0), width, power, linewidth=1, edgecolor=self.color_palette.energy_edge, facecolor=self.color_palette.energy_face, hatch='///')
+        rect = self._build_green_energy_rectangle((start, 0), width, power)
         self.ax.add_patch(rect)
 
     def add_scheduled_task(self, start, task, y, include_task_id=True):
-
-        rect = patches.Rectangle((start, y), task.runtime, task.power, linewidth=1, edgecolor=self.color_palette.task_edge, facecolor=self.color_palette.task_face)
+        rect = self._build_task_rectangle((start, y), task.runtime, task.power)
 
         if include_task_id:
             rx, ry = rect.get_xy()
@@ -103,9 +103,52 @@ class Drawer:
 
         self.ax.add_patch(rect)
 
+    def _build_constant_boundary_rectangle(self, xy, width, height):
+        return patches.Rectangle(xy, width, height, linewidth=1, edgecolor=self.color_palette.constant_boundary_edge, facecolor=self.color_palette.constant_boundary_face)
+
+    def _build_variable_boundary_rectangle(self, xy, width, height):
+        return patches.Rectangle(xy, width, height, linewidth=1, edgecolor=self.color_palette.variable_boundary_edge, facecolor=self.color_palette.variable_boundary_face, hatch='x')
+
+    def _build_green_energy_rectangle(self, xy, width, height):
+        return patches.Rectangle(xy, width, height, linewidth=1, edgecolor=self.color_palette.energy_edge, facecolor=self.color_palette.energy_face, hatch='///')
+
+    def _build_task_rectangle(self, xy, width, height):
+        return patches.Rectangle(xy, width, height, linewidth=1, edgecolor=self.color_palette.task_edge, facecolor=self.color_palette.task_face)
+
+    def _show_legend(self):
+        width = 5
+        heigh = 5
+
+        markers = [
+            self._build_task_rectangle((0, 0), width, heigh),
+            self._build_green_energy_rectangle((0, 0), width, heigh),
+        ]
+
+        boundary_markers = [
+            self._build_constant_boundary_rectangle((0, 0), width, heigh),
+            self._build_variable_boundary_rectangle((0, 0), width, heigh),
+        ]
+
+        legend_text = [
+            'Scheduled Task',
+            'Renewable Power',
+        ]
+
+        boundary_legend_text = [
+            'Constant Boundary',
+            'Variable Boundary',
+        ]
+
+        if self.show_boundaries:
+            markers.extend(boundary_markers)
+            legend_text.extend(boundary_legend_text)
+
+        self.ax.legend(markers, legend_text)
+
     def _plot(self):
         y_start = -Drawer.BOUNDARY_HEIGHT if self.show_boundaries else 0
-
+        if self.show_legends:
+            self._show_legend()
         plt.xlim([0, self.width])
         plt.ylim([y_start, self.height + Drawer.BOUNDARY_HEIGHT])
         plt.xlabel('Time (s)')
