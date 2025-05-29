@@ -109,7 +109,7 @@ def _create_clusters(graph, deadline_factor):
     # intervals = math.ceil(critical_path_length / 10)
     # green_power_list = [random.uniform(MIN_POWER-1, MAX_POWER) for i in range(intervals)]
 
-    resources_path = '../../../resources'
+    resources_path = '../../../../resources'
     photovolta_reader = PhotovoltaReader(resources_path)
     green_power_list = photovolta_reader.get_trace_1(size=10)
 

@@ -1,11 +1,9 @@
 import csv
 import itertools
-import math
 import random
 import statistics
 
 from src.data.photovolta import PhotovoltaReader
-from src.experiments.test.run_experiments import create_dir
 from src.scheduling.algorithms.highest_power_first.highest_power_first import highest_power_first
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
 from src.scheduling.model.cluster import Cluster
@@ -111,7 +109,7 @@ def _create_clusters(graph, deadline_factor):
     # intervals = math.ceil(critical_path_length / 10)
     # green_power_list = [random.uniform(MIN_POWER-1, MAX_POWER) for i in range(intervals)]
 
-    resources_path = '../../../resources'
+    resources_path = '../../../../resources'
     photovolta_reader = PhotovoltaReader(resources_path)
     green_power_list = photovolta_reader.get_trace_1(size=10)
 
