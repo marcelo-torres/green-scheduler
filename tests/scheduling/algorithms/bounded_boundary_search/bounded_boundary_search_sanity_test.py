@@ -3,14 +3,14 @@ import math
 import random
 import unittest
 
-from src.scheduling.algorithms.highest_power_first.highest_power_first import highest_power_first
+from src.scheduling.algorithms.bounded_boundary_search.bounded_boundary_search import bbs
 from src.scheduling.model.cluster import Cluster
 from src.scheduling.model.machine_factory import create_machines_with_target
 from src.scheduling.model.power_series import PowerSeries
 from src.scheduling.util.critical_path_length_calculator import calc_critical_path_length
 from src.scheduling.util.makespan_estimator import estimate_min_makespan
 from src.scheduling.util.scheduling_check import check
-from tests.scheduling.algorithms.highest_power_first.highest_power_first_sanity_test_data import load_workflows
+from tests.scheduling.algorithms.bounded_boundary_search.bounded_boundary_search_sanity_test_data import load_workflows
 
 MIN_POWER = 1
 MAX_POWER = 5
@@ -26,7 +26,7 @@ class HighestPowerFirstSanityTest(unittest.TestCase):
 
                 graph = workflow_provider[1](uniform)
                 clusters, deadline = self._create_clusters(graph, 1)
-                schedule = highest_power_first(graph, deadline, 0.8, clusters, task_sort='energy', shift_mode='right-left')
+                schedule = bbs(graph, deadline, 0.8, clusters, task_sort='energy', shift_mode='right-left')
 
                 violations = check(schedule, graph)
                 self.assertEqual(0, len(violations))
@@ -49,7 +49,7 @@ class HighestPowerFirstSanityTest(unittest.TestCase):
 
                 graph = workflow_provider[1](uniform)
                 clusters, deadline = self._create_clusters(graph, d)
-                schedule = highest_power_first(graph, deadline, c, clusters, task_sort=ordering, shift_mode=shift)
+                schedule = bbs(graph, deadline, c, clusters, task_sort=ordering, shift_mode=shift)
 
                 violations = check(schedule, graph)
                 self.assertEqual(0, len(violations))

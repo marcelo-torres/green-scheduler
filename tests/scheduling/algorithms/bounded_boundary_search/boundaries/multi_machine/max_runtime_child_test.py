@@ -1,6 +1,6 @@
 import unittest
 
-from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.max_runtime_child import \
+from src.scheduling.algorithms.bounded_boundary_search.boundaries.multi_machine.max_runtime_child import \
     calc_max_runtime_child, sort_by_max_runtime_unschedule
 from src.scheduling.model.task_graph import TaskGraph
 from tests.scheduling.graph_utils import get_pipeline_graph, get_parallel_graph

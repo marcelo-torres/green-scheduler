@@ -4,7 +4,7 @@ from src.experiments.main.makespan_estimator_impl import estimate_min_makespan_b
     OPTION_PATH_LPT
 from src.experiments.main.run_experiments import SEED, MIN_TASK_POWER_DEFAULT, MAX_TASK_POWER_DEFAULT
 from src.experiments.random_utils import RandomProvider
-from src.scheduling.algorithms.highest_power_first.highest_power_first import highest_power_first, BOUNDARY_LPT, \
+from src.scheduling.algorithms.bounded_boundary_search.bounded_boundary_search import bbs, BOUNDARY_LPT, \
     BOUNDARY_DEFAULT, BOUNDARY_LPT_PATH, BOUNDARY_LPT_FULL
 from src.scheduling.model.cluster import Cluster
 from src.scheduling.model.machine import Machine
@@ -135,8 +135,8 @@ def calc_min_makespans_of_workflows(resources_path, synthetic_path):
         print(f'deadline: {deadline}s')
 
         try:
-            scheduling = highest_power_first(workflow, deadline, 0.0, [cluster], task_sort='energy', shift_mode='none',
-                                             boundary_strategy=boundary_strategy)
+            scheduling = bbs(workflow, deadline, 0.0, [cluster], task_sort='energy', shift_mode='none',
+                             boundary_strategy=boundary_strategy)
 
             makespan = calc_makespan(scheduling, workflow)
             print(f'makespan: {makespan}s')

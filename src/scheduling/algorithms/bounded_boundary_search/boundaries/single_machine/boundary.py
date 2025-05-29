@@ -1,4 +1,4 @@
-from src.scheduling.algorithms.highest_power_first.boundaries.single_machine.constant_boundary import calculate_left_boundary, \
+from src.scheduling.algorithms.bounded_boundary_search.boundaries.single_machine.constant_boundary import calculate_left_boundary, \
     calculate_right_boundary
 from src.scheduling.util.calc_levels import calc_levels
 

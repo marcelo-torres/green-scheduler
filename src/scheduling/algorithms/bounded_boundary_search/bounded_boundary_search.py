@@ -1,8 +1,8 @@
-from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.multi_machine_boundary import \
+from src.scheduling.algorithms.bounded_boundary_search.boundaries.multi_machine.multi_machine_boundary import \
     MultiMachineBoundaryCalculator
-from src.scheduling.algorithms.highest_power_first.boundaries.single_machine.boundary import BoundaryCalculator
-from src.scheduling.algorithms.highest_power_first.drawer.highest_power_first_drawer import draw_scheduling
-from src.scheduling.algorithms.highest_power_first.shift_left.shift import shift_tasks_to_save_energy
+from src.scheduling.algorithms.bounded_boundary_search.boundaries.single_machine.boundary import BoundaryCalculator
+from src.scheduling.algorithms.bounded_boundary_search.drawer.bounded_boundary_search_drawer import draw_scheduling
+from src.scheduling.algorithms.bounded_boundary_search.shift_left.shift import shift_tasks_to_save_energy
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
 from src.scheduling.util.schedule_in_min_brown_energy import schedule_min_brown_energy_min_start
 
@@ -27,8 +27,8 @@ def _get_task_ordering(key):
     task_ordering = {
         'energy': lambda t: t.power * t.runtime,
         'power': lambda t: t.power,
-        'runtime': lambda t: t.runtime,
-        'runtime_ascending': lambda t: -t.runtime,
+        'runtime': lambda t: t.runtime, #LPT
+        'runtime_ascending': lambda t: -t.runtime, #SPT
     }
 
     return task_ordering[key]
@@ -65,8 +65,8 @@ def _apply_shift(shift_mode, graph, scheduling, machines, boundary_calc, deadlin
 
     return previous_scheduling
 
-
-def highest_power_first(
+# TODO - rename to bbs
+def bbs(
         graph, deadline, c, clusters,
         task_sort=TASK_SORT_ENERGY,
         shift_mode=SHIFT_MODE_LEFT,

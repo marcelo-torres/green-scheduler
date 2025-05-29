@@ -4,7 +4,7 @@ from src.data.photovolta import PhotovoltaReader
 from src.data.wfcommons_reader import WfCommonsRealWorkflowReader
 from src.experiments.random_utils import RandomProvider
 
-from src.scheduling.algorithms.highest_power_first.highest_power_first import highest_power_first, BOUNDARY_SINGLE, \
+from src.scheduling.algorithms.bounded_boundary_search.bounded_boundary_search import bbs, BOUNDARY_SINGLE, \
     SHIFT_MODE_RIGHT_LEFT, TASK_SORT_ENERGY, SHIFT_MODE_LEFT, SHIFT_MODE_NONE
 from src.scheduling.algorithms.lpt.longest_processing_time_first import lpt
 from src.scheduling.algorithms.task_flow.task_flow import task_flow_schedule
@@ -61,24 +61,24 @@ def _compare_schedulers(workflow, power_series):
     deadline = runtime_factor * lpt_makespan
 
     cluster = _create_cluster(num_of_cores, power_series)
-    bbs_schedule_shift_right_left = highest_power_first(workflow, deadline, 0.0, [cluster],
-        task_sort=TASK_SORT_ENERGY,
-        shift_mode=SHIFT_MODE_RIGHT_LEFT,
-        boundary_strategy=BOUNDARY_SINGLE)
+    bbs_schedule_shift_right_left = bbs(workflow, deadline, 0.0, [cluster],
+                                        task_sort=TASK_SORT_ENERGY,
+                                        shift_mode=SHIFT_MODE_RIGHT_LEFT,
+                                        boundary_strategy=BOUNDARY_SINGLE)
     bbs_right_left_brown_energy_used, _, _, bbs_right_left_makespan, bbs_right_left_start_time = _calculate_metricts(bbs_schedule_shift_right_left, workflow, power_series)
 
     cluster = _create_cluster(num_of_cores, power_series)
-    bbs_schedule_shift_left = highest_power_first(workflow, deadline, 0.0, [cluster],
-                                                        task_sort=TASK_SORT_ENERGY,
-                                                        shift_mode=SHIFT_MODE_LEFT,
-                                                        boundary_strategy=BOUNDARY_SINGLE)
+    bbs_schedule_shift_left = bbs(workflow, deadline, 0.0, [cluster],
+                                  task_sort=TASK_SORT_ENERGY,
+                                  shift_mode=SHIFT_MODE_LEFT,
+                                  boundary_strategy=BOUNDARY_SINGLE)
     bbs_left_brown_energy_used, _, _, bbs_left_makespan, bbs_left_start_time = _calculate_metricts(bbs_schedule_shift_left, workflow, power_series)
 
     cluster = _create_cluster(num_of_cores, power_series)
-    bbs_schedule_shift_none = highest_power_first(workflow, deadline, 0.8, [cluster],
-                                                        task_sort=TASK_SORT_ENERGY,
-                                                        shift_mode=SHIFT_MODE_NONE,
-                                                        boundary_strategy=BOUNDARY_SINGLE)
+    bbs_schedule_shift_none = bbs(workflow, deadline, 0.8, [cluster],
+                                  task_sort=TASK_SORT_ENERGY,
+                                  shift_mode=SHIFT_MODE_NONE,
+                                  boundary_strategy=BOUNDARY_SINGLE)
     bbs_none_brown_energy_used, _, _, bbs_none_makespan, bbs_none_time = _calculate_metricts(bbs_schedule_shift_none, workflow, power_series)
 
 

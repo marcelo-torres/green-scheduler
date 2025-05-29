@@ -4,7 +4,7 @@ import random
 import statistics
 
 from src.data.photovolta import PhotovoltaReader
-from src.scheduling.algorithms.highest_power_first.highest_power_first import highest_power_first
+from src.scheduling.algorithms.bounded_boundary_search.bounded_boundary_search import bbs
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
 from src.scheduling.model.cluster import Cluster
 from src.scheduling.model.machine_factory import create_machines_with_target
@@ -13,7 +13,7 @@ from src.scheduling.util.critical_path_length_calculator import calc_critical_pa
 from src.scheduling.util.makespan_calculator import calc_makespan
 from src.scheduling.util.makespan_estimator import estimate_min_makespan
 from src.scheduling.util.scheduling_check import check
-from tests.scheduling.algorithms.highest_power_first.highest_power_first_sanity_test_data import load_workflows
+from tests.scheduling.algorithms.bounded_boundary_search.bounded_boundary_search_sanity_test_data import load_workflows
 
 MIN_POWER = 5
 MAX_POWER = 50
@@ -52,7 +52,7 @@ def run_experiments():
 
             graph = workflow_provider[1](uniform)
             clusters, deadline = _create_clusters(graph, d)
-            schedule = highest_power_first(graph, deadline, c, clusters, task_sort=ordering, shift_mode=shift, use_sort_scheduled=use_sort_scheduled)
+            schedule = bbs(graph, deadline, c, clusters, task_sort=ordering, shift_mode=shift, use_sort_scheduled=use_sort_scheduled)
 
             violations = check(schedule, graph)
             assert len(violations) == 0

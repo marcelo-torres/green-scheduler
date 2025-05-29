@@ -1,4 +1,4 @@
-from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.max_runtime_child import \
+from src.scheduling.algorithms.bounded_boundary_search.boundaries.multi_machine.max_runtime_child import \
     sort_by_max_runtime_unschedule
 
 

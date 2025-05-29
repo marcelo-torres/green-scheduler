@@ -3,7 +3,7 @@ import random
 
 from src.data.photovolta import PhotovoltaReader
 from src.data.wfcommons_reader import WfCommonsRealWorkflowReader
-from src.scheduling.algorithms.highest_power_first.highest_power_first import highest_power_first, SHIFT_MODE_NONE, \
+from src.scheduling.algorithms.bounded_boundary_search.bounded_boundary_search import bbs, SHIFT_MODE_NONE, \
     TASK_SORT_ENERGY, BOUNDARY_SINGLE
 from src.scheduling.algorithms.lpt.longest_processing_time_first import lpt
 from src.scheduling.drawer.task_graph_drawer import draw_task_graph
@@ -71,11 +71,11 @@ def run_example():
     c = 0.3
     df = 4
 
-    schedule = highest_power_first(graph, min_makespan * df, c, [cluster],
-                                         task_sort=TASK_SORT_ENERGY,  # TASK_SORT_POWER, TASK_SORT_RUNTIME, TASK_SORT_RUNTIME_ASCENDING
-                                         shift_mode=SHIFT_MODE_NONE,  # SHIFT_MODE_LEFT or SHIFT_MODE_RIGHT_LEFT,
-                                         show='all'  #  'last' to show only last step
-                                     )
+    schedule = bbs(graph, min_makespan * df, c, [cluster],
+                   task_sort=TASK_SORT_ENERGY,  # TASK_SORT_POWER, TASK_SORT_RUNTIME, TASK_SORT_RUNTIME_ASCENDING
+                   shift_mode=SHIFT_MODE_NONE,  # SHIFT_MODE_LEFT or SHIFT_MODE_RIGHT_LEFT,
+                   show='all'  #  'last' to show only last step
+                   )
     check_integrity(schedule, graph)
     report(schedule, graph, power_series)
 
@@ -107,13 +107,13 @@ def run_real_workflow():
     lpt_schedule = lpt(workflow, [cluster])
     min_makespan = calc_makespan(lpt_schedule, workflow)
 
-    schedule = highest_power_first(workflow, min_makespan * df, c, [cluster],
-                                   task_sort=TASK_SORT_ENERGY,
-                                   # TASK_SORT_POWER, TASK_SORT_RUNTIME, TASK_SORT_RUNTIME_ASCENDING
-                                   shift_mode=SHIFT_MODE_NONE,  # SHIFT_MODE_LEFT or SHIFT_MODE_RIGHT_LEFT,
-                                   boundary_strategy=BOUNDARY_SINGLE,
-                                   show='last'  # 'all' to show every step
-                                   )
+    schedule = bbs(workflow, min_makespan * df, c, [cluster],
+                   task_sort=TASK_SORT_ENERGY,
+                   # TASK_SORT_POWER, TASK_SORT_RUNTIME, TASK_SORT_RUNTIME_ASCENDING
+                   shift_mode=SHIFT_MODE_NONE,  # SHIFT_MODE_LEFT or SHIFT_MODE_RIGHT_LEFT,
+                   boundary_strategy=BOUNDARY_SINGLE,
+                   show='last'  # 'all' to show every step
+                   )
 
     check_integrity(schedule, workflow)
     report(schedule, workflow, power_series)

@@ -1,4 +1,4 @@
-from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.multi_machine_shared import \
+from src.scheduling.algorithms.bounded_boundary_search.boundaries.multi_machine.multi_machine_shared import \
     create_sort_by_max_successor_runtime, unschedule
 from src.scheduling.util.find_start import find_max_start_machine
 

@@ -1,4 +1,4 @@
-from src.scheduling.algorithms.highest_power_first.drawer.highest_power_first_drawer import draw_scheduling
+from src.scheduling.algorithms.bounded_boundary_search.drawer.bounded_boundary_search_drawer import draw_scheduling
 from src.scheduling.util.lpt_topological_sort import LtpTopologicalSort
 
 

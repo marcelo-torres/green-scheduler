@@ -1,6 +1,6 @@
-from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.lpt_boundary_estimator import \
+from src.scheduling.algorithms.bounded_boundary_search.boundaries.multi_machine.lpt_boundary_estimator import \
     LptBoundaryEstimator
-from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.multi_machine_constant_left_boundary import \
+from src.scheduling.algorithms.bounded_boundary_search.boundaries.multi_machine.multi_machine_constant_left_boundary import \
     calculate_constant_left_boundary
 from src.scheduling.algorithms.lpt.longest_processing_time_first import lpt
 from src.scheduling.model.cluster import Cluster

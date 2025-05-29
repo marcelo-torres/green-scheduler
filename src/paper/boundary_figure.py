@@ -1,4 +1,4 @@
-from src.scheduling.algorithms.highest_power_first.highest_power_first import highest_power_first
+from src.scheduling.algorithms.bounded_boundary_search.bounded_boundary_search import bbs
 from src.scheduling.algorithms.lpt.longest_processing_time_first import lpt
 from src.scheduling.algorithms.task_flow.task_flow import task_flow_schedule
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
@@ -94,9 +94,9 @@ def report_schedule(schedule, graph, last_task_id, clusters):
     print(f'brown_energy_used: {brown_energy_used}J | total_energy: {total_energy} | makespan: {makespan}s | min_makespan: {min_makespan}')
 
 
-def plot_highest_power_first_figure(graph, cluster):
+def plot_bounded_boundary_search_figure(graph, cluster):
     min_makespan = calc_critical_path_length(graph)
-    scheduling = highest_power_first(graph, min_makespan * 3, 0.5, [cluster], task_sort='energy', shift_mode='left', show='all', max_power=35)
+    scheduling = bbs(graph, min_makespan * 3, 0.5, [cluster], task_sort='energy', shift_mode='left', show='all', max_power=35)
 
     report_schedule(scheduling, graph, 5, cluster)
 
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     graph = create_graph()
     cluster = create_single_machine_cluster([5, 15, 35, 30, 25, 15, 8, 0, 5, 15, 15, 30, 40], 22)
 
-    plot_highest_power_first_figure(graph, cluster)
+    plot_bounded_boundary_search_figure(graph, cluster)
     #plot_task_flow_figure(graph, cluster)
     #plot_lpt_figure(graph, cluster)
 

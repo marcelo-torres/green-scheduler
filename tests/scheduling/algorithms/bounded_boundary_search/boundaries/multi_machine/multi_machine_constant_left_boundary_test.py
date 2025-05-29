@@ -1,6 +1,6 @@
 import unittest
 
-from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.multi_machine_constant_left_boundary import \
+from src.scheduling.algorithms.bounded_boundary_search.boundaries.multi_machine.multi_machine_constant_left_boundary import \
     calculate_constant_left_boundary
 from src.scheduling.model.machine import Machine
 from src.scheduling.model.task_graph import TaskGraph

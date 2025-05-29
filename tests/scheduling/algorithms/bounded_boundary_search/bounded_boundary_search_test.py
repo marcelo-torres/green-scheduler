@@ -1,6 +1,6 @@
 import unittest
 
-from src.scheduling.algorithms.highest_power_first.highest_power_first import highest_power_first
+from src.scheduling.algorithms.bounded_boundary_search.bounded_boundary_search import bbs
 from src.scheduling.model.cluster import Cluster
 from src.scheduling.model.machine import Machine
 from src.scheduling.model.power_series import PowerSeries
@@ -116,7 +116,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_single_machine_cluster([], 0)
 
-        scheduling = highest_power_first(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
+        scheduling = bbs(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(0, scheduling[task.id][0])
 
@@ -127,7 +127,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_single_machine_cluster([], 0)
 
-        scheduling = highest_power_first(graph, task.runtime * 2, 0.5, clusters, task_sort='energy', shift_mode='left')
+        scheduling = bbs(graph, task.runtime * 2, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(0, scheduling[task.id][0])
 
@@ -138,7 +138,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_single_machine_cluster([0, 10, 0, 10], 40)
 
-        scheduling = highest_power_first(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
+        scheduling = bbs(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(40, scheduling[task.id][0])
 
@@ -149,8 +149,8 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_single_machine_cluster([0, 10, 20, 30, 40, 50, 60], 20)
 
-        scheduling = highest_power_first(graph, task.runtime * 2, 0.5, clusters, task_sort='energy',
-                                         shift_mode='left')
+        scheduling = bbs(graph, task.runtime * 2, 0.5, clusters, task_sort='energy',
+                         shift_mode='left')
 
         self.assertEqual(20, scheduling[task.id][0])
 
@@ -161,7 +161,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_single_machine_cluster([60, 50, 40, 30, 20, 10, 0], 20)
 
-        scheduling = highest_power_first(graph, task.runtime * 2, 0.5, clusters, task_sort='energy', shift_mode='left')
+        scheduling = bbs(graph, task.runtime * 2, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(0, scheduling[task.id][0])
 
@@ -172,7 +172,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_single_machine_cluster([0, 10, 20, 10, 0, 0, 0, 5, 10, 5, 0, 0, 0, 50, 20, 10, 0], 20)
 
-        scheduling = highest_power_first(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
+        scheduling = bbs(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(0, scheduling[task.id][0])
 
@@ -183,7 +183,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_single_machine_cluster([0, 10, 20, 10, 0, 0, 0, 5, 10, 5, 0, 0, 0, 50, 20, 10, 1], 20)
 
-        scheduling = highest_power_first(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
+        scheduling = bbs(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(240, scheduling[task.id][0])
 
@@ -192,7 +192,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_single_machine_cluster([], 0)
 
-        scheduling = highest_power_first(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
+        scheduling = bbs(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(0, scheduling[1][0])
         self.assertEqual(10, scheduling[2][0])
@@ -207,7 +207,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_single_machine_cluster([], 0)
 
-        scheduling = highest_power_first(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
+        scheduling = bbs(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(0, scheduling[1][0])
         self.assertEqual(3, scheduling[2][0])
@@ -220,7 +220,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_single_machine_cluster([0, 10, 20, 20, 0, 20, 40, 20, 0, 0, 0, 30, 0], 10)
 
-        scheduling = highest_power_first(graph, min_makespan * 2, 0.5, clusters, task_sort='energy', shift_mode='left')
+        scheduling = bbs(graph, min_makespan * 2, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(10, scheduling[1][0])
         self.assertEqual(20, scheduling[2][0])
@@ -238,7 +238,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_single_machine_cluster([0, 10, 20, 10, 0, 20, 40, 20, 0, 0, 0, 30, 0], 10)
 
-        scheduling = highest_power_first(graph, min_makespan * 2, 0.5, clusters, task_sort='energy', shift_mode='left', show='none')
+        scheduling = bbs(graph, min_makespan * 2, 0.5, clusters, task_sort='energy', shift_mode='left', show='none')
 
         self.assertEqual(10, scheduling[1][0])
         self.assertEqual(20, scheduling[2][0])
@@ -257,7 +257,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_single_machine_cluster([0, 10, 20, 10, 0, 20, 40, 20, 0, 0, 0, 30, 0], 10)
 
-        scheduling = highest_power_first(graph, min_makespan * 2, 0.5, clusters, task_sort='energy', shift_mode='right-left')
+        scheduling = bbs(graph, min_makespan * 2, 0.5, clusters, task_sort='energy', shift_mode='right-left')
 
         self.assertEqual(10, scheduling[1][0])
         self.assertEqual(20, scheduling[2][0])
@@ -275,7 +275,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_single_machine_cluster([0, 10, 20, 10, 0, 20, 40, 20, 0, 0, 0, 30, 0], 10)
 
-        scheduling = highest_power_first(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
+        scheduling = bbs(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertEqual(10, scheduling[1][0])
         self.assertEqual(20, scheduling[2][0])
@@ -290,7 +290,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_single_machine_cluster([10, 10], 100)
 
-        scheduling = highest_power_first(graph, min_makespan * 4, 0.5, clusters, task_sort='runtime_ascending', shift_mode='left')
+        scheduling = bbs(graph, min_makespan * 4, 0.5, clusters, task_sort='runtime_ascending', shift_mode='left')
 
         scheduling = list(scheduling.items())
         scheduling.sort(key=lambda schedule: schedule[1][0])
@@ -312,7 +312,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_two_machine_cluster([10, 50, 20], 50, cores=1)
 
-        schedule = highest_power_first(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
+        schedule = bbs(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertTaskIn(schedule, 1, 50, 'm1')
 
@@ -323,7 +323,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_two_machine_cluster([0, 0, 0], 50, cores=1)
 
-        schedule = highest_power_first(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
+        schedule = bbs(graph, task.runtime * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertTaskIn(schedule, 1, 0, 'm1')
 
@@ -332,7 +332,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_two_machine_cluster([10, 50, 0, 20], 25, cores=1)
 
-        schedule = highest_power_first(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
+        schedule = bbs(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertTaskIn(schedule, 1, 0, 'm1')
         self.assertTaskIn(schedule, 2, 3, 'm1')
@@ -345,7 +345,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters = create_two_machine_cluster([0]*10, 25, cores=1)
 
-        schedule = highest_power_first(graph, min_makespan * 4, 0.2, clusters, task_sort='energy', shift_mode='left')
+        schedule = bbs(graph, min_makespan * 4, 0.2, clusters, task_sort='energy', shift_mode='left')
 
         self.assertTaskIn(schedule, 1, 0, 'm1')
         self.assertTaskIn(schedule, 2, 3, 'm1')
@@ -359,7 +359,7 @@ class HighestPowerFirstTest(unittest.TestCase):
         clusters = create_two_machine_cluster([10, 50, 0, 20], 25, cores=1)
         clusters[0].machines['m1'].state.use_cores(0, 200, 1)
 
-        schedule = highest_power_first(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
+        schedule = bbs(graph, min_makespan * 4, 0.5, clusters, task_sort='energy', shift_mode='left')
 
         self.assertTaskIn(schedule, 1, 0, 'm2')
         self.assertTaskIn(schedule, 2, 3, 'm2')
@@ -374,7 +374,7 @@ class HighestPowerFirstTest(unittest.TestCase):
         clusters = create_two_machine_cluster([10, 10, 20, 20, 20, 20, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10], 5,
                                               cores=1)
 
-        schedule = highest_power_first(graph, 90, 0.2, clusters, task_sort='energy', shift_mode='left', show='none')
+        schedule = bbs(graph, 90, 0.2, clusters, task_sort='energy', shift_mode='left', show='none')
 
         self.assertTaskIn(schedule, 1, 0, 'm1')
 
@@ -392,7 +392,7 @@ class HighestPowerFirstTest(unittest.TestCase):
                                               cores=1)
 
         clusters[0].machines['m1'].state.use_cores(0, 90, 1)
-        schedule = highest_power_first(graph, 90, 0.2, clusters, task_sort='energy', shift_mode='left', show='none')
+        schedule = bbs(graph, 90, 0.2, clusters, task_sort='energy', shift_mode='left', show='none')
 
         self.assertTaskIn(schedule, 1, 0, 'm2')
         self.assertTaskIn(schedule, 2, 10, 'm2')
@@ -410,7 +410,7 @@ class HighestPowerFirstTest(unittest.TestCase):
     #
     #     clusters[0].machines['m1'].state.use_cores(0, 90, 1)
     #     clusters[0].machines['m2'].state.use_cores(0, 60, 1)
-    #     schedule = highest_power_first(graph, 90, 0.2, clusters, task_sort='energy', shift_mode='left', show='none')
+    #     schedule = bounded_boundary_search(graph, 90, 0.2, clusters, task_sort='energy', shift_mode='left', show='none')
 
     def test_multi_machine_graph_with_cores_with_g_energy_shift_rigth_left(self):
         graph, min_makespan = _get_graph_1()
@@ -418,7 +418,7 @@ class HighestPowerFirstTest(unittest.TestCase):
         clusters = create_two_machine_cluster([10, 20, 10, 0, 15, 20, 10, 0, 15, 5, 0, 10, 10, 10, 0, 0, 0, 15], 5,
                                               cores=1)
 
-        schedule = highest_power_first(graph, 90, 0, clusters, task_sort='energy', shift_mode='right-left', show='none')
+        schedule = bbs(graph, 90, 0, clusters, task_sort='energy', shift_mode='right-left', show='none')
 
         self.assertTaskIn(schedule, 1, 0, 'm1')
 
@@ -435,7 +435,7 @@ class HighestPowerFirstTest(unittest.TestCase):
         clusters = create_two_machine_cluster([10, 20, 20, 0, 15, 20, 10, 0, 15, 5, 0, 10, 10, 10, 0, 0, 0, 15], 5,
                                               cores=1)
 
-        schedule = highest_power_first(graph, 90, 0, clusters, task_sort='energy', shift_mode='right-left', show='none')
+        schedule = bbs(graph, 90, 0, clusters, task_sort='energy', shift_mode='right-left', show='none')
 
         self.assertTaskIn(schedule, 1, 0, 'm1')
 
@@ -454,7 +454,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters[0].machines['m1'].state.use_cores(0, 23, 1)
         clusters[0].machines['m2'].state.use_cores(23, 90, 1)
-        schedule = highest_power_first(graph, 90, 0, clusters, task_sort='energy', shift_mode='right-left', show='none')
+        schedule = bbs(graph, 90, 0, clusters, task_sort='energy', shift_mode='right-left', show='none')
 
 
         #clusters[0].machines['m2'].state.use_cores(0, 60, 1)
@@ -475,7 +475,7 @@ class HighestPowerFirstTest(unittest.TestCase):
 
         clusters[0].machines['m1'].state.use_cores(0, 22, 1)
         clusters[0].machines['m2'].state.use_cores(23, 90, 1)
-        schedule = highest_power_first(graph, 90, 0, clusters, task_sort='energy', shift_mode='right-left', show='none')
+        schedule = bbs(graph, 90, 0, clusters, task_sort='energy', shift_mode='right-left', show='none')
 
         self.assertTaskIn(schedule, 1, 0, 'm2')
         self.assertTaskIn(schedule, 2, 10, 'm2')
@@ -491,7 +491,7 @@ class HighestPowerFirstTest(unittest.TestCase):
         clusters = create_two_machine_cluster([10, 20, 10, 0, 15, 20, 10, 0, 15, 5, 0, 10, 10, 10, 0, 0, 0, 15], 5,
                                               cores=1)
 
-        schedule = highest_power_first(graph, 90, 0, clusters, task_sort='energy', shift_mode='none', show='none')
+        schedule = bbs(graph, 90, 0, clusters, task_sort='energy', shift_mode='none', show='none')
 
         self.assertTaskIn(schedule, 1, 0, 'm1')
         self.assertTaskIn(schedule, 2, 10, 'm1')
@@ -508,7 +508,7 @@ class HighestPowerFirstTest(unittest.TestCase):
                                               cores=1)
         clusters[0].machines['m2'].state.use_cores(0, 200, 1)
 
-        schedule = highest_power_first(graph, 90, 0, clusters, task_sort='energy', shift_mode='none')
+        schedule = bbs(graph, 90, 0, clusters, task_sort='energy', shift_mode='none')
 
         self.assertTaskIn(schedule, 1, 0, 'm1')
         self.assertTaskIn(schedule, 2, 10, 'm1')

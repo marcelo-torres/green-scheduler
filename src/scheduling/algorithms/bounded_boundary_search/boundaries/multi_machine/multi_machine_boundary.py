@@ -1,8 +1,8 @@
-from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.lpt_boundary_estimator import \
+from src.scheduling.algorithms.bounded_boundary_search.boundaries.multi_machine.lpt_boundary_estimator import \
     LptBoundaryEstimator
-from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.multi_machine_constant_left_boundary import \
+from src.scheduling.algorithms.bounded_boundary_search.boundaries.multi_machine.multi_machine_constant_left_boundary import \
     calculate_constant_left_boundary
-from src.scheduling.algorithms.highest_power_first.boundaries.multi_machine.multi_machine_constant_right_boundary import \
+from src.scheduling.algorithms.bounded_boundary_search.boundaries.multi_machine.multi_machine_constant_right_boundary import \
     calculate_constant_right_boundary
 from src.scheduling.util.calc_levels import calc_levels
 
