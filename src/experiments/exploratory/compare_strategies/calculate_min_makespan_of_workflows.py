@@ -1,9 +1,9 @@
 from src.data.photovolta import PhotovoltaReader
 from src.data.wfcommons_reader import WfCommonsWorkflowReader
-from src.experiments.main.makespan_estimator_impl import estimate_min_makespan_by_algorithm, OPTION_LCB_LPT, OPTION_LCB, \
+from src.experiments.exploratory.compare_strategies.makespan_estimator_impl import estimate_min_makespan_by_algorithm, OPTION_LCB_LPT, OPTION_LCB, \
     OPTION_PATH_LPT
 from src.experiments.main.run_experiments import SEED, MIN_TASK_POWER_DEFAULT, MAX_TASK_POWER_DEFAULT
-from src.experiments.random_utils import RandomProvider
+from src.experiments.shared.random_utils import RandomProvider
 from src.scheduling.algorithms.bounded_boundary_search.bounded_boundary_search import bbs, BOUNDARY_LPT, \
     BOUNDARY_DEFAULT, BOUNDARY_LPT_PATH, BOUNDARY_LPT_FULL
 from src.scheduling.model.cluster import Cluster

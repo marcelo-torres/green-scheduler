@@ -1,8 +1,6 @@
-import os
-
 from src.data.photovolta import PhotovoltaReader
 from src.data.wfcommons_reader import WfCommonsRealWorkflowReader
-from src.experiments.random_utils import RandomProvider
+from src.experiments.shared.random_utils import RandomProvider
 
 from src.scheduling.algorithms.bounded_boundary_search.bounded_boundary_search import bbs, BOUNDARY_SINGLE, \
     SHIFT_MODE_RIGHT_LEFT, TASK_SORT_ENERGY, SHIFT_MODE_LEFT, SHIFT_MODE_NONE
@@ -16,7 +14,7 @@ from src.scheduling.util.makespan_calculator import calc_makespan
 from src.util.stopwatch import Stopwatch
 from src.util.time_utils import seconds_to_hours
 
-FILE = 'results_1m_deadline2_2025-05-18.txt'
+FILE = '../main/results_1m_deadline2_2025-05-18.txt'
 
 def write_to_log(s):
     # write async to log file

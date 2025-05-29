@@ -1,7 +1,7 @@
 from math import ceil
 
-from src.experiments.main.makespan_estimator_impl import OPTION_LCB, OPTION_PATH_LPT, OPTION_LCB_LPT, \
-    estimate_min_makespan_by_algorithm, OPTION_LPT
+from src.experiments.exploratory.compare_strategies.makespan_estimator_impl import OPTION_LCB, OPTION_PATH_LPT, OPTION_LCB_LPT, \
+    estimate_min_makespan_by_algorithm
 from src.scheduling.algorithms.bounded_boundary_search.bounded_boundary_search import BOUNDARY_DEFAULT, BOUNDARY_LPT_PATH, \
     BOUNDARY_LPT
 from src.scheduling.model.machine_factory import create_machines_with_target_resource, estimate_machine_count
