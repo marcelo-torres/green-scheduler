@@ -1,10 +1,10 @@
 # Green Scheduler
 
 This Python project provides:
-- A new renewable energy-aware scheduling algorithm called Bounded-Boundary Search (BBS)
-- A new renewable energy-aware version of TaskFlow scheduling algorithm <reference>
-- A simulator
-- Visualization tools to visualize a scheduling step by step
+- Bounded-Boundary Search (BBS): A novel scheduling algorithm designed to maximize the use of renewable (green) energy within flexible deadlines.
+- Green TaskFlow Scheduler: An enhanced, renewable energy-aware version of the TaskFlow scheduling algorithm [<reference>].
+- Scheduling Simulator: A customizable simulator that models task execution on multi-core machines powered by both green and brown energy sources.
+- Visualization Tools: Step-by-step visualization of task scheduling to help analyze algorithm behavior and energy usage.
 
 ## How it works
 Scientific workflows require significant computational power, resulting in considerable energy consumption and carbon
@@ -83,9 +83,17 @@ python3 run_experiments.py
 Docker useful commands
 ```shell
 docker attach green-scheduler-experiment
+```
+```shell
 ^P^Q  // Escape sequence to detach container
-docker logs green-scheduler-experiment (To view the historical logs) 
+```
+```shell
+docker logs green-scheduler-experiment (To view the historical logs)
+```
+```shell 
 docker stop green-scheduler-experiment
+```
+```shell
 docker rm green-scheduler-experiment
 ```
 
