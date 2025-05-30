@@ -2,8 +2,8 @@ import unittest
 
 from src.scheduling.algorithms.bounded_boundary_search.boundaries.multi_machine.multi_machine_boundary import \
     MultiMachineBoundaryCalculator
-from src.scheduling.algorithms.bounded_boundary_search.shift_left.shift import shift_tasks_to_save_energy
-from src.scheduling.algorithms.bounded_boundary_search.shift_left.shift_greedy import \
+from src.scheduling.algorithms.bounded_boundary_search.shift.shift import shift_tasks_to_save_energy
+from src.scheduling.algorithms.bounded_boundary_search.shift.shift_greedy import \
     shift_tasks_to_save_energy_greedy
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
 from src.scheduling.model.cluster import _create_machine_map
