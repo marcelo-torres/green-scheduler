@@ -2,7 +2,7 @@ from src.scheduling.algorithms.bounded_boundary_search.boundaries.multi_machine.
     MultiMachineBoundaryCalculator
 from src.scheduling.algorithms.bounded_boundary_search.boundaries.single_machine.boundary import BoundaryCalculator
 from src.scheduling.algorithms.bounded_boundary_search.drawer.bounded_boundary_search_drawer import draw_scheduling
-from src.scheduling.algorithms.bounded_boundary_search.shift_left.shift import shift_tasks_to_save_energy
+from src.scheduling.algorithms.bounded_boundary_search.shift.shift import shift_tasks_to_save_energy
 from src.scheduling.energy.energy_usage_calculator import EnergyUsageCalculator
 from src.scheduling.util.schedule_in_min_brown_energy import schedule_min_brown_energy_min_start
 
