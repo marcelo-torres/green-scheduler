@@ -6,27 +6,76 @@ This Python project provides:
 - Scheduling Simulator: A customizable simulator that models task execution on multi-core machines powered by both green and brown energy sources.
 - Visualization Tools: Step-by-step visualization of task scheduling to help analyze algorithm behavior and energy usage.
 
-## How it works
+## About BBS
 Scientific workflows require significant computational power, resulting in considerable energy consumption and carbon
 emissions. Renewable (green) energy sources are an alternative to minimize environmental impact. Solar energy, though 
 intermittent, creates temporal energy heterogeneity that can be leveraged to minimize non-renewable (brown) energy 
 usage. However, the intermittency may lead to task delay, increasing the workflow's finish time (makespan), 
 a key user concern.
 
-The BBS algorithm minimizes brown energy usage and makespan, under a deadline provided by the user.
+The BBS algorithm minimizes brown energy usage and makespan, under a deadline provided by the user. The deadline provide
+slack time, which the BBS algorithm can use to delay tasks and use more green energy.
 
-Boundary
+## Parameters:
 
-Shift strategy
+The behavior of the BBS algorithm can be customized using the following parameters:
 
-Parameters:
+### Task Sort Strategies (task_sort)
+Determines the priority queue for scheduling tasks. The task queue is not topologically sorted, so boundary constraints 
+must ensure precedence preservation.
+
+1) TASK_SORT_ENERGY - Energy (Runtime * Power)
+2) TASK_SORT_POWER - Power required to run task
+3) TASK_SORT_SPT - Task runtime ascending
+4) TASK_SORT_LPT - Task runtime descending
+
+### Boundary Strategies (boundary_strategy)
+
+Defines how the algorithm computes constant boundaries (start/end windows) for each task.
+
+1) BOUNDARY_SINGLE - Single machine with enough cores to run all tasks in parallel
+2) BOUNDARY_DEFAULT - Estimate boundaries with limited cores
+3) BOUNDARY_LPT_PATH - Same as strategy BOUNDARY_LPT_PATH, but sort predecessors and successors by LPT
+4) BOUNDARY_LPT_FULL - Use LPT algorithm to create two schedules with predecessors and successors of a task. The length
+of schedule is the boundary size.
+
+### Variable Boundary Width (c)
+
+A value c ∈ [0, 1) controls how much the constant boundary can expand to create variable boundaries for each task. 
+A smaller c reduces slack; a larger c allows more scheduling flexibility.
+
+### Shift Strategies (shift_mode)
+
+The previous procedures may produce schedules with unnecessary idle time between tasks. Such idle times increase the 
+workflow makespan without reducing brown energy usage. Shift procedures attempt to reduce makespan or brown energy 
+usage after initial scheduling.
+
+1) SHIFT_MODE_LEFT - Iterate over tasks by topological sort and reschedule tasks as early as possible, but saving the same 
+or more brown energy. 
+2) SHIFT_MODE_RIGHT_LEFT - Iterate over tasks by inverse topological sort and reschedule tasks as late as possible to minimize 
+brown energy usage. Then, the shift-left is applied to reduce makespan.
+3) SHIFT_MODE_NONE - No shift strategy is applied.
+
+## Example
+
+The figure below shows the scheduling of a sample workflow using BBS with the following configuration:
+```
+c = 0.5  
+task_sort = TASK_SORT_ENERGY  
+boundary_strategy = BOUNDARY_DEFAULT  
+shift_mode = SHIFT_MODE_LEFT  
+```
+
+The workflow requires 1,380J and at least 60 seconds to execute. The schedule found by the algorithm uses 25J of 
+brown energy and has a makespan of 89 seconds. This demonstrates how BBS leverages green energy availability while
+remaining deadline-aware.
 
 ![Workflow](resources/figures/workflow.png?raw=true "Workflow")
 ![BBS Schedule](resources/figures/workflow_scheduling.png?raw=true "BBS Schedule")
 
-## Project structure
+## Repository Structure
 
-```shell
+```
 resources
 ├── experiments
 ├── photovolta

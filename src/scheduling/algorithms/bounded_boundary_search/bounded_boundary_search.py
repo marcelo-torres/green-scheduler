@@ -14,8 +14,8 @@ BOUNDARY_LPT_FULL = 'lpt-full'
 
 TASK_SORT_ENERGY = 'energy'
 TASK_SORT_POWER = 'power'
-TASK_SORT_RUNTIME = 'runtime'
-TASK_SORT_RUNTIME_ASCENDING = 'runtime_ascending'
+TASK_SORT_LPT = 'runtime'
+TASK_SORT_SPT = 'runtime_ascending'
 
 SHIFT_MODE_LEFT = 'left'
 SHIFT_MODE_RIGHT_LEFT = 'right-left'
@@ -78,7 +78,7 @@ def bbs(
 
     _validate_option(shift_mode, 'shift mode', [SHIFT_MODE_LEFT, SHIFT_MODE_RIGHT_LEFT, SHIFT_MODE_NONE])
     _validate_option(boundary_strategy, 'boundary strategy', [BOUNDARY_SINGLE, BOUNDARY_DEFAULT, BOUNDARY_LPT_PATH, BOUNDARY_LPT, BOUNDARY_LPT_FULL])
-    _validate_option(task_sort, 'task sort strategy', [TASK_SORT_ENERGY, TASK_SORT_POWER, TASK_SORT_RUNTIME, TASK_SORT_RUNTIME_ASCENDING])
+    _validate_option(task_sort, 'task sort strategy', [TASK_SORT_ENERGY, TASK_SORT_POWER, TASK_SORT_LPT, TASK_SORT_SPT])
 
     scheduling = {}
     lcb = lvb = rcb = rvb = 0
