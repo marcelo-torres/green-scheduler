@@ -75,7 +75,7 @@ remaining deadline-aware.
 
 ## Repository Structure
 
-```shell
+```
 resources
 ├── experiments
 ├── photovolta
