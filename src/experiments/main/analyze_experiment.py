@@ -3,6 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import matplotlib.lines as mlines
+from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.gridspec import GridSpec, GridSpecFromSubplotSpec
 
 resources_path = '../../../resources/'
@@ -400,7 +401,6 @@ def _apply_filters(filters, df):
 
 def plot_workflows_comparations(mapper, legend_mapper):
 
-
     name_map = {
         'genome': '                  1000Genome',
         'cycles': '            Cycles',
@@ -451,7 +451,6 @@ def plot_workflows_comparations(mapper, legend_mapper):
     large_workflows_df = load_large_workflows_results()
     small_workflows_df = load_small_workflows_results()
 
-    #fig, ax = plt.subplots(n_rows, n_cols, figsize=(20, 10))
     fig = plt.figure(figsize=(40, 20))
 
     gs_main = GridSpec(n_rows, n_cols, figure=fig, hspace=0.2, wspace=0.2)
@@ -495,8 +494,166 @@ def plot_workflows_comparations(mapper, legend_mapper):
     _create_legend_for_dynamic(fig, legend_mapper, None, frameon=False)
 
     fig.tight_layout(pad=0)
-    plt.savefig("teste.svg")
     plt.show()
+
+
+def generate_report_file(output_figure, mapper, legend_mapper):
+
+    name_map = {
+        'blast': 'BLAST',
+        'bwa': 'BWA',
+        'cycles': 'Cycles',
+        'genome': '1000Genome',
+        'soykb': 'SoyKB',
+        'srasearch': 'SRA Search',
+        'montage': 'Montage',
+        'seismology': 'Seismology',
+    }
+
+    filters_list = [
+        {
+            'power_distribution': 'uniform',
+            'multi-value-filters': {},
+        },
+        {
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'task_ordering': ['energy']
+            }
+        },
+        {
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'task_ordering': ['power']
+            }
+        },
+        {
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'task_ordering': ['runtime']
+            }
+        },
+        {
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'task_ordering': ['runtime_ascending']
+            }
+        },
+        {
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'shift_mode': ['none'],
+            }
+        },
+        {
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'shift_mode': ['left'],
+            }
+        },
+        {
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'shift_mode': ['right-left'],
+            }
+        },
+        {
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'deadline_factor': [2],
+            }
+        },
+        {
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'deadline_factor': [4],
+            }
+        },
+        {
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'deadline_factor': [8],
+            }
+        },
+        {
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'c_value': [0.0],
+            }
+        },
+        {
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'c_value': [0.5],
+            }
+        },
+        {
+            'power_distribution': 'uniform',
+            'multi-value-filters': {
+                'c_value': [0.8],
+            }
+        },
+    ]
+
+    n_rows = 2
+    n_cols = 4
+
+    data_frames_loaders = [
+        {
+            'tasks': 1000,
+            'loader': load_large_workflows_results
+        },
+        {
+            'tasks': 200,
+            'loader': load_small_workflows_results
+        },
+    ]
+
+
+    letters_by_row_and_column = [
+        ['a)', 'b)', 'c)', 'd)'],
+        ['e)', 'f)', 'g)', 'h)']
+    ]
+    title_font_size = 20
+
+    with PdfPages(output_figure) as pdf:
+        for data_frames_loader in data_frames_loaders:
+            tasks = data_frames_loader['tasks']
+            df_loader = data_frames_loader['loader']
+
+            workflows_df = df_loader()
+            for filters in filters_list:
+
+                fig = plt.figure(figsize=(40, 20))
+
+                gs_main = GridSpec(n_rows, n_cols, figure=fig, hspace=0.2, wspace=0.2)
+
+                g_row = 0
+                g_col = 0
+
+                for workflow in workflows:
+                    filters['workflow'] = workflow
+                    large_workflows_df_filtered = _apply_filters(filters, workflows_df)
+
+                    gs_nested = GridSpecFromSubplotSpec(2, 2, subplot_spec=gs_main[g_row, g_col], hspace=0, wspace=0)
+                    axs = gs_nested.subplots(sharex='col', sharey='row')
+
+                    title = f'{name_map[workflow]} ({tasks} tasks)'
+                    axs[0][0].set_title(title, fontsize=title_font_size)
+
+                    _add_subplot_of_traces(large_workflows_df_filtered, axs, color_and_marker_getter=mapper.get_color_and_marker,
+                                           controller=None, show_legends=(g_row == 1 and g_col == 0), sub_plot_id=letters_by_row_and_column[g_row][g_col])
+
+                    g_col += 1
+                    if g_col == 4:
+                        g_col = 0
+                        g_row = 1
+
+                _create_legend_for_dynamic(fig, legend_mapper, None, frameon=False)
+
+                fig.tight_layout(pad=0)
+                pdf.savefig()
+                plt.close()
 
 
 def shows_canvas_figs(n_rows, n_cols, canvas_figs):
@@ -787,4 +944,6 @@ if __name__ == '__main__':
 
     #show_dynamic_plot(all_map, 'uniform', legend_lines, AxeVisibilityController())
 
-    plot_workflows_comparations(all_map, legend_lines)
+    #plot_workflows_comparations(all_map, legend_lines)
+
+    generate_report_file('./../../../results/experiment-1-figures.pdf', all_map, legend_lines)
