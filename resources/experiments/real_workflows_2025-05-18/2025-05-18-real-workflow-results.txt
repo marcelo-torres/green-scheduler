@@ -1,0 +1,50 @@
+/media/marcelo/Dados2/_Dados-Marcelo/Educacao/USP/PPGSI/workspace/new-paper/green-scheduler/.venv/bin/python /media/marcelo/Dados2/_Dados-Marcelo/Educacao/USP/PPGSI/workspace/new-paper/green-scheduler/src/experiments/main/compare_real_workflows.py 
+-----------------------
+Start time:  0
+workflow	lpt_brown_energy_used	lpt_makespan	lpt_start_time	bbs_right_left_brown_energy_used	bbs_right_left_makespan	bbs_right_left_start_time	bbs_left_brown_energy_used	bbs_left_makespan	bbs_left_start_time	bbs_none_brown_energy_used	bbs_none_makespan	bbs_none_start_time	task_flow_brown_energy_used	task_flow_makespan	task_flow_start_time
+blast	502749.9	1751	0	502749.9	1751	0	502749.9	1751	0	502749.9	4202	0	502749.9	1751	0
+bwa	50987.16	1653	0	50987.16	1653	0	50987.16	1653	0	50987.16	5406	471	50987.16	1653	0
+cycles	204046.51	649	0	204046.51	649	0	204046.51	649	0	204046.51	2208	88	204046.51	649	0
+genome	167530.41	315	0	167530.41	315	0	167530.41	315	0	167530.41	736	96	167530.41	315	0
+soykb	384804.84	38630	0	0.0	70385	26999	208595.29	64861	0	86923.44	151561	859	384804.84	38630	0
+srasearch	213101.53	3065	0	213101.53	3065	0	213101.53	3065	0	213101.53	4440	0	213101.53	3065	0
+montage	119349.58	314	0	119349.58	314	0	119349.58	314	0	119349.58	1078	0	119349.58	314	0
+seismology	4565.61	6	0	4565.61	6	0	4565.61	6	0	4565.61	12	6	4565.61	6	0
+-----------------------
+Start time:  21600
+workflow	lpt_brown_energy_used	lpt_makespan	lpt_start_time	bbs_right_left_brown_energy_used	bbs_right_left_makespan	bbs_right_left_start_time	bbs_left_brown_energy_used	bbs_left_makespan	bbs_left_start_time	bbs_none_brown_energy_used	bbs_none_makespan	bbs_none_start_time	task_flow_brown_energy_used	task_flow_makespan	task_flow_start_time
+blast	310049.38	1751	0	273572.2	7004	0	273572.2	7004	0	273572.2	7004	0	310049.38	1751	0
+bwa	61908.85	1653	0	59210.69	6612	4959	59210.69	6612	4959	61053.18	5884	471	61908.85	1653	0
+cycles	309098.17	649	0	309098.17	649	0	309098.17	649	0	309098.17	2208	88	309098.17	649	0
+genome	153733.46	315	0	153733.46	315	0	153733.46	315	0	153733.46	972	72	153733.46	315	0
+soykb	261747.28	38630	0	0	48440	5399	179960.79	43261	0	69628.36	134961	412	261747.28	38630	0
+srasearch	188691.74	3065	0	0.0	12064	5399	0.0	11138	5399	150352.82	8464	1947	188691.74	3065	0
+montage	164749.69	314	0	164749.69	314	0	164749.69	314	0	164749.69	1133	6	164749.69	314	0
+seismology	5385.73	6	0	5385.73	6	0	5385.73	6	0	5385.73	12	6	5385.73	6	0
+-----------------------
+Start time:  43200
+workflow	lpt_brown_energy_used	lpt_makespan	lpt_start_time	bbs_right_left_brown_energy_used	bbs_right_left_makespan	bbs_right_left_start_time	bbs_left_brown_energy_used	bbs_left_makespan	bbs_left_start_time	bbs_none_brown_energy_used	bbs_none_makespan	bbs_none_start_time	task_flow_brown_energy_used	task_flow_makespan	task_flow_start_time
+blast	0	1751	0	0	1751	0	0	1751	0	0	4202	0	0	1751	0
+bwa	11417.49	1653	0	0.0	1683	0	6123.85	1653	0	0.0	5406	471	6123.85	1653	0
+cycles	288842.25	649	0	0.0	1292	0	189837.5	770	0	62494.56	2208	96	285907.5	649	0
+genome	78683.06	315	0	0	530	0	66476.22	315	0	1192.68	1050	46	68924.13	315	0
+soykb	124818.71	38630	0	0.0	108361	0	86885.37	108361	0	10411.01	130987	22	113764.58	38630	0
+srasearch	0	3065	0	0	3065	0	0	3065	0	0.0	4440	0	0	3065	0
+montage	125631.91	314	0	0	511	0	96903.44	314	0	53353.62	1133	7	98915.95	314	0
+seismology	1819.92	6	0	0	6	0	0	6	0	0.0	12	3	43.66	6	0
+-----------------------
+Start time:  64800
+workflow	lpt_brown_energy_used	lpt_makespan	lpt_start_time	bbs_right_left_brown_energy_used	bbs_right_left_makespan	bbs_right_left_start_time	bbs_left_brown_energy_used	bbs_left_makespan	bbs_left_start_time	bbs_none_brown_energy_used	bbs_none_makespan	bbs_none_start_time	task_flow_brown_energy_used	task_flow_makespan	task_flow_start_time
+blast	8408.51	1751	0	0.0	2047	0	0.0	1751	0	0	4202	0	2723.78	1751	0
+bwa	23342.49	1653	0	0.0	1757	0	20958.39	1653	0	0.0	5406	471	20958.39	1653	0
+cycles	351038.95	649	0	0	2279	0	275969.53	1093	0	143462.08	2208	88	349469.23	649	0
+genome	180953.17	315	0	0	1260	0	134463.38	626	0	121603.38	1063	68	180254.5	315	0
+soykb	160793.74	38630	0	0	86761	0	69494.27	86761	0	70624.92	154520	42	152694.16	38630	0
+srasearch	10161.24	3065	0	0.0	3066	0	4.09	3065	0	8731.64	4448	0	9076.76	3065	0
+montage	221338.28	314	0	356.61	1256	0	215491.18	314	0	147766.53	1133	9	218260.28	314	0
+seismology	973.61	6	0	0.0	12	0	596.13	6	0	146.13	12	3	596.13	6	0
+
+
+Overall execution: 0:23:05.015602
+
+Process finished with exit code 0
