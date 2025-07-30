@@ -56,7 +56,9 @@ class Drawer:
 
         self.color_palette = color_palette
         self.show_boundaries = show_boundaries
-        self.show_legends = show_legends
+        self.show_legends = True
+        #self.language = 'eg'
+        self.language = 'pt'
 
     def add_constant_boundary(self, start, width):
         rect = self._build_constant_boundary_rectangle((start, -Drawer.BOUNDARY_HEIGHT), width, Drawer.BOUNDARY_HEIGHT)
@@ -130,13 +132,13 @@ class Drawer:
         ]
 
         legend_text = [
-            'Scheduled Task',
-            'Renewable Power',
+            'Tarefa escalonada' if self.language == 'pt' else 'Scheduled Task',
+            'Potência renovável' if self.language == 'pt' else 'Renewable Power',
         ]
 
         boundary_legend_text = [
-            'Constant Boundary',
-            'Variable Boundary',
+            'Fronteira Constante' if self.language == 'pt' else 'Constant Boundary',
+            'Fronteira Variável' if self.language == 'pt' else 'Variable Boundary',
         ]
 
         if self.show_boundaries:
@@ -151,8 +153,8 @@ class Drawer:
             self._show_legend()
         plt.xlim([0, self.width])
         plt.ylim([y_start, self.height + Drawer.BOUNDARY_HEIGHT])
-        plt.xlabel('Time (s)')
-        plt.ylabel('Power (W)')
+        plt.xlabel('Tempo (s)' if self.language == 'pt' else 'Time (s)')
+        plt.ylabel('Potência (W)' if self.language == 'pt' else 'Power (W)')
 
     def show(self):
         self._plot()
