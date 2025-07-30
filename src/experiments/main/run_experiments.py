@@ -220,8 +220,8 @@ def execute_experiments(resources_path, synthetic_path, random_provider):
     ]
 
     green_power_providers = [
-        # ('trace-1', lambda: photovolta_reader.get_trace_1(size=30)),
-        # ('trace-2', lambda: photovolta_reader.get_trace_2(size=30)),
+        ('trace-1', lambda: photovolta_reader.get_trace_1(size=30)),
+        ('trace-2', lambda: photovolta_reader.get_trace_2(size=30)),
         ('trace-3', lambda: photovolta_reader.get_trace_3(size=30)),
         ('trace-4', lambda: photovolta_reader.get_trace_4(size=30)),
     ]
