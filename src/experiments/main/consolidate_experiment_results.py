@@ -43,8 +43,11 @@ def consolidate_experiment_results(experiments_file):
 
 if __name__ == '__main__':
 
-    experiments_1000_file = '../../../resources/experiments/experiments_2025-05-01_16-15-28/report_experiments_2025-05-01_16-15-28.csv'
-    experiments_200_file = '../../../resources/experiments/experiments_2025-05-04_02-54-15/report_experiments_2025-05-04_02-54-15.csv'
+    #experiments_1000_file = '../../../resources/experiments/experiments_2025-05-01_16-15-28/report_experiments_2025-05-01_16-15-28.csv'
+    #experiments_200_file = '../../../resources/experiments/experiments_2025-05-04_02-54-15/report_experiments_2025-05-04_02-54-15.csv'
+
+    experiments_1000_file = '../../../resources/experiments/experiments_large/report_experiments_large_2025-05-01_16-15-28_and_2025-07-30_14-51-45.csv'
+    experiments_200_file = '../../../resources/experiments/experiments_small/report_experiments_small_2025-05-04_02-54-15_and_2025-07-30_13-05-26.csv'
 
     consolidate_experiment_results(experiments_1000_file)
-    consolidate_experiment_results(experiments_200_file)
+    #consolidate_experiment_results(experiments_200_file)

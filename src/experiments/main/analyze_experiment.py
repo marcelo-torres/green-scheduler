@@ -32,6 +32,27 @@ c_values = [0.0, 0.5, 0.8]
 task_ordering_criterias = ['energy', 'power', 'runtime', 'runtime_ascending']
 
 
+def parse_key_factor(deadline_factor):
+    return f'Factor {deadline_factor}'
+
+def parse_key_shift(shift_mode):
+    if shift_mode == 'none':
+        return 'No-shift'
+    else:
+        return f'Shift-{shift_mode}'
+
+def parse_key_task_ordering(task_ordering, c_value):
+    friendly_name_map = {
+        'energy': 'Energy',
+        'power': 'Power',
+        'runtime': 'LPT',
+        'runtime_ascending': 'SPT'
+    }
+    friendly_name = friendly_name_map[task_ordering]
+    return f'{friendly_name} c={c_value}'
+
+
+
 class Mapper:
     def __init__(self, mapping, name, get_color_and_marker):
         self.mapping = mapping
@@ -162,27 +183,19 @@ def _build_all_map():
         legend_lines = {}
 
         for deadline_factor, size in deadline_factor_sizes.items():
-            legend_lines[f'Factor {deadline_factor}'] = ('black', 'o', size)
+            deadline_key = parse_key_factor(deadline_factor)
+            legend_lines[deadline_key] = ('black', 'o', size)
 
         for shift_mode, symbols in shift_symbols.items():
-            if shift_mode == 'none':
-                label = 'No-shift'
-            else:
-                label = f'Shift-{shift_mode}'
-            legend_lines[label] = ('black', symbols, DEFAULT_SHAPE_SIZE)
+            shift_key = parse_key_shift(shift_mode)
+            legend_lines[shift_key] = ('black', symbols, DEFAULT_SHAPE_SIZE)
 
         for task_ordering, color_tone_mapping in tasks_ordering_and_c_values_colors.items():
             for c_value, color in color_tone_mapping.items():
 
-                friendly_name_map = {
-                    'energy': 'Energy',
-                    'power': 'Power',
-                    'runtime': 'LPT',
-                    'runtime_ascending': 'SPT'
-                }
-                friendly_name = friendly_name_map[task_ordering]
+                task_ordering_key = parse_key_task_ordering(task_ordering, c_value)
 
-                legend_lines[f'{friendly_name} c={c_value}'] = (color, 'o', DEFAULT_SHAPE_SIZE)
+                legend_lines[task_ordering_key] = (color, 'o', DEFAULT_SHAPE_SIZE)
 
         return legend_lines
 
@@ -231,9 +244,9 @@ class AxeVisibilityController:
 
     def add(self, ax, shift_mode, deadline, task_ordering, c_value):
         keys = [
-            f'Shift {shift_mode}',
-            f'{task_ordering} - {c_value}',
-            f'Factor {deadline}'
+            parse_key_shift(shift_mode),
+            parse_key_task_ordering(task_ordering, c_value),
+            parse_key_factor(deadline)
         ]
 
         dict_temp = {}
@@ -275,14 +288,18 @@ def load_data():
 
 
 def load_large_workflows_results():  # 1000
-    relative_path = 'experiments/experiments_2025-05-01_16-15-28/'
-    file_name = 'report_experiments_2025-05-01_16-15-28_consolidated.csv'
+    # relative_path = 'experiments/experiments_2025-05-01_16-15-28/'
+    # file_name = 'report_experiments_2025-05-01_16-15-28_consolidated.csv'
+    relative_path = 'experiments/experiments_large/'
+    file_name = 'report_experiments_large_2025-05-01_16-15-28_and_2025-07-30_14-51-45_consolidated.csv'
     return _load_data(resources_path, relative_path, file_name)
 
 
 def load_small_workflows_results():  # 200 tasks
-    relative_path = 'experiments/experiments_2025-05-04_02-54-15/'
-    file_name = 'report_experiments_2025-05-04_02-54-15_consolidated.csv'
+    # relative_path = 'experiments/experiments_2025-05-04_02-54-15/'
+    # file_name = 'report_experiments_2025-05-04_02-54-15_consolidated.csv'
+    relative_path = 'experiments/experiments_small/'
+    file_name = 'report_experiments_small_2025-05-04_02-54-15_and_2025-07-30_13-05-26_consolidated.csv'
     return _load_data(resources_path, relative_path, file_name)
 
 
@@ -617,12 +634,13 @@ def generate_report_file(output_figure, mapper, legend_mapper):
     title_font_size = 20
 
     with PdfPages(output_figure) as pdf:
-        for data_frames_loader in data_frames_loaders:
-            tasks = data_frames_loader['tasks']
-            df_loader = data_frames_loader['loader']
 
-            workflows_df = df_loader()
-            for filters in filters_list:
+        for filters in filters_list:
+            for data_frames_loader in data_frames_loaders:
+                tasks = data_frames_loader['tasks']
+                df_loader = data_frames_loader['loader']
+
+                workflows_df = df_loader()
 
                 fig = plt.figure(figsize=(40, 20))
 

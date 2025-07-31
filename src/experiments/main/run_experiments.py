@@ -5,7 +5,8 @@ from src.data.photovolta import PhotovoltaReader
 from src.data.wfcommons_reader import WfCommonsWorkflowReader
 from src.experiments.shared.ParallelExperimentExecutor import ParallelExperimentExecutor
 from src.experiments.shared.experiment_file_helper import create_csv_file, write_reports_to_csv
-from src.experiments.main.generate_workflows_for_experiments import num_of_tasks_smaller, runtime_factor_map_smaller
+from src.experiments.main.generate_workflows_for_experiments import num_of_tasks_smaller, runtime_factor_map_smaller, \
+    num_of_tasks_bigger, runtime_factor_map_bigger
 from src.experiments.shared.random_utils import RandomProvider
 from src.scheduling.algorithms.bounded_boundary_search.bounded_boundary_search import bbs, BOUNDARY_SINGLE
 from src.scheduling.algorithms.lpt.longest_processing_time_first import lpt
@@ -202,11 +203,11 @@ def execute_experiments(resources_path, synthetic_path, random_provider):
         # ('inverted_exponential', random_provider.random_expovariate_inverse),
     ]
 
-    # num_of_tasks = num_of_tasks_bigger
-    # runtime_factor_map = runtime_factor_map_bigger
+    num_of_tasks = num_of_tasks_bigger
+    runtime_factor_map = runtime_factor_map_bigger
 
-    num_of_tasks = num_of_tasks_smaller
-    runtime_factor_map = runtime_factor_map_smaller
+    # num_of_tasks = num_of_tasks_smaller
+    # runtime_factor_map = runtime_factor_map_smaller
 
     workflow_providers = [
         ('blast', lambda random_power, index: wfcommons_reader.read_blast_workflow(num_of_tasks, runtime_factor_map['blast'], random_power, index)),
@@ -220,10 +221,10 @@ def execute_experiments(resources_path, synthetic_path, random_provider):
     ]
 
     green_power_providers = [
-        ('trace-1', lambda: photovolta_reader.get_trace_1(size=30)),
-        ('trace-2', lambda: photovolta_reader.get_trace_2(size=30)),
-        ('trace-3', lambda: photovolta_reader.get_trace_2(size=30)),
-        ('trace-4', lambda: photovolta_reader.get_trace_2(size=30)),
+        #('trace-1', lambda: photovolta_reader.get_trace_1(size=30)),
+        #('trace-2', lambda: photovolta_reader.get_trace_2(size=30)),
+        ('trace-3', lambda: photovolta_reader.get_trace_3(size=30)),
+        ('trace-4', lambda: photovolta_reader.get_trace_4(size=30)),
     ]
 
     # Process parameters
