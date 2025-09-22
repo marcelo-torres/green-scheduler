@@ -1,0 +1,47 @@
+-----------------------
+Start time: 0
+workflow	lpt_brown_energy_used	lpt_makespan	lpt_start_time	bbs_right_left_brown_energy_used	bbs_right_left_makespan	bbs_right_left_start_time	bbs_left_brown_energy_used	bbs_left_makespan	bbs_left_start_time	bbs_right_left_c8_brown_energy_used	bbs_right_left_c8_makespan	bbs_right_left_c8_start_time	bbs_left_c8_brown_energy_used	bbs_left_c8_makespan	bbs_left_c8_start_time	bbs_nonec_brown_energy_used	bbs_nonec_makespan	bbs_nonec_start_time	bbs_none_brown_energy_used	bbs_none_makespan	bbs_none_start_time	task_flow_brown_energy_used	task_flow_makespan	task_flow_start_time
+blast	473346.23	1751.0	0.0	473346.23	1751.0	0.0	473346.23	1751.0	0.0	473346.23	3221.6	0.0	473346.23	3221.6	0.0	473346.23	1751.0	0.0	473346.23	4202.0	0.0	473346.23	1751.0	0.0
+bwa	42693.56	1653.0	0.0	42693.56	1653.0	0.0	42693.56	1653.0	0.0	42693.56	4655.4	376.8	42693.56	4655.4	376.8	42693.56	1653.0	0.0	42693.56	5406.0	471.0	42693.56	1653.0	0.0
+cycles	286959.74	649.0	0.0	286959.74	649.0	0.0	286959.74	649.0	0.0	286959.74	1428.5	38.0	286959.74	1428.5	38.0	286959.74	649.0	0.0	286959.74	2208.0	76.0	286959.74	649.0	0.0
+genome	157110.91	315.0	0.0	157110.91	315.0	0.0	157110.91	315.0	0.0	157110.91	512.1	15.7	157110.91	512.1	15.7	157110.91	315.0	0.0	157110.91	987.5	62.0	157110.91	315.0	0.0
+soykb	326384.54	38630.0	0.0	0.0	70261.8	26999.0	210033.98	64861.0	0.0	0.0	70261.8	26999.0	21598.67	69987.7	0.0	210033.98	64861.0	0.0	64942.94	151561.0	296.2	326384.54	38630.0	0.0
+srasearch	221925.31	3065.0	0.0	221925.31	3065.0	0.0	221925.31	3065.0	0.0	221925.31	3752.5	0.0	221925.31	3752.5	0.0	221925.31	3065.0	0.0	221925.31	4440.0	0.0	221925.31	3065.0	0.0
+montage	240468.23	314.0	0.0	240468.23	314.0	0.0	240468.23	314.0	0.0	240468.23	962.7	6.4	240468.23	962.7	6.4	240468.23	314.0	0.0	240468.23	1126.5	7.0	240468.23	314.0	0.0
+seismology	3654.89	6.0	0.0	3654.89	6.0	0.0	3654.89	6.0	0.0	3654.89	7.2	0.9	3654.89	7.2	0.9	3654.89	6.0	0.0	3654.89	12.4	4.3	3654.89	6.0	0.0
+-----------------------
+Start time: 21600
+workflow	lpt_brown_energy_used	lpt_makespan	lpt_start_time	bbs_right_left_brown_energy_used	bbs_right_left_makespan	bbs_right_left_start_time	bbs_left_brown_energy_used	bbs_left_makespan	bbs_left_start_time	bbs_right_left_c8_brown_energy_used	bbs_right_left_c8_makespan	bbs_right_left_c8_start_time	bbs_left_c8_brown_energy_used	bbs_left_c8_makespan	bbs_left_c8_start_time	bbs_nonec_brown_energy_used	bbs_nonec_makespan	bbs_nonec_start_time	bbs_none_brown_energy_used	bbs_none_makespan	bbs_none_start_time	task_flow_brown_energy_used	task_flow_makespan	task_flow_start_time
+blast	473346.23	1751.0	0.0	436886.8	7004.0	0.0	436886.8	7004.0	0.0	436886.8	7004.0	0.0	436886.8	7004.0	0.0	436886.8	7004.0	0.0	436886.8	7004.0	0.0	473346.23	1751.0	0.0
+bwa	42693.56	1653.0	0.0	38379.28	6612.0	4959.0	38379.28	6612.0	4959.0	28876.25	6612.0	0.0	41164.25	5884.0	329.7	38379.28	6612.0	4959.0	41164.25	5884.0	471.0	42693.56	1653.0	0.0
+cycles	286959.74	649.0	0.0	286959.74	649.0	0.0	286959.74	649.0	0.0	286959.74	1428.5	38.0	286959.74	1428.5	38.0	286959.74	649.0	0.0	286959.74	2208.0	76.0	286959.74	649.0	0.0
+genome	157110.91	315.0	0.0	157110.91	315.0	0.0	157110.91	315.0	0.0	157110.91	512.1	15.7	157110.91	512.1	15.7	157110.91	315.0	0.0	157110.91	987.5	62.0	157110.91	315.0	0.0
+soykb	265352.16	38630.0	0.0	0.0	48661.8	5399.0	210033.98	43261.0	0.0	0.0	48661.8	5399.0	5536.94	48600.7	539.9	210033.98	43261.0	0.0	27310.07	135466.7	716.5	265352.16	38630.0	0.0
+srasearch	221925.31	3065.0	0.0	2672.51	11777.1	5388.7	2947.21	11214.3	4312.5	2980.64	11775.9	5397.9	166256.75	8540.0	0.0	3256.12	11214.3	4319.2	172982.63	8540.0	1188.9	221925.31	3065.0	0.0
+montage	240468.23	314.0	0.0	240468.23	314.0	0.0	240468.23	314.0	0.0	240468.23	962.7	6.4	240468.23	962.7	6.4	240468.23	314.0	0.0	240468.23	1126.5	7.0	240468.23	314.0	0.0
+seismology	3654.89	6.0	0.0	3654.89	6.0	0.0	3654.89	6.0	0.0	3654.89	7.2	0.9	3654.89	7.2	0.9	3654.89	6.0	0.0	3654.89	12.4	4.3	3654.89	6.0	0.0
+-----------------------
+Start time: 43200
+workflow	lpt_brown_energy_used	lpt_makespan	lpt_start_time	bbs_right_left_brown_energy_used	bbs_right_left_makespan	bbs_right_left_start_time	bbs_left_brown_energy_used	bbs_left_makespan	bbs_left_start_time	bbs_right_left_c8_brown_energy_used	bbs_right_left_c8_makespan	bbs_right_left_c8_start_time	bbs_left_c8_brown_energy_used	bbs_left_c8_makespan	bbs_left_c8_start_time	bbs_nonec_brown_energy_used	bbs_nonec_makespan	bbs_nonec_start_time	bbs_none_brown_energy_used	bbs_none_makespan	bbs_none_start_time	task_flow_brown_energy_used	task_flow_makespan	task_flow_start_time
+blast	29387.92	1751.0	0.0	0.0	2373.5	0.0	0.0	2167.6	0.0	0.0	2529.0	0.0	0.0	2542.1	0.0	0.0	2167.6	0.0	0.0	4202.0	0.0	29125.95	1751.0	0.0
+bwa	28056.55	1653.0	0.0	0.0	1727.1	0.0	23673.06	1653.0	0.0	0.0	1727.1	0.0	0.0	1727.1	0.0	23673.06	1653.0	0.0	0.0	5406.0	471.0	23673.06	1653.0	0.0
+cycles	195505.14	649.0	0.0	0.0	1031.8	0.0	122916.29	723.1	0.0	0.0	1031.8	0.0	0.0	1041.5	0.0	123154.88	649.0	0.0	20494.32	2208.0	77.0	193254.95	649.0	0.0
+genome	48783.82	315.0	0.0	0.0	432.7	0.0	31479.11	339.3	0.0	0.0	560.3	14.4	0.0	568.9	14.4	33509.21	339.3	0.0	3294.64	1040.3	66.5	42241.75	315.0	0.0
+soykb	110414.66	38630.0	0.0	0.0	108361.0	0.0	74394.61	108361.0	0.0	0.0	108361.0	0.0	0.0	108361.0	0.0	76214.93	108361.0	0.0	10932.2	131923.3	312.3	99389.07	38630.0	0.0
+srasearch	0.0	3065.0	0.0	0.0	3065.0	0.0	0.0	3065.0	0.0	0.0	3340.0	0.0	0.0	3340.0	0.0	0.0	3065.0	0.0	0.0	4440.0	0.0	0.0	3065.0	0.0
+montage	177712.56	314.0	0.0	0.0	629.2	0.0	142013.74	327.0	0.0	0.0	629.2	0.0	57659.49	515.2	0.0	142282.86	327.0	0.0	76391.2	1131.4	10.0	152767.26	314.0	0.0
+seismology	2761.98	6.0	0.0	0.0	9.7	0.0	398.73	7.4	0.0	0.0	9.8	0.3	1.03	9.8	0.3	398.73	7.4	0.0	761.96	12.4	4.3	1161.51	6.0	0.0
+-----------------------
+Start time: 64800
+workflow	lpt_brown_energy_used	lpt_makespan	lpt_start_time	bbs_right_left_brown_energy_used	bbs_right_left_makespan	bbs_right_left_start_time	bbs_left_brown_energy_used	bbs_left_makespan	bbs_left_start_time	bbs_right_left_c8_brown_energy_used	bbs_right_left_c8_makespan	bbs_right_left_c8_start_time	bbs_left_c8_brown_energy_used	bbs_left_c8_makespan	bbs_left_c8_start_time	bbs_nonec_brown_energy_used	bbs_nonec_makespan	bbs_nonec_start_time	bbs_none_brown_energy_used	bbs_none_makespan	bbs_none_start_time	task_flow_brown_energy_used	task_flow_makespan	task_flow_start_time
+blast	175913.5	1751.0	0.0	0.0	4041.0	0.0	0.0	3950.9	0.0	0.0	4185.5	0.0	6257.21	3241.4	0.0	0.0	3950.9	0.0	31460.63	4205.2	0.0	152913.72	1751.0	0.0
+bwa	31470.14	1653.0	0.0	0.0	1792.8	0.0	29241.06	1653.0	0.0	0.0	3611.1	235.5	0.0	3611.1	235.5	29241.06	1653.0	0.0	0.0	5406.0	471.0	29241.06	1653.0	0.0
+cycles	259365.89	649.0	0.0	0.0	1886.3	0.0	194114.6	1025.3	0.0	0.0	1886.4	0.0	62159.0	1594.0	0.0	194787.88	657.7	0.0	79633.32	2208.0	86.1	258051.05	649.0	0.0
+genome	119418.6	315.0	0.0	0.0	973.0	0.0	61758.72	716.8	0.0	0.0	977.2	0.0	27906.6	870.1	0.0	62110.95	629.5	0.0	37547.91	1095.4	67.9	118029.56	315.0	0.0
+soykb	202473.51	38630.0	0.0	0.0	86761.0	0.0	108880.9	86761.0	0.0	0.0	86761.0	0.0	0.0	86761.0	0.0	110291.22	86761.0	0.0	69388.73	154520.0	284.5	195007.34	38630.0	0.0
+srasearch	5402.88	3065.0	0.0	0.0	3088.5	0.0	1.37	3065.0	0.0	0.0	3363.5	0.0	0.0	3340.0	0.0	1.37	3065.0	0.0	6111.61	4453.2	0.0	4872.78	3065.0	0.0
+montage	222682.7	314.0	0.0	30196.62	1221.7	0.0	203109.26	387.5	0.0	30239.72	1221.7	0.0	153666.43	695.2	0.0	203115.27	387.5	0.0	158758.17	1134.3	10.4	219434.07	314.0	0.0
+seismology	3323.35	6.0	0.0	658.29	22.3	0.0	1971.37	13.2	0.0	658.29	22.3	0.0	2177.07	11.9	0.0	1971.37	13.2	0.0	2762.07	12.4	4.3	3051.37	6.0	0.0
+
+
+Overall execution: 16:34:39.946130
